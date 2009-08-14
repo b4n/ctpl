@@ -63,23 +63,4 @@ void       *ctpl_stack_pop      (CtplStack *stack);
 gboolean    ctpl_stack_is_empty (CtplStack *stack);
 
 
-#if 0
-
-CtplStack *stack;
-
-stack = ctpl_stack_new ("token_name", NULL);
-ctpl_stack_push (stack, "foo");
-ctpl_stack_push (stack, "bar");
-
-/* prints "bar" */
-printf ("%s\n", ctpl_stack_pop (stack));
-/* prints "foo" */
-printf ("%s\n", ctpl_stack_pop (stack));
-/* fails, there's no more pushed data */
-printf ("%s\n", ctpl_stack_pop (stack));
-
-
-#endif
-
-
 #endif /* guard */
