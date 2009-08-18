@@ -53,6 +53,7 @@ CtplValue    *ctpl_value_new              (void);
 void          ctpl_value_copy             (const CtplValue *src_value,
                                            CtplValue       *dst_value);
 CtplValue    *ctpl_value_dup              (const CtplValue *value);
+static void   ctpl_value_free_value       (CtplValue *value);
 void          ctpl_value_free             (CtplValue *value);
 CtplValue    *ctpl_value_new_int          (int val);
 CtplValue    *ctpl_value_new_float        (float val);

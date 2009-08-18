@@ -34,7 +34,6 @@ struct s_CtplValue
 };
 
 
-static void   ctpl_value_free_value           (CtplValue *value);
 static void   ctpl_value_set_array_internal   (CtplValue     *value,
                                                const GSList  *values);
 
@@ -97,7 +96,7 @@ ctpl_value_dup (const CtplValue *value)
   return new_value;
 }
 
-static void
+void
 ctpl_value_free_value (CtplValue *value)
 {
   switch (value->type) {
