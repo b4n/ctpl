@@ -258,17 +258,13 @@ ctpl_stack_push (CtplStack *stack,
  *          stack or because the last pushed value is %NULL, you should use
  *          ctpl_stack_is_empty() to check whether the stack contains or not
  *          some elements.
- *          <note><para>Poping an empty stack is considered as a programming
- *                      error and prints a critical warning</para></note>
  */
 void *
 ctpl_stack_pop (CtplStack *stack)
 {
   void *data = NULL;
   
-  if (! stack->last) {
-    g_critical ("Can't pop on empty stacks");
-  } else {
+  if (stack->last) {
     data = stack->last->data;
     /*stack->last =*/ ctpl_stack_entry_unref (stack->last);
     if (stack->last->ref_count < 2)
@@ -276,6 +272,12 @@ ctpl_stack_pop (CtplStack *stack)
   }
   
   return data;
+}
+
+void *
+ctpl_stack_peek (CtplStack *stack)
+{
+  return (stack->last) ? stack->last->data : NULL;
 }
 
 /**
