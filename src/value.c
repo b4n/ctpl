@@ -22,6 +22,11 @@
 #include <stdarg.h>
 
 
+static void   ctpl_value_free_value           (CtplValue *value);
+static void   ctpl_value_set_array_internal   (CtplValue     *value,
+                                               const GSList  *values);
+
+
 void
 ctpl_value_init (CtplValue     *value,
                  CtplValueType  type)
@@ -44,6 +49,41 @@ ctpl_value_new (void)
   }
   
   return value;
+}
+
+void
+ctpl_value_copy (const CtplValue *src_value,
+                 CtplValue       *dst_value)
+{
+  switch (ctpl_value_get_held_type (src_value)) {
+    case CTPL_VTYPE_INT:
+      ctpl_value_set_int (dst_value, ctpl_value_get_int (src_value));
+      break;
+    
+    case CTPL_VTYPE_FLOAT:
+      ctpl_value_set_float (dst_value, ctpl_value_get_float (src_value));
+      break;
+    
+    case CTPL_VTYPE_STRING:
+      ctpl_value_set_string (dst_value, ctpl_value_get_string (src_value));
+      break;
+    
+    case CTPL_VTYPE_ARRAY:
+      ctpl_value_set_array_internal (dst_value,
+                                     ctpl_value_get_array (src_value));
+      break;
+  }
+}
+
+CtplValue *
+ctpl_value_dup (const CtplValue *value)
+{
+  CtplValue *new_value;
+  
+  new_value = ctpl_value_new ();
+  ctpl_value_copy (value, new_value);
+  
+  return new_value;
 }
 
 static void
@@ -71,8 +111,10 @@ ctpl_value_free_value (CtplValue *value)
 void
 ctpl_value_free (CtplValue *value)
 {
-  ctpl_value_free_value (value);
-  g_free (value);
+  if (value) {
+    ctpl_value_free_value (value);
+    g_free (value);
+  }
 }
 
 CtplValue *
@@ -163,6 +205,19 @@ ctpl_value_set_string (CtplValue   *value,
   value->value.v_string = g_strdup (val);
 }
 
+static void
+ctpl_value_set_array_internal (CtplValue     *value,
+                               const GSList  *values)
+{
+  ctpl_value_free_value (value);
+  value->type = CTPL_VTYPE_ARRAY;
+  value->value.v_array = NULL; /* needed by the GSList at first appending */
+  for (; values != NULL; values = values->next) {
+    value->value.v_array = g_slist_append (value->value.v_array,
+                                           ctpl_value_dup (values->data));
+  }
+}
+
 void
 ctpl_value_set_arrayv (CtplValue     *value,
                        CtplValueType  type,
@@ -171,6 +226,7 @@ ctpl_value_set_arrayv (CtplValue     *value,
 {
   ctpl_value_free_value (value);
   value->type = CTPL_VTYPE_ARRAY;
+  value->value.v_array = NULL; /* needed by the GSList at first appending */
   
   switch (type) {
     case CTPL_VTYPE_INT: {
@@ -242,7 +298,7 @@ ctpl_value_set_array (CtplValue     *value,
 }
 
 CtplValueType
-ctpl_value_get_type (const CtplValue *value)
+ctpl_value_get_held_type (const CtplValue *value)
 {
   return value->type;
 }

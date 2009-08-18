@@ -55,6 +55,9 @@ struct s_CtplValue
 void          ctpl_value_init       (CtplValue     *value,
                                      CtplValueType  type);
 CtplValue    *ctpl_value_new        (void);
+void          ctpl_value_copy       (const CtplValue *src_value,
+                                     CtplValue       *dst_value);
+CtplValue    *ctpl_value_dup        (const CtplValue *value);
 void          ctpl_value_free       (CtplValue *value);
 CtplValue    *ctpl_value_new_int    (int val);
 CtplValue    *ctpl_value_new_float  (float val);
@@ -79,7 +82,7 @@ void          ctpl_value_set_array  (CtplValue     *value,
                                      CtplValueType  type,
                                      gsize          count,
                                      ...) G_GNUC_NULL_TERMINATED;
-CtplValueType ctpl_value_get_type         (const CtplValue *value);
+CtplValueType ctpl_value_get_held_type    (const CtplValue *value);
 int           ctpl_value_get_int          (const CtplValue *value);
 float         ctpl_value_get_float        (const CtplValue *value);
 const char   *ctpl_value_get_string       (const CtplValue *value);
