@@ -35,6 +35,18 @@ enum e_CtplValueType
 typedef enum e_CtplValueType CtplValueType;
 typedef struct s_CtplValue CtplValue;
 
+/* Public in order to be able to use statically allocated values. */
+struct s_CtplValue
+{
+  int type;
+  union {
+    int         v_int;
+    float       v_float;
+    char       *v_string;
+    GSList     *v_array;
+  } value;
+};
+
 
 #define CTPL_VALUE_HOLDS(value, vtype) \
   (ctpl_value_get_held_type (value) == (vtype))
