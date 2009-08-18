@@ -48,8 +48,7 @@ typedef struct s_CtplValue CtplValue;
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_ARRAY))
 
 
-void          ctpl_value_init             (CtplValue     *value,
-                                           CtplValueType  type);
+void          ctpl_value_init             (CtplValue *value);
 CtplValue    *ctpl_value_new              (void);
 void          ctpl_value_copy             (const CtplValue *src_value,
                                            CtplValue       *dst_value);

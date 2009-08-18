@@ -40,14 +40,13 @@ static void   ctpl_value_set_array_internal   (CtplValue     *value,
 
 
 void
-ctpl_value_init (CtplValue     *value,
-                 CtplValueType  type)
+ctpl_value_init (CtplValue *value)
 {
   value->value.v_int     = 0;
   value->value.v_float   = 0.0f;
   value->value.v_string  = NULL;
   value->value.v_array   = NULL;
-  value->type = type;
+  value->type = CTPL_VTYPE_INT; /* defaults to a simple non-allocated type */
 }
 
 CtplValue *
