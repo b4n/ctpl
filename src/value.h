@@ -35,18 +35,9 @@ enum e_CtplValueType
 typedef enum e_CtplValueType CtplValueType;
 typedef struct s_CtplValue CtplValue;
 
-struct s_CtplValue
-{
-  int type;
-  union {
-    int         v_int;
-    float       v_float;
-    char       *v_string;
-    GSList     *v_array;
-  } value;
-};
 
-#define CTPL_VALUE_HOLDS(value, vtype) ((value)->type == (vtype))
+#define CTPL_VALUE_HOLDS(value, vtype) \
+  (ctpl_value_get_held_type (value) == (vtype))
 #define CTPL_VALUE_HOLDS_INT(value) \
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_INT))
 #define CTPL_VALUE_HOLDS_FLOAT(value) \
@@ -55,6 +46,7 @@ struct s_CtplValue
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_STRING))
 #define CTPL_VALUE_HOLDS_ARRAY(value) \
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_ARRAY))
+
 
 void          ctpl_value_init             (CtplValue     *value,
                                            CtplValueType  type);

@@ -22,6 +22,18 @@
 #include <stdarg.h>
 
 
+struct s_CtplValue
+{
+  int type;
+  union {
+    int         v_int;
+    float       v_float;
+    char       *v_string;
+    GSList     *v_array;
+  } value;
+};
+
+
 static void   ctpl_value_free_value           (CtplValue *value);
 static void   ctpl_value_set_array_internal   (CtplValue     *value,
                                                const GSList  *values);
