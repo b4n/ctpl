@@ -55,7 +55,7 @@ ctpl_value_new (void)
   
   value = g_new0 (CtplValue, 1);
   if (value) {
-    ctpl_value_init (value, CTPL_VTYPE_INT);
+    ctpl_value_init (value);
   }
   
   return value;
