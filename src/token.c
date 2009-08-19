@@ -18,8 +18,7 @@
  */
 
 #include "token.h"
-#include "ctpl.h"
-#include <stdlib.h>
+#include <glib.h>
 
 
 CtplToken *
@@ -27,7 +26,7 @@ ctpl_token_new (void)
 {
   CtplToken *token;
   
-  token = malloc (sizeof *token);
+  token = g_malloc (sizeof *token);
   if (token)
   {
     token->len  = 0;
@@ -40,19 +39,19 @@ ctpl_token_new (void)
 
 void
 ctpl_token_free (CtplToken *token,
-                 CtplBool   free_data)
+                 gboolean   free_data)
 {
   if (token)
   {
     if (free_data)
     {
       token->len = 0;
-      free (token->token);
+      g_free (token->token);
       token->token = NULL;
       ctpl_token_free (token->child, free_data);
       token->child = NULL;
     }
-    free (token);
+    g_free (token);
   }
 }
 

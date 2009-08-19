@@ -20,8 +20,7 @@
 #include "parse.h"
 #include "token.h"
 #include <mb.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <glib.h>
 #include <string.h>
 
 
@@ -52,7 +51,7 @@ static CtplToken *
 create_token (MB             *mb,
               size_t          end_offset,
               size_t          start_offset,
-              CtplBool        has_subtoken)
+              gboolean        has_subtoken)
 {
   CtplToken *token = NULL;
   
@@ -68,11 +67,11 @@ create_token (MB             *mb,
     #endif
     cur_offset = mb_tell (mb);
     token->len = end_offset - start_offset;
-    token->token = malloc (token->len);
+    token->token = g_malloc (token->len);
     mb_seek (mb, start_offset, MB_SEEK_SET);
     if (mb_read (mb, token->token, token->len) != 0)
     {
-      ctpl_token_free (token, CTPL_TRUE);
+      ctpl_token_free (token, TRUE);
       token = NULL;
     }
     else
@@ -125,7 +124,7 @@ ctpl_parse_read_token (MB *mb)
     /* if all subtokens was closed, create token */
     if (stack == 0)
     {
-      token = create_token (mb, mb_tell (mb), offset, (CtplBool)(n_tokens > 1));
+      token = create_token (mb, mb_tell (mb), offset, (gboolean)(n_tokens > 1));
     }
   }
   

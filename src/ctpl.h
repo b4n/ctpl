@@ -21,9 +21,7 @@
 #define H_CTPL_H
 
 
-typedef unsigned int CtplBool;
-#define CTPL_FALSE 0
-#define CTPL_TRUE  (!CTPL_FALSE)
+
 
 
 #endif /* guard */

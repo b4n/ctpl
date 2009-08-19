@@ -125,7 +125,7 @@ main (int    argc,
           if (token)
           {
             print_token (token);
-            ctpl_token_free (token, CTPL_TRUE);
+            ctpl_token_free (token, TRUE);
           }
           else
           {

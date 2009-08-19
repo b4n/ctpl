@@ -20,8 +20,7 @@
 #ifndef H_CTPL_TOKEN_H
 #define H_CTPL_TOKEN_H
 
-#include "ctpl.h"
-#include <stdlib.h>
+#include <glib.h>
 
 
 
@@ -35,6 +34,6 @@ struct s_CtplToken
 
 CtplToken *ctpl_token_new   (void);
 void       ctpl_token_free  (CtplToken *token,
-                             CtplBool   free_data);
+                             gboolean   free_data);
 
 #endif /* guard */
