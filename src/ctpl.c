@@ -68,15 +68,15 @@ _print_value (const CtplValue *value,
   
   switch (ctpl_value_get_held_type (value)) {
     case CTPL_VTYPE_INT:
-      printf ("%d\n", ctpl_value_get_int (value));
+      printf ("I %d\n", ctpl_value_get_int (value));
       break;
     
     case CTPL_VTYPE_FLOAT:
-      printf ("%f\n", ctpl_value_get_float (value));
+      printf ("F %f\n", ctpl_value_get_float (value));
       break;
     
     case CTPL_VTYPE_STRING:
-      printf ("%s\n", ctpl_value_get_string (value));
+      printf ("S %s\n", ctpl_value_get_string (value));
       break;
     
     case CTPL_VTYPE_ARRAY: {
@@ -216,6 +216,12 @@ main (int    argc,
     ctpl_value_copy (v, v2);
     print_value (v);
     print_value (v2);
+    
+    ctpl_value_set_array_int (v, 0, NULL);
+    ctpl_value_array_append_int (v, 42);
+    ctpl_value_array_append_string (v, "42");
+    ctpl_value_array_append_float (v, 42.0);
+    print_value (v);
     
     ctpl_value_free (v);
     ctpl_value_free (v2);
