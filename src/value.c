@@ -295,6 +295,66 @@ ctpl_value_set_array (CtplValue     *value,
   va_end (ap);
 }
 
+void
+ctpl_value_set_array_intv (CtplValue     *value,
+                           gsize          count,
+                           va_list        ap)
+{
+  ctpl_value_set_arrayv (value, CTPL_VTYPE_INT, count, ap);
+}
+
+void
+ctpl_value_set_array_int (CtplValue     *value,
+                          gsize          count,
+                          ...)
+{
+  va_list ap;
+  
+  va_start (ap, count);
+  ctpl_value_set_array_intv (value, count, ap);
+  va_end (ap);
+}
+
+void
+ctpl_value_set_array_floatv (CtplValue     *value,
+                             gsize          count,
+                             va_list        ap)
+{
+  ctpl_value_set_arrayv (value, CTPL_VTYPE_FLOAT, count, ap);
+}
+
+void
+ctpl_value_set_array_float (CtplValue     *value,
+                            gsize          count,
+                            ...)
+{
+  va_list ap;
+  
+  va_start (ap, count);
+  ctpl_value_set_array_floatv (value, count, ap);
+  va_end (ap);
+}
+
+void
+ctpl_value_set_array_stringv (CtplValue     *value,
+                              gsize          count,
+                              va_list        ap)
+{
+  ctpl_value_set_arrayv (value, CTPL_VTYPE_STRING, count, ap);
+}
+
+void
+ctpl_value_set_array_string (CtplValue     *value,
+                             gsize          count,
+                             ...)
+{
+  va_list ap;
+  
+  va_start (ap, count);
+  ctpl_value_set_array_stringv (value, count, ap);
+  va_end (ap);
+}
+
 CtplValueType
 ctpl_value_get_held_type (const CtplValue *value)
 {
