@@ -232,10 +232,6 @@ ctpl_value_set_arrayv (CtplValue     *value,
       for (i = 0; i < count; i++) {
         ctpl_value_array_append_int (value, va_arg (ap, int));
       }
-      if (va_arg (ap, const char *) != NULL) {
-        g_critical ("Last read parameter is not a NULL pointer. You probably "
-                    "gave a wrong count of arguments or missed the sentinel.");
-      }
       break;
     }
     
@@ -243,10 +239,6 @@ ctpl_value_set_arrayv (CtplValue     *value,
       gsize i;
       for (i = 0; i < count; i++) {
         ctpl_value_array_append_float (value, va_arg (ap, double));
-      }
-      if (va_arg (ap, const char *) != NULL) {
-        g_critical ("Last read parameter is not a NULL pointer. You probably "
-                    "gave a wrong count of arguments or missed the sentinel.");
       }
       break;
     }
@@ -256,10 +248,6 @@ ctpl_value_set_arrayv (CtplValue     *value,
       for (i = 0; i < count; i++) {
         ctpl_value_array_append_string (value, va_arg (ap, const char *));
       }
-      if (va_arg (ap, const char *) != NULL) {
-        g_critical ("Last read parameter is not a NULL pointer. You probably "
-                    "gave a wrong count of arguments or missed the sentinel.");
-      }
       break;
     }
     
@@ -267,6 +255,12 @@ ctpl_value_set_arrayv (CtplValue     *value,
       g_critical ("Cannot build arrays of arrays this way"); 
       break;
     }
+  }
+  /* finally, red the sentinel */
+  if (va_arg (ap, const char *) != NULL) {
+    g_critical ("Last read parameter is not a NULL pointer. You probably gave "
+                "a wrong count of arguments, missed the sentinel or gave an "
+                "argument of the wrong type.");
   }
 }
 
