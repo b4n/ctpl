@@ -230,11 +230,7 @@ ctpl_value_set_arrayv (CtplValue     *value,
     case CTPL_VTYPE_INT: {
       gsize i;
       for (i = 0; i < count; i++) {
-        CtplValue *v;
-        int arg = va_arg (ap, int);
-        
-        v = ctpl_value_new_int (arg);
-        value->value.v_array = g_slist_append (value->value.v_array, v);
+        ctpl_value_array_append_int (value, va_arg (ap, int));
       }
       if (va_arg (ap, const char *) != NULL) {
         g_critical ("Last read parameter is not a NULL pointer. You probably "
@@ -246,11 +242,7 @@ ctpl_value_set_arrayv (CtplValue     *value,
     case CTPL_VTYPE_FLOAT: {
       gsize i;
       for (i = 0; i < count; i++) {
-        CtplValue *v;
-        double arg = va_arg (ap, double);
-        
-        v = ctpl_value_new_float (arg);
-        value->value.v_array = g_slist_append (value->value.v_array, v);
+        ctpl_value_array_append_float (value, va_arg (ap, double));
       }
       if (va_arg (ap, const char *) != NULL) {
         g_critical ("Last read parameter is not a NULL pointer. You probably "
@@ -262,11 +254,7 @@ ctpl_value_set_arrayv (CtplValue     *value,
     case CTPL_VTYPE_STRING: {
       gsize i;
       for (i = 0; i < count; i++) {
-        CtplValue *v;
-        const char *arg = va_arg (ap, const char *);
-        
-        v = ctpl_value_new_string (arg);
-        value->value.v_array = g_slist_append (value->value.v_array, v);
+        ctpl_value_array_append_string (value, va_arg (ap, const char *));
       }
       if (va_arg (ap, const char *) != NULL) {
         g_critical ("Last read parameter is not a NULL pointer. You probably "
@@ -354,6 +342,87 @@ ctpl_value_set_array_string (CtplValue     *value,
   ctpl_value_set_array_stringv (value, count, ap);
   va_end (ap);
 }
+
+void
+ctpl_value_array_append (CtplValue       *value,
+                         const CtplValue *val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_append (value->value.v_array,
+                                         ctpl_value_dup (val));
+}
+
+void
+ctpl_value_array_prepend (CtplValue       *value,
+                          const CtplValue *val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_prepend (value->value.v_array,
+                                          ctpl_value_dup (val));
+}
+
+void
+ctpl_value_array_append_int (CtplValue       *value,
+                             int              val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_append (value->value.v_array,
+                                         ctpl_value_new_int (val));
+}
+
+void
+ctpl_value_array_prepend_int (CtplValue       *value,
+                              int              val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_prepend (value->value.v_array,
+                                          ctpl_value_new_int (val));
+}
+
+void
+ctpl_value_array_append_float (CtplValue       *value,
+                               float            val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_append (value->value.v_array,
+                                         ctpl_value_new_float (val));
+}
+
+void
+ctpl_value_array_prepend_float (CtplValue       *value,
+                                float            val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_prepend (value->value.v_array,
+                                          ctpl_value_new_float (val));
+}
+
+void
+ctpl_value_array_append_string (CtplValue       *value,
+                                const char      *val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_append (value->value.v_array,
+                                         ctpl_value_new_string (val));
+}
+
+void
+ctpl_value_array_prepend_string (CtplValue       *value,
+                                 const char      *val)
+{
+  g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
+  
+  value->value.v_array = g_slist_prepend (value->value.v_array,
+                                          ctpl_value_new_string (val));
+}
+
 
 CtplValueType
 ctpl_value_get_held_type (const CtplValue *value)

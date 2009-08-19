@@ -108,6 +108,22 @@ void          ctpl_value_set_array_stringv(CtplValue     *value,
 void          ctpl_value_set_array_string (CtplValue     *value,
                                            gsize          count,
                                            ...) G_GNUC_NULL_TERMINATED;
+void          ctpl_value_array_append         (CtplValue       *value,
+                                               const CtplValue *val);
+void          ctpl_value_array_prepend        (CtplValue       *value,
+                                               const CtplValue *val);
+void          ctpl_value_array_append_int     (CtplValue       *value,
+                                               int              val);
+void          ctpl_value_array_prepend_int    (CtplValue       *value,
+                                               int              val);
+void          ctpl_value_array_append_float   (CtplValue       *value,
+                                               float            val);
+void          ctpl_value_array_prepend_float  (CtplValue       *value,
+                                               float            val);
+void          ctpl_value_array_append_string  (CtplValue       *value,
+                                               const char      *val);
+void          ctpl_value_array_prepend_string (CtplValue       *value,
+                                               const char      *val);
 CtplValueType ctpl_value_get_held_type    (const CtplValue *value);
 int           ctpl_value_get_int          (const CtplValue *value);
 float         ctpl_value_get_float        (const CtplValue *value);
