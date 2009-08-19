@@ -20,15 +20,17 @@
 #include "parse.h"
 #include "token.h"
 #include "stack.h"
+#include "environ.h"
+#include "value.h"
 #include <mb.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 
-void
-print_token (const CtplToken *token,
-             size_t           nested_level)
+static void
+_print_token (const CtplToken *token,
+              size_t           nested_level)
 {
   if (token)
   {
@@ -44,9 +46,53 @@ print_token (const CtplToken *token,
       for (i = 0; i < nested_level; i++)
         fputs ("   ", stdout);
       fputs ("-> ", stdout);
-      print_token (token->child, nested_level + 1);
+      _print_token (token->child, nested_level + 1);
     }
   }
+}
+static void
+print_token (const CtplToken *token)
+{
+  _print_token (token, 0);
+}
+
+static void
+_print_value (const CtplValue *value,
+              size_t           nesting_level)
+{
+  size_t i;
+  
+  for (i = 0; i < nesting_level; i++) {
+    fputs ("   ", stdout);
+  }
+  
+  switch (ctpl_value_get_held_type (value)) {
+    case CTPL_VTYPE_INT:
+      printf ("%d\n", ctpl_value_get_int (value));
+      break;
+    
+    case CTPL_VTYPE_FLOAT:
+      printf ("%f\n", ctpl_value_get_float (value));
+      break;
+    
+    case CTPL_VTYPE_STRING:
+      printf ("%s\n", ctpl_value_get_string (value));
+      break;
+    
+    case CTPL_VTYPE_ARRAY: {
+      const GSList *list;
+      
+      fputs ("->\n", stdout);
+      for (list = ctpl_value_get_array (value); list != NULL; list = list->next) {
+        _print_value (list->data, nesting_level + 1);
+      }
+    }
+  }
+}
+static void
+print_value (const CtplValue *value)
+{
+  _print_value (value, 0);
 }
 
 int
@@ -78,7 +124,7 @@ main (int    argc,
           token = ctpl_parse_read_token (mb);
           if (token)
           {
-            print_token (token, 0);
+            print_token (token);
             ctpl_token_free (token, CTPL_TRUE);
           }
           else
@@ -115,6 +161,66 @@ main (int    argc,
     
     ctpl_stack_free (stack);
   }
+  
+  {
+    CtplEnviron *env;
+    CtplValue val;
+    CtplValue *pval;
+    
+    env = ctpl_environ_new ();
+    
+    ctpl_value_init (&val);
+    
+    ctpl_value_set_string (&val, "coucou");
+    ctpl_environ_push (env, "foo", &val);
+    ctpl_value_set_array (&val, CTPL_VTYPE_STRING, 2, "foo", "bar", NULL);
+    pval = ctpl_environ_pop (env, "foo");
+    g_assert (memcmp (&val, pval, sizeof val));
+    if (CTPL_VALUE_HOLDS_STRING (pval))
+      g_print ("foo: %s\n", ctpl_value_get_string (pval));
+    
+    ctpl_value_free_value (&val);
+    ctpl_environ_free (env);
+  }
+  
+  {
+    CtplValue *v;
+    CtplValue *v2;
+    
+    v = ctpl_value_new_int (42);
+    ctpl_value_free (v);
+    
+    v = ctpl_value_new_float (25.1);
+    v2 = ctpl_value_dup (v);
+    print_value (v);
+    ctpl_value_set_string (v, "vouvuo");
+    ctpl_value_copy (v, v2);
+    print_value (v);
+    ctpl_value_set_string (v, "coucou");
+    ctpl_value_copy (v, v2);
+    print_value (v);
+    ctpl_value_set_array (v, CTPL_VTYPE_STRING, 3, "abc", "def", "ghi", NULL);
+    ctpl_value_copy (v, v2);
+    print_value (v);
+    ctpl_value_set_array_string (v, 3, "abc", "def", "lol", NULL);
+    ctpl_value_array_append_int (v, 42);
+    print_value (v);
+    ctpl_value_set_array_float (v, 2, 1.2, 1215.1, NULL);
+    print_value (v);
+    ctpl_value_set_array_int (v, 2, 1, 121, NULL);
+    print_value (v);
+    ctpl_value_set_array (v, CTPL_VTYPE_INT, 3, 1, 2, 3, NULL);
+    ctpl_value_copy (v, v2);
+    print_value (v);
+    ctpl_value_set_array (v, CTPL_VTYPE_FLOAT, 2, 21635454354.54, 126354., NULL);
+    ctpl_value_copy (v, v2);
+    print_value (v);
+    print_value (v2);
+    
+    ctpl_value_free (v);
+    ctpl_value_free (v2);
+  }
+  
   #endif
   
   return err;
