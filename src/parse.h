@@ -22,6 +22,9 @@
 
 #include "token.h"
 #include <mb.h>
+#include <glib.h>
+
+G_BEGIN_DECLS
 
 
 #define CTPL_START_CHAR '{'
@@ -30,5 +33,7 @@
 
 CtplToken *ctpl_parse_read_token (MB *mb);
 
+
+G_END_DECLS
 
 #endif /* guard */

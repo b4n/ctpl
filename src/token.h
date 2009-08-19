@@ -22,6 +22,7 @@
 
 #include <glib.h>
 
+G_BEGIN_DECLS
 
 
 typedef struct s_CtplToken CtplToken;
@@ -35,5 +36,8 @@ struct s_CtplToken
 CtplToken *ctpl_token_new   (void);
 void       ctpl_token_free  (CtplToken *token,
                              gboolean   free_data);
+
+
+G_END_DECLS
 
 #endif /* guard */

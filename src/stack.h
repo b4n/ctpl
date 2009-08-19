@@ -22,6 +22,8 @@
 
 #include <glib.h>
 
+G_BEGIN_DECLS
+
 
 typedef struct s_CtplStack       CtplStack;
 typedef struct s_CtplStackEntry  CtplStackEntry;
@@ -63,5 +65,7 @@ void       *ctpl_stack_pop      (CtplStack *stack);
 void       *ctpl_stack_peek     (CtplStack *stack);
 gboolean    ctpl_stack_is_empty (CtplStack *stack);
 
+
+G_END_DECLS
 
 #endif /* guard */

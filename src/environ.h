@@ -23,6 +23,8 @@
 #include "value.h"
 #include <glib.h>
 
+G_BEGIN_DECLS
+
 
 typedef struct s_CtplEnviron  CtplEnviron;
 
@@ -94,5 +96,7 @@ CtplValue    *ctpl_environ_pop            (CtplEnviron *env,
  * 
  */
 
+
+G_END_DECLS
 
 #endif /* guard */

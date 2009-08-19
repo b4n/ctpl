@@ -23,6 +23,8 @@
 #include <glib.h>
 #include <stdarg.h>
 
+G_BEGIN_DECLS
+
 
 enum e_CtplValueType
 {
@@ -141,5 +143,7 @@ char        **ctpl_value_get_array_string (const CtplValue *value,
 
 #endif
 
+
+G_END_DECLS
 
 #endif /* guard */

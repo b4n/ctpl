@@ -20,8 +20,14 @@
 #ifndef H_CTPL_H
 #define H_CTPL_H
 
+#include <glib.h>
+
+G_BEGIN_DECLS
 
 
 
+
+
+G_END_DECLS
 
 #endif /* guard */
