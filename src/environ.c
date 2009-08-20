@@ -139,8 +139,7 @@ ctpl_environ_push (CtplEnviron     *env,
   
   stack = g_hash_table_lookup (env->symbol_table, symbol);
   if (! stack) {
-    /* FIXME: stack doesn't need name as it is already the table's key */
-    stack = ctpl_stack_new (symbol, NULL, (GFreeFunc)ctpl_value_free);
+    stack = ctpl_stack_new (NULL, (GFreeFunc)ctpl_value_free);
     if (stack) {
       g_hash_table_insert (env->symbol_table, g_strdup (symbol), stack);
     }

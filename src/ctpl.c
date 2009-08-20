@@ -142,7 +142,7 @@ main (int    argc,
   {
     CtplStack *stack;
 
-    stack = ctpl_stack_new ("token_name", g_strcmp0, g_free);
+    stack = ctpl_stack_new (g_strcmp0, g_free);
     ctpl_stack_push (stack, g_strdup ("bar"));
     ctpl_stack_push (stack, g_strdup ("foo"));
     ctpl_stack_push (stack, g_strdup ("foo"));
