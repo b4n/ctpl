@@ -46,7 +46,7 @@
  * <example>
  * CtplStack *stack;
  * 
- * stack = ctpl_stack_new ("token_name", g_strcmp0, NULL);
+ * stack = ctpl_stack_new (g_strcmp0, NULL);
  * ctpl_stack_push (stack, "foo");
  * ctpl_stack_push (stack, "bar");
  * 
@@ -123,11 +123,9 @@ ctpl_stack_entry_unref (CtplStackEntry *entry)
 
 static void
 ctpl_stack_init (CtplStack   *stack,
-                 const char  *name,
                  GCompareFunc compare_func,
                  GFreeFunc    free_func)
 {
-  stack->name         = g_strdup (name);
   stack->compare_func = compare_func;
   stack->free_func    = free_func;
   stack->last         = NULL;
@@ -136,7 +134,6 @@ ctpl_stack_init (CtplStack   *stack,
 
 /**
  * ctpl_stack_new:
- * @name: The stack name
  * @compare_func: A #GComapreFunc to compare data, or %NULL
  * @free_func: A #GFreeFunc to free pushed data, or %NULL
  * 
@@ -145,15 +142,14 @@ ctpl_stack_init (CtplStack   *stack,
  * Returns: A new #CtplStack
  */
 CtplStack *
-ctpl_stack_new (const char   *name,
-                GCompareFunc  compare_func,
+ctpl_stack_new (GCompareFunc  compare_func,
                 GFreeFunc     free_func)
 {
   CtplStack *stack;
   
   stack = g_new0 (CtplStack, 1);
   if (stack) {
-    ctpl_stack_init (stack, name, compare_func, free_func);
+    ctpl_stack_init (stack, compare_func, free_func);
   }
   
   return stack;
@@ -174,7 +170,6 @@ ctpl_stack_free (CtplStack *stack)
   }
   stack->last_free  = NULL;
   stack->last       = NULL;
-  g_free (stack->name);
   g_free (stack);
 }
 

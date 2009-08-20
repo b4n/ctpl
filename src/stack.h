@@ -37,7 +37,6 @@ struct s_CtplStackEntry
 
 /**
  * s_CtplStack:
- * @name: stack name
  * @last: Last pushed element, or NULL
  * @last_free: Last item of pushed elements for freeing them later.
  * 
@@ -45,7 +44,6 @@ struct s_CtplStackEntry
  */
 struct s_CtplStack
 {
-  char           *name;
   GCompareFunc    compare_func;
   GFreeFunc       free_func;
   CtplStackEntry *last;
@@ -53,8 +51,7 @@ struct s_CtplStack
 };
 
 
-CtplStack  *ctpl_stack_new      (const char  *name,
-                                 GCompareFunc compare_func,
+CtplStack  *ctpl_stack_new      (GCompareFunc compare_func,
                                  GFreeFunc    free_func);
 void        ctpl_stack_free     (CtplStack *stack);
 
