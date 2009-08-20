@@ -26,15 +26,14 @@
 G_BEGIN_DECLS
 
 
-enum e_CtplValueType
+typedef enum e_CtplValueType
 {
   CTPL_VTYPE_INT,
   CTPL_VTYPE_FLOAT,
   CTPL_VTYPE_STRING,
   CTPL_VTYPE_ARRAY
-};
+} CtplValueType;
 
-typedef enum e_CtplValueType CtplValueType;
 typedef struct s_CtplValue CtplValue;
 
 /* Public in order to be able to use statically allocated values. */
