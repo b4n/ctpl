@@ -9,9 +9,20 @@ Makefile
 Makefile.in
 config.*
 /stamp-*
+*.stamp
 
-# may be removed if some .m4 became manually generated
+# documentation
+docs/reference/ctpl/html/
+docs/reference/ctpl/xml/
+docs/reference/ctpl/version.xml
+docs/reference/ctpl/ctpl-*.txt
+docs/reference/ctpl/ctpl-*.txt.bak
+# this one is perhaps not so good
+docs/reference/ctpl/ctpl.*
+
+# may be removed if some .m4 or .make became manually generated
 *.m4
+*.make
 
 # generated files suffixes
 *.o
