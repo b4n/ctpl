@@ -31,7 +31,8 @@ ctpl_parse_read_token
 <SECTION>
 <TITLE>CtplValue</TITLE>
 <FILE>value</FILE>
-value
+CtplValue
+CtplValueType
 CTPL_VALUE_HOLDS
 CTPL_VALUE_HOLDS_INT
 CTPL_VALUE_HOLDS_FLOAT

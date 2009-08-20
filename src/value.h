@@ -26,6 +26,15 @@
 G_BEGIN_DECLS
 
 
+/**
+ * CtplValueType:
+ * @CTPL_VTYPE_INT: Integer (C's int)
+ * @CTPL_VTYPE_FLOAT: Floating point value (C's float)
+ * @CTPL_VTYPE_STRING: 0-terminated string (C string)
+ * @CTPL_VTYPE_ARRAY: Array of values
+ * 
+ * Represents the types that a #CtplValue can hold.
+ */
 typedef enum e_CtplValueType
 {
   CTPL_VTYPE_INT,
@@ -37,8 +46,16 @@ typedef enum e_CtplValueType
 typedef struct s_CtplValue CtplValue;
 
 /* Public in order to be able to use statically allocated values. */
+/**
+ * CtplValue:
+ * @type: Type that the value holds
+ * @value: Union containing the held value
+ * 
+ * Represents a generic value.
+ */
 struct s_CtplValue
 {
+  /*<private>*/
   int type;
   union {
     int         v_int;
@@ -49,14 +66,55 @@ struct s_CtplValue
 };
 
 
+/**
+ * CTPL_VALUE_HOLDS:
+ * @value: A #CtplValue
+ * @vtype: A #CtplValueType
+ * 
+ * Checks whether a #CtplValue holds a value of the given type.
+ * 
+ * Returns: %TRUE if @value holds a value of @vtype, %FALSE otherwise.
+ */
 #define CTPL_VALUE_HOLDS(value, vtype) \
   (ctpl_value_get_held_type (value) == (vtype))
+/**
+ * CTPL_VALUE_HOLDS_INT:
+ * @value: A #CtplValue
+ * 
+ * Check whether a #CtplValue holds an integer value.
+ * 
+ * Returns: %TRUE if @value holds an integer, %FALSE otherwise.
+ */
 #define CTPL_VALUE_HOLDS_INT(value) \
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_INT))
+/**
+ * CTPL_VALUE_HOLDS_FLOAT:
+ * @value: A #CtplValue
+ * 
+ * Check whether a #CtplValue holds a floating point value.
+ * 
+ * Returns: %TRUE if @value holds a float, %FALSE otherwise.
+ */
 #define CTPL_VALUE_HOLDS_FLOAT(value) \
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_FLOAT))
+/**
+ * CTPL_VALUE_HOLDS_STRING:
+ * @value: A #CtplValue
+ * 
+ * Check whether a #CtplValue holds a string.
+ * 
+ * Returns: %TRUE if @value holds a string, %FALSE otherwise.
+ */
 #define CTPL_VALUE_HOLDS_STRING(value) \
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_STRING))
+/**
+ * CTPL_VALUE_HOLDS_ARRAY:
+ * @value: A #CtplValue
+ * 
+ * Check whether a #CtplValue holds an array of values.
+ * 
+ * Returns: %TRUE if @value holds an array, %FALSE otherwise.
+ */
 #define CTPL_VALUE_HOLDS_ARRAY(value) \
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_ARRAY))
 
