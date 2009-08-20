@@ -28,6 +28,14 @@ G_BEGIN_DECLS
 typedef struct s_CtplStack       CtplStack;
 typedef struct s_CtplStackEntry  CtplStackEntry;
 
+/**
+ * CtplStackEntry:
+ * @ref_count: Reverence count of the entry
+ * @data: Data of the entry
+ * @parent: Parent entry, or %NULL if none
+ * 
+ * A stack entry.
+ */
 struct s_CtplStackEntry
 {
   guint           ref_count;
@@ -36,11 +44,13 @@ struct s_CtplStackEntry
 };
 
 /**
- * s_CtplStack:
+ * CtplStack:
+ * @compare_func: Function to compare two stack elements
+ * @free_func: Function to free a stack element
  * @last: Last pushed element, or NULL
  * @last_free: Last item of pushed elements for freeing them later.
  * 
- * 
+ * The stack structure.
  */
 struct s_CtplStack
 {
