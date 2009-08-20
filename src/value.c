@@ -26,6 +26,14 @@ static void   ctpl_value_set_array_internal   (CtplValue     *value,
                                                const GSList  *values);
 
 
+/**
+ * ctpl_value_init:
+ * @value: An uninitialised #CtplValue
+ * 
+ * Initialises a #CtplValue.
+ * This function is useful for statically allocated values, and is not required
+ * for values created by ctpl_value_new().
+ */
 void
 ctpl_value_init (CtplValue *value)
 {
@@ -36,6 +44,14 @@ ctpl_value_init (CtplValue *value)
   value->type = CTPL_VTYPE_INT; /* defaults to a simple non-allocated type */
 }
 
+/**
+ * ctpl_value_new:
+ * 
+ * Creates a new empty #CtplValue.
+ * 
+ * Returns: A newly allocated #CtplValue that should be freed using
+ *          ctpl_value_free()
+ */
 CtplValue *
 ctpl_value_new (void)
 {
@@ -49,6 +65,14 @@ ctpl_value_new (void)
   return value;
 }
 
+/**
+ * ctpl_value_copy:
+ * @src_value: A #CtplValue to copy
+ * @dst_value: A #CtplValue into which copy @src_value
+ * 
+ * Copies a #CtplValue to another.
+ * See ctpl_value_dup() if you want to duplicate the value.
+ */
 void
 ctpl_value_copy (const CtplValue *src_value,
                  CtplValue       *dst_value)
@@ -73,6 +97,16 @@ ctpl_value_copy (const CtplValue *src_value,
   }
 }
 
+/**
+ * ctpl_value_dup:
+ * @value: A #CtplValue to copy
+ * 
+ * Duplicates a #CtplValue.
+ * This function simply creates a new #CtplValue with ctpl_value_new() then
+ * copies @value into it using ctpl_value_copy().
+ * 
+ * Returns: A newly allocated #CtplValue
+ */
 CtplValue *
 ctpl_value_dup (const CtplValue *value)
 {
@@ -84,6 +118,15 @@ ctpl_value_dup (const CtplValue *value)
   return new_value;
 }
 
+/**
+ * ctpl_value_free_value:
+ * @value: A #CtplValue
+ * 
+ * Frees the data held by a #CtplValue.
+ * This function is only useful to the end user for statically allocated values
+ * as ctpl_value_free() does all the job needed to completely release an
+ * allocated #CtplValue.
+ */
 void
 ctpl_value_free_value (CtplValue *value)
 {
@@ -106,6 +149,15 @@ ctpl_value_free_value (CtplValue *value)
   }
 }
 
+/**
+ * ctpl_value_free:
+ * @value: A #CtplValue
+ * 
+ * Frees all resources used by a #CtplValue.
+ * This function can't be used with statically allocated as it frees the value
+ * itself; if you want to free a statically allocated value, use
+ * ctpl_value_free_value().
+ */
 void
 ctpl_value_free (CtplValue *value)
 {
@@ -115,6 +167,15 @@ ctpl_value_free (CtplValue *value)
   }
 }
 
+/**
+ * ctpl_value_new_int:
+ * @val: An integer
+ * 
+ * Creates a new #CtplValue and sets its value to @val.
+ * See ctpl_value_new() and ctpl_value_set_int().
+ * 
+ * Returns: A newly allocated #CtplValue holding @val.
+ */
 CtplValue *
 ctpl_value_new_int (int val)
 {
@@ -126,6 +187,15 @@ ctpl_value_new_int (int val)
   return value;
 }
 
+/**
+ * ctpl_value_new_float:
+ * @val: A float
+ * 
+ * Creates a new #CtplValue and sets its value to @val.
+ * See ctpl_value_new() and ctpl_value_set_float().
+ * 
+ * Returns: A newly allocated #CtplValue holding @val.
+ */
 CtplValue *
 ctpl_value_new_float (float val)
 {
@@ -137,6 +207,15 @@ ctpl_value_new_float (float val)
   return value;
 }
 
+/**
+ * ctpl_value_new_string:
+ * @val: A string
+ * 
+ * Creates a new #CtplValue and sets its value to @val.
+ * See ctpl_value_new() and ctpl_value_set_string().
+ * 
+ * Returns: A newly allocated #CtplValue holding @val.
+ */
 CtplValue *
 ctpl_value_new_string (const char *val)
 {
@@ -148,6 +227,25 @@ ctpl_value_new_string (const char *val)
   return value;
 }
 
+/**
+ * ctpl_value_new_arrayv:
+ * @type: The type of the array's elements
+ * @count: The number of elements
+ * @ap: A va_list containing the values of the type specified by @type,
+ *      ended by a %NULL value
+ * 
+ * Creates a new #CtplValue and sets its values to the given ones.
+ * See ctpl_value_new() and ctpl_value_set_arrayv().
+ * 
+ * <warning><para>
+ * As this function takes a variadic argument, there is no control on the values
+ * neither on their type nor on any other of their properties. Then, you have to
+ * take care to pass strictly right data to it if you won't see your program
+ * crash in the better case.
+ * </para></warning>
+ * 
+ * Returns: A newly allocated #CtplValue holding given values.
+ */
 CtplValue *
 ctpl_value_new_arrayv (CtplValueType type,
                        gsize         count,
@@ -161,6 +259,24 @@ ctpl_value_new_arrayv (CtplValueType type,
   return value;
 }
 
+/**
+ * ctpl_value_new_array:
+ * @type: The type of the array's elements
+ * @count: The number of elements
+ * @...: A %NULL-ended list of elements of the type specified by @type
+ * 
+ * Creates a new #CtplValue and sets its values to the given ones.
+ * See ctpl_value_new_arrayv().
+ * 
+ * <warning><para>
+ * As this function takes a variadic argument, there is no control on the values
+ * neither on their type nor on any other of their properties. Then, you have to
+ * take care to pass strictly right data to it if you won't see your program
+ * crash in the better case.
+ * </para></warning>
+ * 
+ * Returns: A newly allocated #CtplValue holding given values.
+ */
 CtplValue *
 ctpl_value_new_array (CtplValueType type,
                       gsize         count,
@@ -176,6 +292,13 @@ ctpl_value_new_array (CtplValueType type,
   return value;
 }
 
+/**
+ * ctpl_value_set_int:
+ * @value: A #CtplValue
+ * @val: An integer
+ * 
+ * Sets the value of a #CtplValue to the given integer.
+ */
 void
 ctpl_value_set_int (CtplValue *value,
                     int        val)
@@ -185,6 +308,13 @@ ctpl_value_set_int (CtplValue *value,
   value->value.v_int = val;
 }
 
+/**
+ * ctpl_value_set_float:
+ * @value: A #CtplValue
+ * @val: A float
+ * 
+ * Sets the value of a #CtplValue to the given float.
+ */
 void
 ctpl_value_set_float (CtplValue *value,
                       float      val)
@@ -194,6 +324,15 @@ ctpl_value_set_float (CtplValue *value,
   value->value.v_float = val;
 }
 
+/**
+ * ctpl_value_set_string:
+ * @value: A #CtplValue
+ * @val: A string
+ * 
+ * Sets the value of a #CtplValue to the given string.
+ * The string will be duplicated the either a static string or a temporary
+ * allocated buffer.
+ */
 void
 ctpl_value_set_string (CtplValue   *value,
                        const char  *val)
@@ -203,6 +342,13 @@ ctpl_value_set_string (CtplValue   *value,
   value->value.v_string = g_strdup (val);
 }
 
+/*
+ * ctpl_value_set_array_internal:
+ * @value: A #CtplValue
+ * @values: A GSList containing values to set.
+ * 
+ * This function duplicates all the given #GSList.
+ */
 static void
 ctpl_value_set_array_internal (CtplValue     *value,
                                const GSList  *values)
@@ -216,6 +362,24 @@ ctpl_value_set_array_internal (CtplValue     *value,
   }
 }
 
+/**
+ * ctpl_value_set_arrayv:
+ * @value: A #CtplValue
+ * @type: The type of the given elements
+ * @count: The number of elements
+ * @ap: A %NULL-ended va_list of the elements
+ * 
+ * Sets the value of a #CtplValue from the given list of elements.
+ * See ctpl_value_array_append(), ctpl_value_array_append_int(),
+ * ctpl_value_array_append_float() and ctpl_value_array_append_string().
+ * 
+ * <warning><para>
+ * As this function takes a variadic argument, there is no control on the values
+ * neither on their type nor on any other of their properties. Then, you have to
+ * take care to pass strictly right data to it if you won't see your program
+ * crash in the better case.
+ * </para></warning>
+ */
 void
 ctpl_value_set_arrayv (CtplValue     *value,
                        CtplValueType  type,
@@ -264,6 +428,23 @@ ctpl_value_set_arrayv (CtplValue     *value,
   }
 }
 
+/**
+ * ctpl_value_set_array:
+ * @value: A #CtplValue
+ * @type: The type of the given elements
+ * @count: The number of elements
+ * @...: A %NULL-ended list of elements
+ * 
+ * Sets the value of a #CtplValue from the given elements.
+ * See ctpl_value_set_arrayv().
+ * 
+ * <warning><para>
+ * As this function takes a variadic argument, there is no control on the values
+ * neither on their type nor on any other of their properties. Then, you have to
+ * take care to pass strictly right data to it if you won't see your program
+ * crash in the better case.
+ * </para></warning>
+ */
 void
 ctpl_value_set_array (CtplValue     *value,
                       CtplValueType  type,
@@ -277,6 +458,16 @@ ctpl_value_set_array (CtplValue     *value,
   va_end (ap);
 }
 
+/**
+ * ctpl_value_set_array_intv:
+ * @value: A #CtplValue
+ * @count: The number of given elements
+ * @ap: A %NULL-ended va_list of integers
+ * 
+ * Sets the value of a #CtplValue from the given integers.
+ * This is a convenience wrapper around ctpl_value_set_arrayv(), and the same
+ * care have to been taken about.
+ */
 void
 ctpl_value_set_array_intv (CtplValue     *value,
                            gsize          count,
@@ -285,6 +476,16 @@ ctpl_value_set_array_intv (CtplValue     *value,
   ctpl_value_set_arrayv (value, CTPL_VTYPE_INT, count, ap);
 }
 
+/**
+ * ctpl_value_set_array_int:
+ * @value: A #CtplValue
+ * @count: The number of given elements
+ * @...: A %NULL-ended list of integers
+ * 
+ * Sets the value of a #CtplValue from the given integers.
+ * This is a convenience wrapper around ctpl_value_set_array(), and the same
+ * care have to been taken about.
+ */
 void
 ctpl_value_set_array_int (CtplValue     *value,
                           gsize          count,
@@ -297,6 +498,16 @@ ctpl_value_set_array_int (CtplValue     *value,
   va_end (ap);
 }
 
+/**
+ * ctpl_value_set_array_floatv:
+ * @value: A #CtplValue
+ * @count: The number of given elements
+ * @ap: A %NULL-ended va_list of floats
+ * 
+ * Sets the value of a #CtplValue from the given floats.
+ * This is a convenience wrapper around ctpl_value_set_arrayv(), and the same
+ * care have to been taken about.
+ */
 void
 ctpl_value_set_array_floatv (CtplValue     *value,
                              gsize          count,
@@ -305,6 +516,16 @@ ctpl_value_set_array_floatv (CtplValue     *value,
   ctpl_value_set_arrayv (value, CTPL_VTYPE_FLOAT, count, ap);
 }
 
+/**
+ * ctpl_value_set_array_float:
+ * @value: A #CtplValue
+ * @count: The number of given elements
+ * @...: A %NULL-ended list of floats
+ * 
+ * Sets the value of a #CtplValue from the given floats.
+ * This is a convenience wrapper around ctpl_value_set_array(), and the same
+ * care have to been taken about.
+ */
 void
 ctpl_value_set_array_float (CtplValue     *value,
                             gsize          count,
@@ -317,6 +538,16 @@ ctpl_value_set_array_float (CtplValue     *value,
   va_end (ap);
 }
 
+/**
+ * ctpl_value_set_array_stringv:
+ * @value: A #CtplValue
+ * @count: The number of given elements
+ * @ap: A %NULL-ended va_list of strings (as const char*)
+ * 
+ * Sets the value of a #CtplValue from the given strings.
+ * This is a convenience wrapper around ctpl_value_set_arrayv(), and the same
+ * care have to been taken about.
+ */
 void
 ctpl_value_set_array_stringv (CtplValue     *value,
                               gsize          count,
@@ -325,6 +556,16 @@ ctpl_value_set_array_stringv (CtplValue     *value,
   ctpl_value_set_arrayv (value, CTPL_VTYPE_STRING, count, ap);
 }
 
+/**
+ * ctpl_value_set_array_string:
+ * @value: A #CtplValue
+ * @count: The number of given elements
+ * @...: A %NULL-ended list of strings (as const char*)
+ * 
+ * Sets the value of a #CtplValue from the given strings.
+ * This is a convenience wrapper around ctpl_value_set_array(), and the same
+ * care have to been taken about.
+ */
 void
 ctpl_value_set_array_string (CtplValue     *value,
                              gsize          count,
@@ -337,6 +578,14 @@ ctpl_value_set_array_string (CtplValue     *value,
   va_end (ap);
 }
 
+/**
+ * ctpl_value_array_append:
+ * @value: A #CtplValue holding an array
+ * @val: A #CtplValue to append
+ * 
+ * Appends a #CtplValue to another #CtplValue holding an array. The appended
+ * value is copied.
+ */
 void
 ctpl_value_array_append (CtplValue       *value,
                          const CtplValue *val)
@@ -347,6 +596,14 @@ ctpl_value_array_append (CtplValue       *value,
                                          ctpl_value_dup (val));
 }
 
+/**
+ * ctpl_value_array_prepend:
+ * @value: A #CtplValue holding an array
+ * @val: A #CtplValue to prepend
+ * 
+ * Prepends a #CtplValue to another #CtplValue holding an array. The prepended
+ * value is copied.
+ */
 void
 ctpl_value_array_prepend (CtplValue       *value,
                           const CtplValue *val)
@@ -357,6 +614,13 @@ ctpl_value_array_prepend (CtplValue       *value,
                                           ctpl_value_dup (val));
 }
 
+/**
+ * ctpl_value_array_append_int:
+ * @value: A #CtplValue holding an array
+ * @val: An integer to append
+ * 
+ * Appends an integer to a #CtplValue holding an array.
+ */
 void
 ctpl_value_array_append_int (CtplValue       *value,
                              int              val)
@@ -367,6 +631,13 @@ ctpl_value_array_append_int (CtplValue       *value,
                                          ctpl_value_new_int (val));
 }
 
+/**
+ * ctpl_value_array_prepend_int:
+ * @value: A #CtplValue holding an array
+ * @val: An integer to prepend
+ * 
+ * Prepends an integer to a #CtplValue holding an array.
+ */
 void
 ctpl_value_array_prepend_int (CtplValue       *value,
                               int              val)
@@ -377,6 +648,13 @@ ctpl_value_array_prepend_int (CtplValue       *value,
                                           ctpl_value_new_int (val));
 }
 
+/**
+ * ctpl_value_array_append_float:
+ * @value: A #CtplValue holding an array
+ * @val: A float to append
+ * 
+ * Appends a float to a #CtplValue holding an array.
+ */
 void
 ctpl_value_array_append_float (CtplValue       *value,
                                float            val)
@@ -387,6 +665,13 @@ ctpl_value_array_append_float (CtplValue       *value,
                                          ctpl_value_new_float (val));
 }
 
+/**
+ * ctpl_value_array_prepend_float:
+ * @value: A #CtplValue holding an array
+ * @val: A float to prepend
+ * 
+ * Prepends a float to a #CtplValue holding an array.
+ */
 void
 ctpl_value_array_prepend_float (CtplValue       *value,
                                 float            val)
@@ -397,6 +682,13 @@ ctpl_value_array_prepend_float (CtplValue       *value,
                                           ctpl_value_new_float (val));
 }
 
+/**
+ * ctpl_value_array_append_string:
+ * @value: A #CtplValue holding an array
+ * @val: A string to append
+ * 
+ * Appends a string to a #CtplValue holding an array. The string is copied.
+ */
 void
 ctpl_value_array_append_string (CtplValue       *value,
                                 const char      *val)
@@ -407,6 +699,13 @@ ctpl_value_array_append_string (CtplValue       *value,
                                          ctpl_value_new_string (val));
 }
 
+/**
+ * ctpl_value_array_prepend_string:
+ * @value: A #CtplValue holding an array
+ * @val: A string to prepend
+ * 
+ * Prepends a string to a #CtplValue holding an array. The string is copied.
+ */
 void
 ctpl_value_array_prepend_string (CtplValue       *value,
                                  const char      *val)
@@ -418,12 +717,28 @@ ctpl_value_array_prepend_string (CtplValue       *value,
 }
 
 
+/**
+ * ctpl_value_get_held_type:
+ * @value: A #CtplValue
+ * 
+ * Gets the type held by the a #CtplValue.
+ * 
+ * Returns: The type held by the value.
+ */
 CtplValueType
 ctpl_value_get_held_type (const CtplValue *value)
 {
   return value->type;
 }
 
+/**
+ * ctpl_value_get_int:
+ * @value:  A #CtplValue holding a int
+ * 
+ * Gets the value of a #CtplValue holding a integer.
+ * 
+ * Returns: The integer value held by @value.
+ */
 int
 ctpl_value_get_int (const CtplValue *value)
 {
@@ -431,6 +746,14 @@ ctpl_value_get_int (const CtplValue *value)
   return value->value.v_int;
 }
 
+/**
+ * ctpl_value_get_float:
+ * @value: A #CtplValue holding a float
+ * 
+ * Gets the value of a #CtplValue holding a float.
+ * 
+ * Returns: The float value held by @value.
+ */
 float
 ctpl_value_get_float (const CtplValue *value)
 {
@@ -438,6 +761,15 @@ ctpl_value_get_float (const CtplValue *value)
   return value->value.v_float;
 }
 
+/**
+ * ctpl_value_get_string:
+ * @value: A #CtplValue holding a string
+ * 
+ * Gets the value of a #CtplValue holding a string.
+ * 
+ * Returns: A string owned by the value that should not be modified or freed, or
+ *          %NULL if an error occurs.
+ */
 const char *
 ctpl_value_get_string (const CtplValue *value)
 {
@@ -445,6 +777,16 @@ ctpl_value_get_string (const CtplValue *value)
   return value->value.v_string;
 }
 
+/**
+ * ctpl_value_get_array:
+ * @value: A #CtplValue holding an array
+ * 
+ * Gets the values of a #CtplValue holding an array as a #GSList in which each
+ * element holds a #CtplValue holding the element value.
+ * 
+ * Returns: A #GSList owned by the value that must not be freed, neither the
+ *          list itself nor its values, or %NULL in an error occurs.
+ */
 const GSList *
 ctpl_value_get_array (const CtplValue *value)
 {
@@ -452,6 +794,17 @@ ctpl_value_get_array (const CtplValue *value)
   return value->value.v_array;
 }
 
+/**
+ * ctpl_value_get_array_int:
+ * @value: A #CtplValue holding an array of integers
+ * @length: Return location for the array length, or %NULL
+ * 
+ * Gets the values of a #CtplValue as an array of int.
+ * The value must hold an array and all array's elements must be integers.
+ * 
+ * Returns: A newly allocated array of integers that should be freed with
+ *          g_free() or %NULL if an error occurs.
+ */
 int *
 ctpl_value_get_array_int (const CtplValue *value,
                           gsize           *length)
@@ -489,12 +842,14 @@ ctpl_value_get_array_int (const CtplValue *value,
 
 /**
  * ctpl_value_get_array_float:
- * @value: 
- * @length: 
+ * @value: A #CtplValue holding an array of floats
+ * @length: Return location for the array length, or %NULL
  * 
+ * Gets the values of a #CtplValue as an array of floats.
+ * @value must hold an array and all array's elements must be floats.
  * 
- * 
- * Returns: 
+ * Returns: A newly allocated array of floats that should be freed with g_free()
+ *          or %NULL if an error occurs.
  */
 float *
 ctpl_value_get_array_float (const CtplValue *value,
@@ -536,7 +891,8 @@ ctpl_value_get_array_float (const CtplValue *value,
  * @value: A #CtplValue holding an array of strings
  * @length: Return location for the length of the returned array, or %NULL.
  * 
- * 
+ * Gets the values held by a #CtplValue as an array of strings.
+ * @value must hold an array containing only strings.
  * 
  * Returns: A newly allocated %NULL-terminated array of strings. Free with
  *          g_strfreev() when no longer needed.
