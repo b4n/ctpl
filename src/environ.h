@@ -28,6 +28,12 @@ G_BEGIN_DECLS
 
 typedef struct s_CtplEnviron  CtplEnviron;
 
+/**
+ * CtplEnviron:
+ * @symbol_table: Table containing stacks of symbols
+ * 
+ * Represents a environment
+ */
 struct s_CtplEnviron
 {
   GHashTable     *symbol_table; /* hash table containing stacks of symbols */

@@ -23,6 +23,30 @@
 #include <glib.h>
 
 
+/**
+ * SECTION:environ
+ * @short_description: Environment
+ * @include: ctpl/environ.h
+ * 
+ * A #CtplEnviron represents a environment of symbols used to lookup, push and
+ * pop symbols when computing a template.
+ * 
+ * <example>
+ *   <title>Creating and filling a environment</title>
+ *   <programlisting>
+ * CtplEnviron *env;
+ * 
+ * env = ctpl_environ_new ()
+ * ctpl_environ_push_string (env, "symbol name", "symbol value");
+ * ctpl_environ_push_int (env, "response", 42);
+ * 
+ * // ...
+ * 
+ * ctpl_environ_free (env);
+ *   </programlisting>
+ * </example>
+ */
+
 
 /*
  * ctpl_environ_init:
