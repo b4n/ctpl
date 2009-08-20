@@ -23,7 +23,9 @@
 
 
 /**
- * CtplStack:
+ * SECTION:stack
+ * @short_description: Stack
+ * @include: ctpl/stack.h
  * 
  * A stack optimised for storing same data multiple times at once.
  * E.g., pushing "foo", "bar", "bar", "bar" could only uses 2 data structures
@@ -44,6 +46,8 @@
  * ctpl_stack_push_ref(), and pop the data using ctpl_stack_pop().
  * 
  * <example>
+ *   <title>Simple use of a CtplStack.</title>
+ *   <programlisting>
  * CtplStack *stack;
  * 
  * stack = ctpl_stack_new (g_strcmp0, NULL);
@@ -55,6 +59,7 @@
  * }
  * 
  * ctpl_stack_free (stack);
+ * </programlisting>
  * </example>
  */
 
