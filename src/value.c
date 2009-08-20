@@ -22,6 +22,54 @@
 #include <stdarg.h>
 
 
+/**
+ * SECTION:value
+ * @short_description: Generic values
+ * @include: ctpl/ctpl.h
+ * 
+ * A generic value manager.
+ * 
+ * Dynamically allocated #CtplValue are created with ctpl_value_new() and freed
+ * with ctpl_value_free().
+ * Statically allocated ones are initialised with ctpl_value_init() and
+ * uninitialised with ctpl_value_free_value().
+ * 
+ * You can set the data they holds with ctpl_value_set_int(),
+ * ctpl_value_set_float(), ctpl_value_set_string(), ctpl_value_set_array(), you
+ * can add data to an array value with ctpl_value_array_append(),
+ * ctpl_value_array_prepend(), ctpl_value_array_append_int(),
+ * ctpl_value_array_prepend_int(), ctpl_value_array_append_float(),
+ * ctpl_value_array_prepend_float(), ctpl_value_array_append_string() and
+ * ctpl_value_array_prepend_string().
+ * 
+ * <example>
+ * <title>Simple usage of allocated generic values</title>
+ * <programlisting>
+ * CtplValue *val;
+ * 
+ * val = ctpl_value_new ();
+ * ctpl_value_set_int (val, 42);
+ * 
+ * // Free all data allocated for value and the held data
+ * ctpl_value_free (val);
+ * </programlisting>
+ * </example>
+ * 
+ * <example>
+ * <title>Simple usage of static generic values</title>
+ * <programlisting>
+ * CtplValue val;
+ * 
+ * ctpl_value_init (&val);
+ * ctpl_value_set_int (&val, 42);
+ * 
+ * // Free all data allocated for the held data
+ * ctpl_value_free_value (&val);
+ * </programlisting>
+ * </example>
+ */
+
+
 static void   ctpl_value_set_array_internal   (CtplValue     *value,
                                                const GSList  *values);
 
