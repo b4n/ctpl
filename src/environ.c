@@ -24,6 +24,12 @@
 
 
 
+/*
+ * ctpl_environ_init:
+ * @env: A #CtplEnviron
+ * 
+ * Inits a #CtplEnviron.
+ */
 static void
 ctpl_environ_init (CtplEnviron    *env)
 {
@@ -32,6 +38,13 @@ ctpl_environ_init (CtplEnviron    *env)
                                              (GDestroyNotify)ctpl_stack_free);
 }
 
+/**
+ * ctpl_environ_new:
+ * 
+ * Creates a new #CtplEnviron
+ * 
+ * Returns: A new #CtplEnviron
+ */
 CtplEnviron *
 ctpl_environ_new (void)
 {
@@ -45,6 +58,12 @@ ctpl_environ_new (void)
   return env;
 }
 
+/**
+ * ctpl_environ_free:
+ * @env: a #CtplEnviron
+ * 
+ * Frees a #CtplEnviron and all its allocated resources.
+ */
 void
 ctpl_environ_free (CtplEnviron *env)
 {
@@ -54,6 +73,15 @@ ctpl_environ_free (CtplEnviron *env)
   }
 }
 
+/*
+ * ctpl_environ_lookup_stack:
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * 
+ * Lookups for a symbol stack in the given #CtplEnviron.
+ * 
+ * Returns: A #CtplStack or %NULL if the symbol can't be found.
+ */
 static CtplStack *
 ctpl_environ_lookup_stack (CtplEnviron *env,
                            const char  *symbol)
@@ -61,6 +89,15 @@ ctpl_environ_lookup_stack (CtplEnviron *env,
   return g_hash_table_lookup (env->symbol_table, symbol);
 }
 
+/**
+ * ctpl_environ_lookup:
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * 
+ * Looks up for a symbol in the given #CtplEnviron.
+ * 
+ * Returns: A #CtplValue or %NULL if the symbol can't found.
+ */
 CtplValue *
 ctpl_environ_lookup (CtplEnviron *env,
                      const char  *symbol)
@@ -76,6 +113,19 @@ ctpl_environ_lookup (CtplEnviron *env,
   return value;
 }
 
+/**
+ * ctpl_environ_push:
+ * @env: A #CtplEnviron
+ * @symbol: The symbol name
+ * @value: The symbol value
+ * 
+ * Pushes a symbol into a #CtplEnviron.
+ * Pushing a symbol adds it or overwrites the value in place for it while
+ * keeping any already present value for latter poping.
+ * The push/pop concept is simple as a stack: when you push, to adds a value on
+ * to of a stack, and when you pop, you remove the top element of this stack,
+ * revealing the previous value.
+ */
 void
 ctpl_environ_push (CtplEnviron     *env,
                    const char      *symbol,
@@ -100,6 +150,14 @@ ctpl_environ_push (CtplEnviron     *env,
   }
 }
 
+/**
+ * ctpl_environ_push_int:
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @value: The symbol value
+ * 
+ * Pushes an integer symbol into a #CtplEnviron. See ctpl_environ_push().
+ */
 void
 ctpl_environ_push_int (CtplEnviron     *env,
                        const char      *symbol,
@@ -113,6 +171,14 @@ ctpl_environ_push_int (CtplEnviron     *env,
   ctpl_value_free_value (&val);
 }
 
+/**
+ * ctpl_environ_push_float:
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @value: The symbol value
+ * 
+ * Pushes a float symbol into a #CtplEnviron. See ctpl_environ_push().
+ */
 void
 ctpl_environ_push_float (CtplEnviron     *env,
                          const char      *symbol,
@@ -126,6 +192,14 @@ ctpl_environ_push_float (CtplEnviron     *env,
   ctpl_value_free_value (&val);
 }
 
+/**
+ * ctpl_environ_push_string:
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @value: The symbol value
+ * 
+ * Pushes a string symbol into a #CtplEnviron. See ctpl_environ_push().
+ */
 void
 ctpl_environ_push_string (CtplEnviron     *env,
                           const char      *symbol,
@@ -139,6 +213,18 @@ ctpl_environ_push_string (CtplEnviron     *env,
   ctpl_value_free_value (&val);
 }
 
+/**
+ * ctpl_environ_pop:
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * 
+ * Pops a symbol from a #CtplValue. See ctpl_value_push() for details on pushing
+ * and poping.
+ * Use ctpl_environ_lookup() if you want to get the symbol's value without
+ * poping it from the environ.
+ * 
+ * Returns: A #CtplValue or %NULL if the symbol can't be found.
+ */
 CtplValue *
 ctpl_environ_pop (CtplEnviron *env,
                   const char  *symbol)
