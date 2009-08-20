@@ -43,7 +43,8 @@
  * 
  * A #CtplStack is created with ctpl_stack_new() and freed using
  * ctpl_stack_free(). You can push data into a stack using ctpl_stack_push() and
- * ctpl_stack_push_ref(), and pop the data using ctpl_stack_pop().
+ * ctpl_stack_push_ref(), pop the data using ctpl_stack_pop() and gets the data
+ * using ctpl_stack_peek().
  * 
  * <example>
  *   <title>Simple use of a CtplStack.</title>
@@ -274,6 +275,15 @@ ctpl_stack_pop (CtplStack *stack)
   return data;
 }
 
+/**
+ * ctpl_stack_peek:
+ * @stack: A #CtplStack
+ * 
+ * Peeks (gets) the top-level value of a #CtplStack.
+ * See ctpl_stack_pop() if you want to get the value and pop it from the stack.
+ * 
+ * Returns: The top-level data of @stack, or %NULL if the stack is empty.
+ */
 void *
 ctpl_stack_peek (const CtplStack *stack)
 {
