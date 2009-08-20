@@ -275,7 +275,7 @@ ctpl_stack_pop (CtplStack *stack)
 }
 
 void *
-ctpl_stack_peek (CtplStack *stack)
+ctpl_stack_peek (const CtplStack *stack)
 {
   return (stack->last) ? stack->last->data : NULL;
 }

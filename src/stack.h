@@ -62,7 +62,7 @@ void        ctpl_stack_push     (CtplStack *stack,
                                  void      *data);
 gboolean    ctpl_stack_push_ref (CtplStack *stack);
 void       *ctpl_stack_pop      (CtplStack *stack);
-void       *ctpl_stack_peek     (CtplStack *stack);
+void       *ctpl_stack_peek     (const CtplStack *stack);
 gboolean    ctpl_stack_is_empty (CtplStack *stack);
 
 
