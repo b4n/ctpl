@@ -83,8 +83,8 @@ ctpl_environ_free (CtplEnviron *env)
  * Returns: A #CtplStack or %NULL if the symbol can't be found.
  */
 static CtplStack *
-ctpl_environ_lookup_stack (CtplEnviron *env,
-                           const char  *symbol)
+ctpl_environ_lookup_stack (const CtplEnviron *env,
+                           const char        *symbol)
 {
   return g_hash_table_lookup (env->symbol_table, symbol);
 }
@@ -100,8 +100,8 @@ ctpl_environ_lookup_stack (CtplEnviron *env,
  *          should not be freed.
  */
 const CtplValue *
-ctpl_environ_lookup (CtplEnviron *env,
-                     const char  *symbol)
+ctpl_environ_lookup (const CtplEnviron *env,
+                     const char        *symbol)
 {
   CtplStack  *stack;
   CtplValue  *value = NULL;

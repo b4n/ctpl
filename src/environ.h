@@ -36,8 +36,8 @@ struct s_CtplEnviron
 
 CtplEnviron      *ctpl_environ_new            (void);
 void              ctpl_environ_free           (CtplEnviron *env);
-const CtplValue  *ctpl_environ_lookup         (CtplEnviron *env,
-                                               const char  *symbol);
+const CtplValue  *ctpl_environ_lookup         (const CtplEnviron *env,
+                                               const char        *symbol);
 void              ctpl_environ_push           (CtplEnviron     *env,
                                                const char      *symbol,
                                                const CtplValue *value);
