@@ -96,9 +96,10 @@ ctpl_environ_lookup_stack (CtplEnviron *env,
  * 
  * Looks up for a symbol in the given #CtplEnviron.
  * 
- * Returns: A #CtplValue or %NULL if the symbol can't found.
+ * Returns: A #CtplValue or %NULL if the symbol can't be found. This value
+ *          should not be freed.
  */
-CtplValue *
+const CtplValue *
 ctpl_environ_lookup (CtplEnviron *env,
                      const char  *symbol)
 {
@@ -223,9 +224,10 @@ ctpl_environ_push_string (CtplEnviron     *env,
  * Use ctpl_environ_lookup() if you want to get the symbol's value without
  * poping it from the environ.
  * 
- * Returns: A #CtplValue or %NULL if the symbol can't be found.
+ * Returns: A #CtplValue or %NULL if the symbol can't be found. This value
+ *          should not be freed.
  */
-CtplValue *
+const CtplValue *
 ctpl_environ_pop (CtplEnviron *env,
                   const char  *symbol)
 {

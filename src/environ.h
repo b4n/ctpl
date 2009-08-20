@@ -34,24 +34,24 @@ struct s_CtplEnviron
 };
 
 
-CtplEnviron  *ctpl_environ_new            (void);
-void          ctpl_environ_free           (CtplEnviron *env);
-CtplValue    *ctpl_environ_lookup         (CtplEnviron *env,
-                                           const char  *symbol);
-void          ctpl_environ_push           (CtplEnviron     *env,
-                                           const char      *symbol,
-                                           const CtplValue *value);
-void          ctpl_environ_push_int       (CtplEnviron     *env,
-                                           const char      *symbol,
-                                           int              value);
-void          ctpl_environ_push_float     (CtplEnviron     *env,
-                                           const char      *symbol,
-                                           float            value);
-void          ctpl_environ_push_string    (CtplEnviron     *env,
-                                           const char      *symbol,
-                                           const char      *value);
-CtplValue    *ctpl_environ_pop            (CtplEnviron *env,
-                                           const char  *symbol);
+CtplEnviron      *ctpl_environ_new            (void);
+void              ctpl_environ_free           (CtplEnviron *env);
+const CtplValue  *ctpl_environ_lookup         (CtplEnviron *env,
+                                               const char  *symbol);
+void              ctpl_environ_push           (CtplEnviron     *env,
+                                               const char      *symbol,
+                                               const CtplValue *value);
+void              ctpl_environ_push_int       (CtplEnviron     *env,
+                                               const char      *symbol,
+                                               int              value);
+void              ctpl_environ_push_float     (CtplEnviron     *env,
+                                               const char      *symbol,
+                                               float            value);
+void              ctpl_environ_push_string    (CtplEnviron     *env,
+                                               const char      *symbol,
+                                               const char      *value);
+const CtplValue  *ctpl_environ_pop            (CtplEnviron *env,
+                                               const char  *symbol);
 
 /* en fait ce n'est pas une bonne idée, le concept de scope et inutile ici,
  * et rend le tout particulièrement lourd. Le seule chose utile est de pouvoir
