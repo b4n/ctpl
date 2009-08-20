@@ -13,6 +13,9 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+# check for gtk-doc
+GTK_DOC_CHECK(1.9)
+
 # Checks for libraries.
 PKG_CHECK_MODULES([LIBMB],  [libmb])
 PKG_CHECK_MODULES([GLIB],   [glib-2.0])
@@ -31,5 +34,9 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([memchr])
 
 AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+                 src/Makefile
+                 docs/Makefile
+                 docs/reference/Makefile
+                 docs/reference/ctpl/Makefile
+                 docs/reference/ctpl/version.xml])
 AC_OUTPUT

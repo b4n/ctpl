@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
+[
+  <!ENTITY % local.common.attrib "xmlns:xi  CDATA  #FIXED 'http://www.w3.org/2003/XInclude'">
+  <!ENTITY version SYSTEM "version.xml">
+]>
+<book id="index">
+  <bookinfo>
+    <title>CTPL Reference Manual</title>
+    <releaseinfo>
+      for CTPL &version;.
+<!--
+      The latest version of this documentation can be found on-line at
+      <ulink role="online-location" url="http://[SERVER]/ctpl/index.html">http://[SERVER]/ctpl/</ulink>.
+-->
+    </releaseinfo>
+  </bookinfo>
+
+  <chapter>
+    <title>CTPL overview</title>
+    <para>
+      CTPL is a template library written in C.
+    </para>
+    <para>
+      CTPL depends on the following libraries:
+      <variablelist>
+        <varlistentry>
+          <term><ulink url="http://www.gtk.org">GLib</ulink></term>
+          <listitem>
+            <para>
+              General purpose C utility library
+            </para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><ulink url="http://ban.free-h.net/libmb/">LibMB</ulink></term>
+          <listitem>
+            <para>
+              FILE-like API for memory buffer read
+            </para>
+          </listitem>
+        </varlistentry>
+      </variablelist>
+    </para>
+  </chapter>
+
+  <chapter>
+    <title>API reference</title>
+    <xi:include href="xml/token.xml"/>
+    <xi:include href="xml/environ.xml"/>
+    <xi:include href="xml/parse.xml"/>
+    <xi:include href="xml/value.xml"/>
+    <xi:include href="xml/stack.xml"/>
+  </chapter>
+  <!--chapter id="object-tree">
+    <title>Object Hierarchy</title>
+     <xi:include href="xml/tree_index.sgml"/>
+  </chapter-->
+  <index id="api-index-full">
+    <title>API Index</title>
+    <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
+  </index>
+
+  <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
+</book>
