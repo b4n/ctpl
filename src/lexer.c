@@ -37,12 +37,34 @@
                   BLANKCHARS /* allow any blank character in expr */ \
                   SYMBOLCHARS /* for references to symbols */
 
+/* statements constants */
+enum
+{
+  S_NONE,
+  S_IF,
+  S_ELSE,
+  S_FOR,
+  S_END,
+  S_DATA
+};
 
 typedef struct s_LexerState LexerState;
 
+/* LexerState:
+ * @block_depth: Depth of the current block.
+ * @last_statement_type_if: Used to help reading if/else/end groups.
+ *                      Set to:
+ *                       - S_NONE if no previous token;
+ *                       - S_IF when encountering an if statement;
+ *                       - S_ELSE when encountering an else statement;
+ *                       - S_END xhen encountering an end statement.
+ * 
+ * State informations of the lexer.
+ */
 struct s_LexerState
 {
   int block_depth;
+  int last_statement_type_if;
 };
 
 
@@ -133,7 +155,10 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
   g_debug ("if?");
   skip_blank (mb);
   expr = read_expr (mb);
-  if (expr) {
+  if (! expr || *expr == 0) {
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "Missing expression after 'if' token");
+  } else {
     skip_blank (mb);
     if (mb_getc (mb) != CTPL_END_CHAR) {
       /* fail */
@@ -142,10 +167,18 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
                    "Unexpected character '%c' before end of 'if' statement",
                    mb_cur_char (mb));
     } else {
+      CtplToken *if_token;
+      CtplToken *else_token = NULL;
+      
       g_debug ("if token: `if %s`", expr);
-      /* FIXME: read if and else children */
-      token = ctpl_token_new_if (expr, NULL, NULL);
       state->block_depth ++;
+      state->last_statement_type_if = S_IF;
+      if_token = ctpl_lexer_lex_internal (mb, state, error);
+      if (state->last_statement_type_if == S_ELSE) {
+        g_debug ("have else");
+        else_token = ctpl_lexer_lex_internal (mb, state, error);
+      }
+      token = ctpl_token_new_if (expr, if_token, else_token);
     }
   }
   g_free (expr);
@@ -168,7 +201,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   g_debug ("for?");
   skip_blank (mb);
   iter_name = read_symbol (mb);
-  if (! iter_name) {
+  if (! iter_name || *iter_name == 0) {
     /* fail */
     /*g_error ("for: failed to read iter name");*/
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -181,11 +214,12 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
       /* fail */
       /*g_error ("for: 'in' keyword missing after iter, got '%s'", keyword_in);*/
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                   "Missing 'in' keyword after iterator name of 'for' statement");
+                   "Missing 'in' keyword after iterator name of 'for' "
+                   "statement");
     } else {
       skip_blank (mb);
       array_name = read_symbol (mb);
-      if (! array_name) {
+      if (! array_name || *array_name == 0) {
         /* fail */
         /*g_error ("for: failed to read array name");*/
         g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -199,11 +233,12 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
                        "Unexpected character '%c' before end of 'for' statement",
                        mb_cur_char (mb));
         } else {
+          CtplToken *for_children;
+          
           g_debug ("for token: `for %s in %s`", iter_name, array_name);
-          /* FIXME: read children */
           state->block_depth ++;
-          token = ctpl_token_new_for (array_name, iter_name,
-                                      ctpl_lexer_lex_internal (mb, state, error));
+          for_children = ctpl_lexer_lex_internal (mb, state, error);
+          token = ctpl_token_new_for (array_name, iter_name, for_children);
         }
       }
       g_free (array_name);
@@ -216,7 +251,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
 }
 
 /* reads a end block end (} of a {end} block)
- * Return a new token or %NULL on error or at data end */
+ * Return a new token or %NULL on error */
 static gboolean
 ctpl_lexer_read_token_tpl_end (MB          *mb,
                                LexerState  *state,
@@ -241,6 +276,40 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unmatching 'end' statement (needs a 'if' or 'for' before)");
     } else {
+      state->last_statement_type_if = S_END;
+      rv = TRUE;
+    }
+  }
+  
+  return rv;
+}
+
+/* reads an else block end (} of a {else} block)
+ * Return a new token or %NULL on error */
+static gboolean
+ctpl_lexer_read_token_tpl_else (MB          *mb,
+                                LexerState  *state,
+                                GError     **error)
+{
+  gboolean rv = FALSE;
+  
+  g_debug ("else?");
+  skip_blank (mb);
+  if (mb_getc (mb) != CTPL_END_CHAR) {
+    /* fail, missing } at the end */
+    /*g_error ("else: missing '%c' at the end", CTPL_END_CHAR);*/
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "Unexpected character '%c' before end of 'else' statement",
+                 mb_cur_char (mb));
+  } else {
+    g_debug ("else statement");
+    if (state->last_statement_type_if != S_IF) {
+      /* fail */
+      /*g_error ("found else statement but no previous if");*/
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Unmatching 'else' statement (needs an 'if' before)");
+    } else {
+      state->last_statement_type_if = S_ELSE;
       rv = TRUE;
     }
   }
@@ -281,11 +350,14 @@ ctpl_lexer_read_token_tpl (MB          *mb,
     } else if (strcmp (first_word, "end") == 0) {
       /* a block end:
        * {end} */
-      if (! ctpl_lexer_read_token_tpl_end (mb, state, error)) {
-        /* fail */
-      } else {
-        /*token = ctpl_lexer_read_token (mb, state);*/
-      }
+      ctpl_lexer_read_token_tpl_end (mb, state, error);
+      /* here we will return NULL, which is fine as it simply stops token
+       * reading, and as we use nested lexing calls for nested blocks */
+    } else if (strcmp (first_word, "else") == 0) {
+      /* an else statement:
+       * {else} */
+      ctpl_lexer_read_token_tpl_else (mb, state, error);
+      /* return NULL, see above */
     } else if (first_word != NULL) {
       /* a var:
        * {:BLANKCHARS:?:WORDCHARS::BLANKCHARS:?} */
@@ -423,7 +495,7 @@ ctpl_lexer_lex (MB       *mb,
                 GError  **error)
 {
   CtplToken  *root;
-  LexerState  lex_state = {0};
+  LexerState  lex_state = {0, S_NONE};
   
   root = ctpl_lexer_lex_internal (mb, &lex_state, error);
   if (lex_state.block_depth != 0) {
