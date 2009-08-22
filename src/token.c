@@ -197,7 +197,9 @@ ctpl_token_dump_internal (const CtplToken *token,
     g_print ("  ");
   }
   g_print ("token[%p]: ", token);
-  if (token) {
+  if (! token) {
+    g_print ("\n");
+  } else {
     switch (token->type) {
       case CTPL_TOKEN_TYPE_DATA:
         g_print ("data: '%s'\n", token->token.t_data);
@@ -210,17 +212,22 @@ ctpl_token_dump_internal (const CtplToken *token,
       case CTPL_TOKEN_TYPE_FOR:
         g_print ("for: for '%s' in '%s'\n",
                  token->token.t_for.iter, token->token.t_for.array);
-        
-        ctpl_token_dump_internal (token->token.t_for.children, TRUE, depth + 1);
+        if (token->token.t_for.children) {
+          ctpl_token_dump_internal (token->token.t_for.children,
+                                    TRUE, depth + 1);
+        }
         break;
       
       case CTPL_TOKEN_TYPE_IF:
         g_print ("if: if (%s)\n", token->token.t_if.condition);
-        
-        ctpl_token_dump_internal (token->token.t_if.if_children,
-                                  TRUE, depth + 1);
-        ctpl_token_dump_internal (token->token.t_if.else_children,
-                                  TRUE, depth + 1);
+        if (token->token.t_if.if_children) {
+          ctpl_token_dump_internal (token->token.t_if.if_children,
+                                    TRUE, depth + 1);
+        }
+        if (token->token.t_if.else_children) {
+          ctpl_token_dump_internal (token->token.t_if.else_children,
+                                    TRUE, depth + 1);
+        }
         break;
       
       default:
