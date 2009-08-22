@@ -25,17 +25,73 @@
 G_BEGIN_DECLS
 
 
-typedef struct s_CtplToken CtplToken;
-struct s_CtplToken
+/**
+ * CtplTokenType:
+ * @CTPL_TOKEN_TYPE_DATA: Data flow, not a real token
+ * @CTPL_TOKEN_TYPE_VAR: A variable that should be replaced
+ * @CTPL_TOKEN_TYPE_FOR: A loop through an array of value
+ * @CTPL_TOKEN_TYPE_IF: A conditional branching
+ * 
+ * 
+ */
+typedef enum e_CtplTokenType
 {
-  size_t        len;
-  char         *token;
-  CtplToken    *child;
+  CTPL_TOKEN_TYPE_DATA,
+  CTPL_TOKEN_TYPE_VAR,
+  CTPL_TOKEN_TYPE_FOR,
+  CTPL_TOKEN_TYPE_IF
+} CtplTokenType;
+
+typedef struct s_CtplToken    CtplToken;
+typedef struct s_CtplTokenFor CtplTokenFor;
+typedef struct s_CtplTokenIf  CtplTokenIf;
+
+struct s_CtplTokenFor
+{
+  char       *array;
+  char       *iter;
+  CtplToken  *children;
 };
 
-CtplToken *ctpl_token_new   (void);
-void       ctpl_token_free  (CtplToken *token,
-                             gboolean   free_data);
+struct s_CtplTokenIf
+{
+  char       *condition;
+  CtplToken  *if_children;
+  CtplToken  *else_children;
+};
+
+struct s_CtplToken
+{
+  CtplTokenType type;
+  union {
+    char         *t_data;
+    char         *t_var;
+    CtplTokenFor  t_for;
+    CtplTokenIf   t_if;
+  } token;
+  CtplToken    *prev;
+  CtplToken    *next;
+};
+
+
+CtplToken    *ctpl_token_new_data (const char *data,
+                                   gssize      len);
+CtplToken    *ctpl_token_new_var  (const char *var,
+                                   gssize      len);
+CtplToken    *ctpl_token_new_for  (const char *array,
+                                   const char *iterator,
+                                   CtplToken  *children);
+CtplToken    *ctpl_token_new_if   (const char *condition,
+                                   CtplToken  *if_children,
+                                   CtplToken  *else_children);
+void          ctpl_token_free     (CtplToken *token,
+                                   gboolean   chain);
+void          ctpl_token_append   (CtplToken *token,
+                                   CtplToken *brother);
+void          ctpl_token_prepend  (CtplToken *token,
+                                   CtplToken *brother);
+void          ctpl_token_dump     (const CtplToken *token,
+                                   gboolean         chain);
 
 
 G_END_DECLS

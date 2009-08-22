@@ -18,6 +18,7 @@
  */
 
 #include "parse.h"
+#include "lexer.h"
 #include "token.h"
 #include "stack.h"
 #include "environ.h"
@@ -28,6 +29,7 @@
 #include <string.h>
 
 
+#if 0
 static void
 _print_token (const CtplToken *token,
               size_t           nested_level)
@@ -55,6 +57,7 @@ print_token (const CtplToken *token)
 {
   _print_token (token, 0);
 }
+#endif
 
 static void
 _print_value (const CtplValue *value,
@@ -111,6 +114,10 @@ main (int    argc,
     mb = mb_new (buf, strlen (buf), MB_DONTCOPY);
     if (mb)
     {
+      mb_seek (mb, 0, MB_SEEK_END);
+      printf ("last character is '%c'\n", mb_cur_char (mb));
+      mb_seek (mb, 0, MB_SEEK_SET);
+      #if 0
       while (! mb_eof (mb))
       {
         int c;
@@ -134,11 +141,22 @@ main (int    argc,
           }
         }
       }
+      #else
+      CtplToken *root;
+      
+      root = ctpl_lexer_lex (mb);
+      if (! root) {
+        puts ("Wrong data");
+      } else {
+        ctpl_lexer_dump_tree (root);
+        ctpl_lexer_free_tree (root);
+      }
+      #endif
       mb_free (mb);
     }
   }
   
-  #if 1
+  #if 0
   {
     CtplStack *stack;
 

@@ -3,6 +3,7 @@ noinst_PROGRAMS = ctpl
 lib_LTLIBRARIES = libctpl.la
 
 libctpl_la_SOURCES = environ.c \
+                     lexer.c \
                      parse.c \
                      stack.c \
                      token.c \
