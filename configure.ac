@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.64])
+AC_PREREQ([2.63])
 AC_INIT([CTPL], [0.0], [ban@herbesfolles.org])
 AC_CONFIG_SRCDIR([src/stack.c])
 AC_CONFIG_AUX_DIR([build/aux])
