@@ -143,14 +143,16 @@ main (int    argc,
       }
       #else
       CtplToken *root;
+      GError *err = NULL;
       
-      root = ctpl_lexer_lex (mb);
-      if (! root) {
-        puts ("Wrong data");
+      root = ctpl_lexer_lex (mb, &err);
+      if (! root || err) {
+        printf ("Wrong data: %s\n", err ? err->message : "???");
+        g_error_free (err);
       } else {
         ctpl_lexer_dump_tree (root);
-        ctpl_lexer_free_tree (root);
       }
+      ctpl_lexer_free_tree (root);
       #endif
       mb_free (mb);
     }

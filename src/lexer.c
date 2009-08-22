@@ -47,10 +47,24 @@ struct s_LexerState
 
 
 static CtplToken   *ctpl_lexer_lex_internal   (MB          *mb,
-                                               LexerState  *state);
+                                               LexerState  *state,
+                                               GError     **error);
 static CtplToken   *ctpl_lexer_read_token     (MB          *mb,
-                                               LexerState  *state);
+                                               LexerState  *state,
+                                               GError     **error);
 
+
+GQuark
+ctpl_lexer_error_quark (void)
+{
+  static GQuark error_quark = 0;
+  
+  if (G_UNLIKELY (error_quark == 0)) {
+    error_quark = g_quark_from_static_string ("CtplLexer");
+  }
+  
+  return error_quark;
+}
 
 static char *
 read_word (MB          *mb,
@@ -110,7 +124,8 @@ skip_blank (MB *mb)
  * Return a new token or %NULL on error */
 static CtplToken *
 ctpl_lexer_read_token_tpl_if (MB          *mb,
-                              LexerState  *state)
+                              LexerState  *state,
+                              GError     **error)
 {
   char       *expr;
   CtplToken  *token = NULL;
@@ -122,7 +137,10 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
     skip_blank (mb);
     if (mb_getc (mb) != CTPL_END_CHAR) {
       /* fail */
-      g_error ("if: invalid character in condition or missing end character");
+      /*g_error ("if: invalid character in condition or missing end character");*/
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Unexpected character '%c' before end of 'if' statement",
+                   mb_cur_char (mb));
     } else {
       g_debug ("if token: `if %s`", expr);
       /* FIXME: read if and else children */
@@ -139,7 +157,8 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
  * Return a new token or %NULL on error */
 static CtplToken *
 ctpl_lexer_read_token_tpl_for (MB          *mb,
-                               LexerState  *state)
+                               LexerState  *state,
+                               GError     **error)
 {
   CtplToken *token = NULL;
   char *iter_name;
@@ -151,31 +170,40 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   iter_name = read_symbol (mb);
   if (! iter_name) {
     /* fail */
-    g_error ("for: failed to read iter name");
+    /*g_error ("for: failed to read iter name");*/
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "No iterator identifier for 'for' statement");
   } else {
     g_debug ("for: iter is '%s'", iter_name);
     skip_blank (mb);
     keyword_in = read_symbol (mb);
     if (! keyword_in || strcmp (keyword_in, "in") != 0) {
       /* fail */
-      g_error ("for: 'in' keyword missing after iter, got '%s'", keyword_in);
+      /*g_error ("for: 'in' keyword missing after iter, got '%s'", keyword_in);*/
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Missing 'in' keyword after iterator name of 'for' statement");
     } else {
       skip_blank (mb);
       array_name = read_symbol (mb);
       if (! array_name) {
         /* fail */
-        g_error ("for: failed to read array name");
+        /*g_error ("for: failed to read array name");*/
+        g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                     "No array identifier for 'for' loop");
       } else {
         skip_blank (mb);
         if (mb_getc (mb) != CTPL_END_CHAR) {
           /* fail */
-          g_error ("for: no ending character %c", CTPL_END_CHAR);
+          /*g_error ("for: no ending character %c", CTPL_END_CHAR);*/
+          g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                       "Unexpected character '%c' before end of 'for' statement",
+                       mb_cur_char (mb));
         } else {
           g_debug ("for token: `for %s in %s`", iter_name, array_name);
           /* FIXME: read children */
           state->block_depth ++;
           token = ctpl_token_new_for (array_name, iter_name,
-                                      ctpl_lexer_lex_internal (mb, state));
+                                      ctpl_lexer_lex_internal (mb, state, error));
         }
       }
       g_free (array_name);
@@ -191,7 +219,8 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
  * Return a new token or %NULL on error or at data end */
 static gboolean
 ctpl_lexer_read_token_tpl_end (MB          *mb,
-                               LexerState  *state)
+                               LexerState  *state,
+                               GError     **error)
 {
   gboolean rv = FALSE;
   
@@ -199,13 +228,18 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
   skip_blank (mb);
   if (mb_getc (mb) != CTPL_END_CHAR) {
     /* fail, missing } at the end */
-    g_error ("end: missing '%c' at the end", CTPL_END_CHAR);
+    /*g_error ("end: missing '%c' at the end", CTPL_END_CHAR);*/
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "Unexpected character '%c' before end of 'end' statement",
+                 mb_cur_char (mb));
   } else {
     g_debug ("block end");
     state->block_depth --;
     if (state->block_depth < 0) {
       /* fail */
-      g_error ("found end of non-existing block");
+      /*g_error ("found end of non-existing block");*/
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Unmatching 'end' statement (needs a 'if' or 'for' before)");
     } else {
       rv = TRUE;
     }
@@ -217,14 +251,18 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
 /* reads a real token */
 static CtplToken *
 ctpl_lexer_read_token_tpl (MB          *mb,
-                           LexerState  *state)
+                           LexerState  *state,
+                           GError     **error)
 {
   CtplToken *token = NULL;
   
   /* ensure the first character is a start character */
   if (mb_getc (mb) != CTPL_START_CHAR) {
     /* fail */
-    g_error ("expected '%c' before '%c'", CTPL_START_CHAR, mb_cur_char (mb));
+    /*g_error ("expected '%c' before '%c'", CTPL_START_CHAR, mb_cur_char (mb));*/
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "Unexpected character '%c' before start of statement",
+                 mb_cur_char (mb));
   } else {
     gboolean  need_end = TRUE; /* whether the block needs an {end} statement */
     char     *first_word;
@@ -235,15 +273,15 @@ ctpl_lexer_read_token_tpl (MB          *mb,
     if        (strcmp (first_word, "if") == 0) {
       /* an if condition:
        * if expr */
-      token = ctpl_lexer_read_token_tpl_if (mb, state);
+      token = ctpl_lexer_read_token_tpl_if (mb, state, error);
     } else if (strcmp (first_word, "for") == 0) {
       /* a for loop:
        * for iter in array */
-      token = ctpl_lexer_read_token_tpl_for (mb, state);
+      token = ctpl_lexer_read_token_tpl_for (mb, state, error);
     } else if (strcmp (first_word, "end") == 0) {
       /* a block end:
        * {end} */
-      if (! ctpl_lexer_read_token_tpl_end (mb, state)) {
+      if (! ctpl_lexer_read_token_tpl_end (mb, state, error)) {
         /* fail */
       } else {
         /*token = ctpl_lexer_read_token (mb, state);*/
@@ -256,7 +294,10 @@ ctpl_lexer_read_token_tpl (MB          *mb,
       skip_blank (mb);
       if (mb_getc (mb) != CTPL_END_CHAR) {
         /* fail, missing } at the end */
-        g_error ("var: missing '%c' at block end", CTPL_END_CHAR);
+        /*g_error ("var: missing '%c' at block end", CTPL_END_CHAR);*/
+        g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                     "Unexpected character '%c' before end of 'var' statement",
+                     mb_cur_char (mb));
       } else {
         g_debug ("var: %s", first_word);
         token = ctpl_token_new_var (first_word, -1);
@@ -299,7 +340,8 @@ forward_to_non_data (MB *mb)
  * Returns: A new token on success, %NULL otherwise (syntax error) */
 static CtplToken *
 ctpl_lexer_read_token_data (MB         *mb,
-                            LexerState *state)
+                            LexerState *state,
+                            GError    **error)
 {
   gsize start;
   CtplToken *token = NULL;
@@ -307,7 +349,10 @@ ctpl_lexer_read_token_data (MB         *mb,
   start = mb_tell (mb);
   if (! forward_to_non_data (mb)) {
     /* fail */
-    g_error ("unexpected '%c'", CTPL_END_CHAR);
+    /*g_error ("unexpected '%c'", CTPL_END_CHAR);*/
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "Unexpected character '%c' inside data block",
+                 CTPL_END_CHAR);
   } else {
     gsize len;
     char *buf;
@@ -327,7 +372,8 @@ ctpl_lexer_read_token_data (MB         *mb,
 
 static CtplToken *
 ctpl_lexer_read_token (MB          *mb,
-                       LexerState  *state)
+                       LexerState  *state,
+                       GError     **error)
 {
   CtplToken *token = NULL;
   
@@ -335,16 +381,19 @@ ctpl_lexer_read_token (MB          *mb,
   switch (mb_cur_char (mb)) {
     case CTPL_START_CHAR:
       g_debug ("start of a template recognised syntax");
-      token = ctpl_lexer_read_token_tpl (mb, state);
+      token = ctpl_lexer_read_token_tpl (mb, state, error);
       break;
     
     case CTPL_END_CHAR:
       /* fail here */
-      g_error ("syntax error near '%c' token", CTPL_END_CHAR);
+      /*g_error ("syntax error near '%c' token", CTPL_END_CHAR);*/
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Unexpected character '%c' at statement start",
+                   CTPL_END_CHAR);
       break;
     
     default:
-      token = ctpl_lexer_read_token_data (mb, state);
+      token = ctpl_lexer_read_token_data (mb, state, error);
   }
   
   return token;
@@ -352,12 +401,13 @@ ctpl_lexer_read_token (MB          *mb,
 
 static CtplToken *
 ctpl_lexer_lex_internal (MB          *mb,
-                         LexerState  *state)
+                         LexerState  *state,
+                         GError     **error)
 {
   CtplToken  *token = NULL;
   CtplToken  *root = NULL;
   
-  while ((token = ctpl_lexer_read_token (mb, state)) != NULL) {
+  while ((token = ctpl_lexer_read_token (mb, state, error)) != NULL) {
     if (! root) {
       root = token;
     } else {
@@ -369,14 +419,22 @@ ctpl_lexer_lex_internal (MB          *mb,
 }
 
 CtplToken *
-ctpl_lexer_lex (MB *mb)
+ctpl_lexer_lex (MB       *mb,
+                GError  **error)
 {
   CtplToken  *root;
   LexerState  lex_state = {0};
   
-  root = ctpl_lexer_lex_internal (mb, &lex_state);
+  root = ctpl_lexer_lex_internal (mb, &lex_state, error);
   if (lex_state.block_depth != 0) {
-    g_error ("syntax error: block close count doesn't match block open count");
+    /*g_error ("syntax error: block close count doesn't match block open count");*/
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "Closed block count doesn't match open block count "
+                 "(%d %s)",
+                 ABS (lex_state.block_depth),
+                 (lex_state.block_depth > 0)
+                 ? "blocks still opened"
+                 : "unclosed blocks");
   }
   
   return root;

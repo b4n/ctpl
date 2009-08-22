@@ -30,10 +30,20 @@ G_BEGIN_DECLS
 #define CTPL_START_CHAR '{'
 #define CTPL_END_CHAR   '}'
 
+#define CTPL_LEXER_ERROR  (ctpl_lexer_error_quark ())
 
-CtplToken  *ctpl_lexer_lex        (MB *mb);
-void        ctpl_lexer_free_tree  (CtplToken *root);
-void        ctpl_lexer_dump_tree  (const CtplToken *root);
+typedef enum
+{
+  CTPL_LEXER_ERROR_SYNTAX_ERROR,
+  CTPL_LEXER_ERROR_FAILED
+} CtplLexerError;
+
+
+GQuark      ctpl_lexer_error_quark  (void);
+CtplToken  *ctpl_lexer_lex          (MB      *mb,
+                                     GError **error);
+void        ctpl_lexer_free_tree    (CtplToken *root);
+void        ctpl_lexer_dump_tree    (const CtplToken *root);
 
 
 G_END_DECLS
