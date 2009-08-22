@@ -17,21 +17,20 @@
  * 
  */
 
-#ifndef H_CTPL_PARSE_H
-#define H_CTPL_PARSE_H
+#ifndef H_CTPL_PARSER_H
+#define H_CTPL_PARSER_H
 
 #include "token.h"
-#include <mb.h>
+#include "environ.h"
 #include <glib.h>
 
 G_BEGIN_DECLS
 
 
-#define CTPL_START_CHAR '{'
-#define CTPL_END_CHAR   '}'
-
-
-CtplToken *ctpl_parse_read_token (MB *mb);
+/*
+gboolean  ctpl_parser_parse   (CtplToken   *tree,
+                               CtplEnviron *env);
+*/
 
 
 G_END_DECLS
