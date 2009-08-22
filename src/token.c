@@ -18,9 +18,9 @@
  */
 
 #include "token.h"
+#include <string.h>
 #include <glib.h>
 #include <glib/gprintf.h>
-#include <string.h>
 
 
 static CtplToken *
@@ -187,15 +187,21 @@ ctpl_token_prepend (CtplToken *token,
 }
 
 static void
-ctpl_token_dump_internal (const CtplToken *token,
-                          gboolean         chain,
-                          gsize            depth)
+print_depth_prefix (gsize depth)
 {
   gsize i;
   
   for (i = 0; i < depth; i++) {
     g_print ("  ");
   }
+}
+
+static void
+ctpl_token_dump_internal (const CtplToken *token,
+                          gboolean         chain,
+                          gsize            depth)
+{
+  print_depth_prefix (depth);
   g_print ("token[%p]: ", token);
   if (! token) {
     g_print ("\n");
@@ -221,10 +227,14 @@ ctpl_token_dump_internal (const CtplToken *token,
       case CTPL_TOKEN_TYPE_IF:
         g_print ("if: if (%s)\n", token->token.t_if.condition);
         if (token->token.t_if.if_children) {
+          print_depth_prefix (depth);
+          g_print (" then:\n");
           ctpl_token_dump_internal (token->token.t_if.if_children,
                                     TRUE, depth + 1);
         }
         if (token->token.t_if.else_children) {
+          print_depth_prefix (depth);
+          g_print (" else:\n");
           ctpl_token_dump_internal (token->token.t_if.else_children,
                                     TRUE, depth + 1);
         }
