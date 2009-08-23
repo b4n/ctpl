@@ -95,19 +95,21 @@ read_word (MB          *mb,
   int   c;
   gsize start;
   gsize len;
-  char *word;
+  char *word = NULL;
   
   start = mb_tell (mb);
   do {
     c = mb_getc (mb);
   } while (! mb_eof (mb) && strchr (accept, c));
   len = (mb_tell (mb) - start) - 1;
-  word = g_malloc (len + 1);
-  if (word) {
-    mb_seek (mb, start, MB_SEEK_SET);
-    mb_read (mb, word, len);
-    word[len] = 0;
-    /*g_debug ("Next read character will be '%c'", mb_cur_char (mb));*/
+  if (len > 0) {
+    word = g_malloc (len + 1);
+    if (word) {
+      mb_seek (mb, start, MB_SEEK_SET);
+      mb_read (mb, word, len);
+      word[len] = 0;
+      /*g_debug ("Next read character will be '%c'", mb_cur_char (mb));*/
+    }
   }
   
   return word;
@@ -155,7 +157,7 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
   //~ g_debug ("if?");
   skip_blank (mb);
   expr = read_expr (mb);
-  if (! expr || *expr == 0) {
+  if (! expr) {
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Missing expression after 'if' token");
   } else {
@@ -203,7 +205,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   //~ g_debug ("for?");
   skip_blank (mb);
   iter_name = read_symbol (mb);
-  if (! iter_name || *iter_name == 0) {
+  if (! iter_name) {
     /* fail */
     /*g_error ("for: failed to read iter name");*/
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -221,7 +223,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
     } else {
       skip_blank (mb);
       array_name = read_symbol (mb);
-      if (! array_name || *array_name == 0) {
+      if (! array_name) {
         /* fail */
         /*g_error ("for: failed to read array name");*/
         g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -347,7 +349,10 @@ ctpl_lexer_read_token_tpl (MB          *mb,
     skip_blank (mb);
     first_word = read_symbol (mb);
     //~ g_debug ("read word '%s'", first_word);
-    if        (strcmp (first_word, "if") == 0) {
+    if (first_word == NULL) {
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Empty statements are not allowed");
+    } else if (strcmp (first_word, "if") == 0) {
       /* an if condition:
        * if expr */
       token = ctpl_lexer_read_token_tpl_if (mb, state, error);
@@ -366,7 +371,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
        * {else} */
       ctpl_lexer_read_token_tpl_else (mb, state, error);
       /* return NULL, see above */
-    } else if (first_word != NULL) {
+    } else {
       /* a var:
        * {:BLANKCHARS:?:WORDCHARS::BLANKCHARS:?} */
       //~ g_debug ("var?");
@@ -382,8 +387,6 @@ ctpl_lexer_read_token_tpl (MB          *mb,
         //~ g_debug ("var: %s", first_word);
         token = ctpl_token_new_var (first_word, -1);
       }
-    } else {
-      g_error ("WTF???");
     }
     g_free (first_word);
   }
