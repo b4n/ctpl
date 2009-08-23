@@ -39,6 +39,13 @@ G_BEGIN_DECLS
  * Character delimiting end of language tokens from raw data.
  */
 #define CTPL_END_CHAR   '}'
+/**
+ * CTPL_ESCAPE_CHAR:
+ * 
+ * Character used to escape a special character (%CTPL_START_CHAR,
+ * %CTPL_END_CHAR or %CTPL_ESCAPE_CHAR).
+ */
+#define CTPL_ESCAPE_CHAR  '\\'
 
 /**
  * CTPL_LEXER_ERROR:
@@ -50,7 +57,7 @@ G_BEGIN_DECLS
 /**
  * CtplLexerError:
  * @CTPL_LEXER_ERROR_SYNTAX_ERROR: The input data contains invalid syntax
- * @CTPL_LEXER_ERROR_FAILED: A error occurred without any precision on what
+ * @CTPL_LEXER_ERROR_FAILED: An error occurred without any precision on what
  *                           failed.
  * 
  * Error codes that lexing functions can throw.

@@ -3,6 +3,7 @@
 <FILE>lexer</FILE>
 CTPL_START_CHAR
 CTPL_END_CHAR
+CTPL_ESCAPE_CHAR
 CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex

@@ -431,15 +431,17 @@ ctpl_lexer_read_token_tpl (MB          *mb,
 static gboolean
 forward_to_non_data (MB *mb)
 {
-  int prev_c;
-  int c = 0;
-  gboolean rv = TRUE;
+  int       prev_c;
+  int       c       = 0;
+  gboolean  rv      = TRUE;
+  gboolean  escaped = FALSE;
   
   do {
     prev_c = c;
     c = mb_getc (mb);
+    escaped = (prev_c == CTPL_ESCAPE_CHAR) ? !escaped : FALSE;
   } while (! mb_eof (mb) &&
-           ((c != CTPL_START_CHAR && c != CTPL_END_CHAR) || prev_c == '\\'));
+           ((c != CTPL_START_CHAR && c != CTPL_END_CHAR) || escaped));
   
   if (! mb_eof (mb)) {
     mb_seek (mb, -1, MB_SEEK_CUR);
@@ -448,6 +450,29 @@ forward_to_non_data (MB *mb)
   }
   
   return rv;
+}
+
+/* stores read data in @buf by removing unescaped CTPL_ESCAPE_CHAR.
+ * Returns the length filled in @buf */
+static gsize
+do_read_data (MB   *mb,
+              char *buf,
+              gsize input_len)
+{
+  int       prev_c;
+  char      c       = 0;
+  gboolean  escaped = FALSE;
+  gsize     len     = 0;
+  
+  for (; input_len > 0; input_len --) {
+    prev_c = c;
+    c = mb_getc (mb);
+    escaped = (prev_c == CTPL_ESCAPE_CHAR) ? !escaped : FALSE;
+    if (c != CTPL_ESCAPE_CHAR || escaped)
+      buf[len ++] = c;
+  }
+  
+  return len;
 }
 
 /* reads a data token
@@ -475,7 +500,7 @@ ctpl_lexer_read_token_data (MB         *mb,
     buf = g_malloc (len);
     if (buf) {
       mb_seek (mb, start, MB_SEEK_SET);
-      mb_read (mb, buf, len);
+      len = do_read_data (mb, buf, len);
       token = ctpl_token_new_data (buf, len);
     }
     g_free (buf);
