@@ -5,10 +5,11 @@ CTPL_START_CHAR
 CTPL_END_CHAR
 CTPL_LEXER_ERROR
 CtplLexerError
-ctpl_lexer_error_quark
 ctpl_lexer_lex
 ctpl_lexer_free_tree
 ctpl_lexer_dump_tree
+<SUBSECTION Standard>
+ctpl_lexer_error_quark
 </SECTION>
 
 <SECTION>
