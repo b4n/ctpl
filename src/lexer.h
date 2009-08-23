@@ -62,7 +62,7 @@ typedef enum _CtplLexerError
 } CtplLexerError;
 
 
-GQuark      ctpl_lexer_error_quark  (void);
+GQuark      ctpl_lexer_error_quark  (void) G_GNUC_CONST;
 CtplToken  *ctpl_lexer_lex          (MB      *mb,
                                      GError **error);
 void        ctpl_lexer_free_tree    (CtplToken *root);
