@@ -489,13 +489,20 @@ ctpl_lexer_lex_internal (MB          *mb,
 {
   CtplToken  *token = NULL;
   CtplToken  *root = NULL;
+  GError     *err = NULL;
   
-  while ((token = ctpl_lexer_read_token (mb, state, error)) != NULL) {
+  while ((token = ctpl_lexer_read_token (mb, state, &err)) != NULL &&
+         err == NULL) {
     if (! root) {
       root = token;
     } else {
       ctpl_token_append (root, token);
     }
+  }
+  if (err) {
+    ctpl_lexer_free_tree (root);
+    root = NULL;
+    g_propagate_error (error, err);
   }
   
   return root;
@@ -507,17 +514,22 @@ ctpl_lexer_lex (MB       *mb,
 {
   CtplToken  *root;
   LexerState  lex_state = {0, S_NONE};
+  GError     *err = NULL;
   
-  root = ctpl_lexer_lex_internal (mb, &lex_state, error);
-  if (lex_state.block_depth != 0) {
+  root = ctpl_lexer_lex_internal (mb, &lex_state, &err);
+  if (! err /* don't report another error if there is already one */ &&
+      lex_state.block_depth != 0) {
     /*g_error ("syntax error: block close count doesn't match block open count");*/
-    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+    g_set_error (&err, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Closed block count doesn't match open block count "
                  "(%d %s)",
                  ABS (lex_state.block_depth),
                  (lex_state.block_depth > 0)
                  ? "blocks still opened"
                  : "unclosed blocks");
+  }
+  if (err) {
+    g_propagate_error (error, err);
   }
   
   return root;
