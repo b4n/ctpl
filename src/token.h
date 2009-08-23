@@ -32,7 +32,7 @@ G_BEGIN_DECLS
  * @CTPL_TOKEN_TYPE_FOR: A loop through an array of value
  * @CTPL_TOKEN_TYPE_IF: A conditional branching
  * 
- * 
+ * Possible types of a token.
  */
 typedef enum e_CtplTokenType
 {
@@ -46,6 +46,14 @@ typedef struct s_CtplToken    CtplToken;
 typedef struct s_CtplTokenFor CtplTokenFor;
 typedef struct s_CtplTokenIf  CtplTokenIf;
 
+/**
+ * CtplTokenFor:
+ * @array: The symbol of the array
+ * @iter: The symbol of the iterator
+ * @children: Tree to repeat on iterations
+ * 
+ * Holds information about a for statement.
+ */
 struct s_CtplTokenFor
 {
   char       *array;
@@ -53,6 +61,14 @@ struct s_CtplTokenFor
   CtplToken  *children;
 };
 
+/**
+ * CtplTokenIf:
+ * @condition: The condition string
+ * @if_children: Branching if @condiition evaluate to true
+ * @else_children: Branching if @condition evaluate to false
+ * 
+ * Holds information about a if statement.
+ */
 struct s_CtplTokenIf
 {
   char       *condition;
@@ -60,6 +76,15 @@ struct s_CtplTokenIf
   CtplToken  *else_children;
 };
 
+/**
+ * CtplToken:
+ * @type: Type of the token
+ * @token: Union holding the corresponding token (according to @type)
+ * @prev: Previous token
+ * @next: Next token
+ * 
+ * The #CtplToken structure.
+ */
 struct s_CtplToken
 {
   CtplTokenType type;

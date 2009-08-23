@@ -37,6 +37,16 @@ token_new (void)
   return token;
 }
 
+/**
+ * ctpl_token_new_data:
+ * @data: Buffer containing token value (raw data)
+ * @len: length of the @data or -1 if 0-terminated
+ * 
+ * Creates a new token holding raw data.
+ * 
+ * Returns: A new #CtplToken that should be freed with ctpl_token_free() when no
+ *          longer needed.
+ */
 CtplToken *
 ctpl_token_new_data (const char *data,
                      gssize      len)
@@ -54,6 +64,16 @@ ctpl_token_new_data (const char *data,
   return token;
 }
 
+/**
+ * ctpl_token_new_var:
+ * @var: Buffer containing token symbol name
+ * @len: length of the @var or -1 if 0-terminated
+ * 
+ * Creates a new token holding a symbol (variable/constant).
+ * 
+ * Returns: A new #CtplToken that should be freed with ctpl_token_free() when no
+ *          longer needed.
+ */
 CtplToken *
 ctpl_token_new_var (const char *var,
                     gssize      len)
@@ -71,6 +91,17 @@ ctpl_token_new_var (const char *var,
   return token;
 }
 
+/**
+ * ctpl_token_new_for:
+ * @array: String containing the name of the array to iterate
+ * @iterator: String containing the name of the array iterator
+ * @children: Sub-tree that should be treated on each loop iteration.
+ * 
+ * Creates a new token holding a for statement.
+ * 
+ * Returns: A new #CtplToken that should be freed with ctpl_token_free() when no
+ *          longer needed.
+ */
 CtplToken *
 ctpl_token_new_for (const char *array,
                     const char *iterator,
@@ -97,9 +128,10 @@ ctpl_token_new_for (const char *array,
  * @if_children: Branching if condition evaluate to true
  * @else_children: Branching if condition evaluate to false, or %NULL
  * 
+ * Creates a new token holding an if statement.
  * 
- * 
- * Returns: A new #CtplToken
+ * Returns: A new #CtplToken that should be freed with ctpl_token_free() when no
+ *          longer needed.
  */
 CtplToken *
 ctpl_token_new_if (const char *condition,
@@ -121,6 +153,18 @@ ctpl_token_new_if (const char *condition,
   return token;
 }
 
+/**
+ * ctpl_token_free:
+ * @token: A #CtplToken to free
+ * @chain: Whether all next tokens should be freed too or not.
+ * 
+ * Frees all memory used bey a #CtplToken.
+ * If @chain is %TRUE, all tokens attached at the right of @token (appended
+ * ones) will be freed too. Then, if this function is called with @chain set to
+ * %TRUE on the root token of a tree, all the tree will be freed.
+ * Otherwise, if @chain is %FALSE, @token is freed and detached from its
+ * neighbours.
+ */
 void
 ctpl_token_free (CtplToken *token,
                  gboolean   chain)
@@ -164,6 +208,13 @@ ctpl_token_free (CtplToken *token,
   }
 }
 
+/**
+ * ctpl_token_append:
+ * @token: A #CtplToken
+ * @brother: Another #CtplToken
+ * 
+ * Appends (link at the end) @brother to @token.
+ */
 void
 ctpl_token_append (CtplToken *token,
                    CtplToken *brother)
@@ -175,6 +226,13 @@ ctpl_token_append (CtplToken *token,
   brother->prev = token;
 }
 
+/**
+ * ctpl_token_prepend:
+ * @token: A #CtplToken
+ * @brother: Another #CtplToken
+ * 
+ * Prepends (link at the start) @btother to @token.
+ */
 void
 ctpl_token_prepend (CtplToken *token,
                     CtplToken *brother)
@@ -249,6 +307,14 @@ ctpl_token_dump_internal (const CtplToken *token,
   }
 }
 
+/**
+ * ctpl_token_dump:
+ * @token: A #CtplToken
+ * @chain: Whether to dump all next tokens
+ * 
+ * Dumps a token with g_print().
+ * If @chain is %TRUE, all next tokens will be dumped too.
+ */
 void
 ctpl_token_dump (const CtplToken *token,
                  gboolean         chain)
