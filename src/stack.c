@@ -135,7 +135,7 @@ ctpl_stack_init (CtplStack   *stack,
   stack->compare_func = compare_func;
   stack->free_func    = free_func;
   stack->last         = NULL;
-  stack->last_free    = NULL;
+  stack->free_stack   = NULL;
 }
 
 /**
@@ -165,17 +165,19 @@ ctpl_stack_new (GCompareFunc  compare_func,
  * ctpl_stack_free:
  * @stack: A #CtplStack
  * 
- * Frees a #CtplBuffer
+ * Frees a #CtplStack
  */
 void
 ctpl_stack_free (CtplStack *stack)
 {
-  while (stack->last_free) {
-    stack->last_free = ctpl_stack_entry_free (stack->last_free,
-                                              stack->free_func);
+  GSList *tmp;
+  
+  for (tmp = stack->free_stack; tmp; tmp = tmp->next) {
+    ctpl_stack_entry_free (tmp->data, stack->free_func);
   }
-  stack->last_free  = NULL;
-  stack->last       = NULL;
+  g_slist_free (stack->free_stack);
+  stack->free_stack = NULL;
+  stack->last = NULL;
   g_free (stack);
 }
 
@@ -242,7 +244,7 @@ ctpl_stack_push (CtplStack *stack,
     entry = ctpl_stack_entry_new (stack, data);
     if (entry) {
       stack->last       = ctpl_stack_entry_ref (entry);
-      stack->last_free  = entry;
+      stack->free_stack = g_slist_append (stack->free_stack, entry);
       g_debug ("Pushed an entry");
     }
   }

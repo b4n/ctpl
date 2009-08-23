@@ -48,7 +48,7 @@ struct _CtplStackEntry
  * @compare_func: Function to compare two stack elements
  * @free_func: Function to free a stack element
  * @last: Last pushed element, or NULL
- * @last_free: Last item of pushed elements for freeing them later.
+ * @free_stack: List of elements the should be freed when stack is freed
  * 
  * The stack structure.
  */
@@ -58,7 +58,7 @@ struct _CtplStack
   GCompareFunc    compare_func;
   GFreeFunc       free_func;
   CtplStackEntry *last;
-  CtplStackEntry *last_free;
+  GSList         *free_stack;
 };
 
 
