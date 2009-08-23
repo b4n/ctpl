@@ -185,7 +185,7 @@ static void
 _ctpl_stack_push_ref (CtplStack *stack)
 {
   ctpl_stack_entry_ref (stack->last);
-  g_debug ("Pushed a reference");
+  //~ g_debug ("Pushed a reference");
 }
 
 /**
@@ -245,7 +245,7 @@ ctpl_stack_push (CtplStack *stack,
     if (entry) {
       stack->last       = ctpl_stack_entry_ref (entry);
       stack->free_stack = g_slist_append (stack->free_stack, entry);
-      g_debug ("Pushed an entry");
+      //~ g_debug ("Pushed an entry");
     }
   }
 }
