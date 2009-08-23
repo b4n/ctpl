@@ -60,49 +60,6 @@ void              ctpl_environ_push_string    (CtplEnviron     *env,
 const CtplValue  *ctpl_environ_pop            (CtplEnviron *env,
                                                const char  *symbol);
 
-/* en fait ce n'est pas une bonne idée, le concept de scope et inutile ici,
- * et rend le tout particulièrement lourd. Le seule chose utile est de pouvoir
- * "pusher" et "poper" des variables/constantes :
- * 
- * Une boucle :
- * {for i in items}
- *   ...
- * {end}
- * ->
- *   lookup items
- *   assert items is array
- *   while items:
- *     push i = *items
- *     ...
- *     pop i
- *     ++items
- * 
- * Une affectation :
- * {i = 42}
- * ->
- *   pop i
- *   push i = 42
- * qui pourrait être simplifiée, moyenant une instruction en plus :
- * {i = 42}
- * ->
- *   set i = 42
- * Avec référence à une variable :
- * {i = foo}
- * ->
- *   lookup foo
- *   set i = foo
- * 
- * Un test :
- * {if n > 42}
- *   ...
- * {end}
- * ->
- *   lookup n
- *   if eval n > 42:
- *     ...
- * 
- */
-
 
 G_END_DECLS
 
