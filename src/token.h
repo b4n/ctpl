@@ -117,6 +117,7 @@ void          ctpl_token_prepend  (CtplToken *token,
                                    CtplToken *brother);
 void          ctpl_token_dump     (const CtplToken *token,
                                    gboolean         chain);
+#define ctpl_token_get_type(token) ((token)->type)
 
 
 G_END_DECLS
