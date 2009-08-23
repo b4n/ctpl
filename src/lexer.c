@@ -32,7 +32,7 @@
                     "0123456789" \
                     "_"
 #define BLANKCHARS " \t\v\r\n"
-#define EXPRCHARS "()+-/*=><" \
+#define EXPRCHARS "()+-/*=><%" \
                   "." /* for floating point values */ \
                   BLANKCHARS /* allow any blank character in expr */ \
                   SYMBOLCHARS /* for references to symbols */
