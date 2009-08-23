@@ -47,9 +47,10 @@
 
   <chapter>
     <title>API reference</title>
-    <xi:include href="xml/token.xml"/>
     <xi:include href="xml/environ.xml"/>
-    <xi:include href="xml/parse.xml"/>
+    <xi:include href="xml/token.xml"/>
+    <xi:include href="xml/lexer.xml"/>
+    <xi:include href="xml/parser.xml"/>
     <xi:include href="xml/value.xml"/>
     <xi:include href="xml/stack.xml"/>
   </chapter>
