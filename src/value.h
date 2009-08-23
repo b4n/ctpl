@@ -194,6 +194,7 @@ float        *ctpl_value_get_array_float  (const CtplValue *value,
                                            gsize           *length);
 char        **ctpl_value_get_array_string (const CtplValue *value,
                                            gsize           *length);
+char         *ctpl_value_to_string        (const CtplValue *value);
 
 
 #if 0

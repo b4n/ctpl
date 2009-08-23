@@ -450,7 +450,8 @@ ctpl_value_set_arrayv (CtplValue     *value,
     case CTPL_VTYPE_FLOAT: {
       gsize i;
       for (i = 0; i < count; i++) {
-        ctpl_value_array_append_float (value, va_arg (ap, double));
+        /* float is promoted to double in varags, the cast back to float */
+        ctpl_value_array_append_float (value, (float)va_arg (ap, double));
       }
       break;
     }
@@ -979,4 +980,53 @@ ctpl_value_get_array_string (const CtplValue *value,
  fail:
   g_free (array);
   return NULL;
+}
+
+char *
+ctpl_value_to_string (const CtplValue *value)
+{
+  char *val = NULL;
+  
+  switch (ctpl_value_get_held_type (value)) {
+    case CTPL_VTYPE_ARRAY: {
+      /* FIXME: should we warn when converting arrays to strings? */
+      const GSList *subvalues;
+      GString      *string;
+      
+      string = g_string_new ("[");
+      for (subvalues = ctpl_value_get_array (value);
+           subvalues;
+           subvalues = subvalues->next) {
+        char *item;
+        
+        item = ctpl_value_to_string (subvalues->data);
+        g_string_append (string, item);
+        g_free (item);
+        /* append a comma if there is a next element */
+        if (subvalues->next) {
+          g_string_append (string, ", ");
+        }
+      }
+      g_string_append (string, "]");
+      val = g_string_free (string, FALSE);
+      break;
+    }
+    
+    case CTPL_VTYPE_FLOAT:
+      val = g_strdup_printf ("%f", value->value.v_float);
+      break;
+    
+    case CTPL_VTYPE_INT:
+      val = g_strdup_printf ("%d", value->value.v_int);
+      break;
+    
+    case CTPL_VTYPE_STRING:
+      val = g_strdup (value->value.v_string);
+      break;
+    
+    default:
+      g_critical ("WTF???");
+  }
+  
+  return val;
 }
