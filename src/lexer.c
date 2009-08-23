@@ -152,7 +152,7 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
   char       *expr;
   CtplToken  *token = NULL;
   
-  g_debug ("if?");
+  //~ g_debug ("if?");
   skip_blank (mb);
   expr = read_expr (mb);
   if (! expr || *expr == 0) {
@@ -170,12 +170,12 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
       CtplToken *if_token;
       CtplToken *else_token = NULL;
       
-      g_debug ("if token: `if %s`", expr);
+      //~ g_debug ("if token: `if %s`", expr);
       state->block_depth ++;
       state->last_statement_type_if = S_IF;
       if_token = ctpl_lexer_lex_internal (mb, state, error);
       if (state->last_statement_type_if == S_ELSE) {
-        g_debug ("have else");
+        //~ g_debug ("have else");
         else_token = ctpl_lexer_lex_internal (mb, state, error);
       }
       token = ctpl_token_new_if (expr, if_token, else_token);
@@ -198,7 +198,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   char *keyword_in;
   char *array_name;
   
-  g_debug ("for?");
+  //~ g_debug ("for?");
   skip_blank (mb);
   iter_name = read_symbol (mb);
   if (! iter_name || *iter_name == 0) {
@@ -207,7 +207,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "No iterator identifier for 'for' statement");
   } else {
-    g_debug ("for: iter is '%s'", iter_name);
+    //~ g_debug ("for: iter is '%s'", iter_name);
     skip_blank (mb);
     keyword_in = read_symbol (mb);
     if (! keyword_in || strcmp (keyword_in, "in") != 0) {
@@ -235,7 +235,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
         } else {
           CtplToken *for_children;
           
-          g_debug ("for token: `for %s in %s`", iter_name, array_name);
+          //~ g_debug ("for token: `for %s in %s`", iter_name, array_name);
           state->block_depth ++;
           for_children = ctpl_lexer_lex_internal (mb, state, error);
           token = ctpl_token_new_for (array_name, iter_name, for_children);
@@ -259,7 +259,7 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
 {
   gboolean rv = FALSE;
   
-  g_debug ("end?");
+  //~ g_debug ("end?");
   skip_blank (mb);
   if (mb_getc (mb) != CTPL_END_CHAR) {
     /* fail, missing } at the end */
@@ -268,7 +268,7 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
                  "Unexpected character '%c' before end of 'end' statement",
                  mb_cur_char (mb));
   } else {
-    g_debug ("block end");
+    //~ g_debug ("block end");
     state->block_depth --;
     if (state->block_depth < 0) {
       /* fail */
@@ -293,7 +293,7 @@ ctpl_lexer_read_token_tpl_else (MB          *mb,
 {
   gboolean rv = FALSE;
   
-  g_debug ("else?");
+  //~ g_debug ("else?");
   skip_blank (mb);
   if (mb_getc (mb) != CTPL_END_CHAR) {
     /* fail, missing } at the end */
@@ -302,7 +302,7 @@ ctpl_lexer_read_token_tpl_else (MB          *mb,
                  "Unexpected character '%c' before end of 'else' statement",
                  mb_cur_char (mb));
   } else {
-    g_debug ("else statement");
+    //~ g_debug ("else statement");
     if (state->last_statement_type_if != S_IF) {
       /* fail */
       /*g_error ("found else statement but no previous if");*/
@@ -338,7 +338,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
     
     skip_blank (mb);
     first_word = read_symbol (mb);
-    g_debug ("read word '%s'", first_word);
+    //~ g_debug ("read word '%s'", first_word);
     if        (strcmp (first_word, "if") == 0) {
       /* an if condition:
        * if expr */
@@ -361,7 +361,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
     } else if (first_word != NULL) {
       /* a var:
        * {:BLANKCHARS:?:WORDCHARS::BLANKCHARS:?} */
-      g_debug ("var?");
+      //~ g_debug ("var?");
       need_end = FALSE;
       skip_blank (mb);
       if (mb_getc (mb) != CTPL_END_CHAR) {
@@ -371,7 +371,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
                      "Unexpected character '%c' before end of 'var' statement",
                      mb_cur_char (mb));
       } else {
-        g_debug ("var: %s", first_word);
+        //~ g_debug ("var: %s", first_word);
         token = ctpl_token_new_var (first_word, -1);
       }
     } else {
@@ -449,10 +449,10 @@ ctpl_lexer_read_token (MB          *mb,
 {
   CtplToken *token = NULL;
   
-  g_debug ("Will read a token (starts with %c)", mb_cur_char (mb));
+  //~ g_debug ("Will read a token (starts with %c)", mb_cur_char (mb));
   switch (mb_cur_char (mb)) {
     case CTPL_START_CHAR:
-      g_debug ("start of a template recognised syntax");
+      //~ g_debug ("start of a template recognised syntax");
       token = ctpl_lexer_read_token_tpl (mb, state, error);
       break;
     
