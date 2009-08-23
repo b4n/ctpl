@@ -27,11 +27,34 @@
 G_BEGIN_DECLS
 
 
+/**
+ * CTPL_START_CHAR:
+ * 
+ * Character delimiting start of language tokens from raw data.
+ */
 #define CTPL_START_CHAR '{'
+/**
+ * CTPL_END_CHAR:
+ * 
+ * Character delimiting end of language tokens from raw data.
+ */
 #define CTPL_END_CHAR   '}'
 
+/**
+ * CTPL_LEXER_ERROR:
+ * 
+ * Domain of CtplLexer errors.
+ */
 #define CTPL_LEXER_ERROR  (ctpl_lexer_error_quark ())
 
+/**
+ * CtplLexerError:
+ * @CTPL_LEXER_ERROR_SYNTAX_ERROR: The input data contains invalid syntax
+ * @CTPL_LEXER_ERROR_FAILED: A error occurred without any precision on what
+ *                           failed.
+ * 
+ * Error codes that lexing functions can throw.
+ */
 typedef enum
 {
   CTPL_LEXER_ERROR_SYNTAX_ERROR,
