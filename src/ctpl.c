@@ -29,36 +29,6 @@
 #include <string.h>
 
 
-#if 0
-static void
-_print_token (const CtplToken *token,
-              size_t           nested_level)
-{
-  if (token)
-  {
-    size_t i;
-    
-    putchar ('"');
-    for (i = 0; i < token->len; i++)
-      putchar (token->token[i]);
-    putchar ('"');
-    putchar ('\n');
-    if (token->child)
-    {
-      for (i = 0; i < nested_level; i++)
-        fputs ("   ", stdout);
-      fputs ("-> ", stdout);
-      _print_token (token->child, nested_level + 1);
-    }
-  }
-}
-static void
-print_token (const CtplToken *token)
-{
-  _print_token (token, 0);
-}
-#endif
-
 static void
 _print_value (const CtplValue *value,
               size_t           nesting_level)
@@ -114,34 +84,6 @@ main (int    argc,
     mb = mb_new (buf, strlen (buf), MB_DONTCOPY);
     if (mb)
     {
-      mb_seek (mb, 0, MB_SEEK_END);
-      printf ("last character is '%c'\n", mb_cur_char (mb));
-      mb_seek (mb, 0, MB_SEEK_SET);
-      #if 0
-      while (! mb_eof (mb))
-      {
-        int c;
-        
-        c = mb_getc (mb);
-        if (c == CTPL_START_CHAR)
-        {
-          CtplToken *token;
-          
-          mb_seek (mb, -1, MB_CURSOR_POS_CUR);
-          token = ctpl_parse_read_token (mb);
-          if (token)
-          {
-            print_token (token);
-            ctpl_token_free (token, TRUE);
-          }
-          else
-          {
-            puts ("whattafoc?");
-            mb_getc (mb);
-          }
-        }
-      }
-      #else
       CtplToken *root;
       GError *err = NULL;
       
@@ -153,7 +95,6 @@ main (int    argc,
         ctpl_lexer_dump_tree (root);
       }
       ctpl_lexer_free_tree (root);
-      #endif
       mb_free (mb);
     }
   }
