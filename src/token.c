@@ -23,6 +23,15 @@
 #include <glib/gprintf.h>
 
 
+/**
+ * SECTION: token
+ * @short_description: Language token
+ * @include: ctpl/token.h
+ * 
+ * Represents a CTPL language token.
+ */
+
+
 static CtplToken *
 token_new (void)
 {
