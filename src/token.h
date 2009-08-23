@@ -34,7 +34,7 @@ G_BEGIN_DECLS
  * 
  * Possible types of a token.
  */
-typedef enum e_CtplTokenType
+typedef enum _CtplTokenType
 {
   CTPL_TOKEN_TYPE_DATA,
   CTPL_TOKEN_TYPE_VAR,
@@ -42,9 +42,9 @@ typedef enum e_CtplTokenType
   CTPL_TOKEN_TYPE_IF
 } CtplTokenType;
 
-typedef struct s_CtplToken    CtplToken;
-typedef struct s_CtplTokenFor CtplTokenFor;
-typedef struct s_CtplTokenIf  CtplTokenIf;
+typedef struct _CtplToken     CtplToken;
+typedef struct _CtplTokenFor  CtplTokenFor;
+typedef struct _CtplTokenIf   CtplTokenIf;
 
 /**
  * CtplTokenFor:
@@ -54,7 +54,7 @@ typedef struct s_CtplTokenIf  CtplTokenIf;
  * 
  * Holds information about a for statement.
  */
-struct s_CtplTokenFor
+struct _CtplTokenFor
 {
   char       *array;
   char       *iter;
@@ -69,7 +69,7 @@ struct s_CtplTokenFor
  * 
  * Holds information about a if statement.
  */
-struct s_CtplTokenIf
+struct _CtplTokenIf
 {
   char       *condition;
   CtplToken  *if_children;
@@ -85,7 +85,7 @@ struct s_CtplTokenIf
  * 
  * The #CtplToken structure.
  */
-struct s_CtplToken
+struct _CtplToken
 {
   CtplTokenType type;
   union {

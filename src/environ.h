@@ -26,16 +26,17 @@
 G_BEGIN_DECLS
 
 
-typedef struct s_CtplEnviron  CtplEnviron;
+typedef struct _CtplEnviron CtplEnviron;
 
 /**
  * CtplEnviron:
  * @symbol_table: Table containing stacks of symbols
  * 
- * Represents a environment
+ * Represents an environment
  */
-struct s_CtplEnviron
+struct _CtplEnviron
 {
+  /*<private>*/
   GHashTable     *symbol_table; /* hash table containing stacks of symbols */
 };
 

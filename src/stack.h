@@ -25,8 +25,8 @@
 G_BEGIN_DECLS
 
 
-typedef struct s_CtplStack       CtplStack;
-typedef struct s_CtplStackEntry  CtplStackEntry;
+typedef struct _CtplStack       CtplStack;
+typedef struct _CtplStackEntry  CtplStackEntry;
 
 /**
  * CtplStackEntry:
@@ -36,7 +36,7 @@ typedef struct s_CtplStackEntry  CtplStackEntry;
  * 
  * A stack entry.
  */
-struct s_CtplStackEntry
+struct _CtplStackEntry
 {
   guint           ref_count;
   void           *data;
@@ -52,8 +52,9 @@ struct s_CtplStackEntry
  * 
  * The stack structure.
  */
-struct s_CtplStack
+struct _CtplStack
 {
+  /*<private>*/
   GCompareFunc    compare_func;
   GFreeFunc       free_func;
   CtplStackEntry *last;

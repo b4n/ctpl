@@ -55,7 +55,7 @@ G_BEGIN_DECLS
  * 
  * Error codes that lexing functions can throw.
  */
-typedef enum
+typedef enum _CtplLexerError
 {
   CTPL_LEXER_ERROR_SYNTAX_ERROR,
   CTPL_LEXER_ERROR_FAILED

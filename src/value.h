@@ -35,7 +35,7 @@ G_BEGIN_DECLS
  * 
  * Represents the types that a #CtplValue can hold.
  */
-typedef enum e_CtplValueType
+typedef enum _CtplValueType
 {
   CTPL_VTYPE_INT,
   CTPL_VTYPE_FLOAT,
@@ -43,7 +43,7 @@ typedef enum e_CtplValueType
   CTPL_VTYPE_ARRAY
 } CtplValueType;
 
-typedef struct s_CtplValue CtplValue;
+typedef struct _CtplValue CtplValue;
 
 /* Public in order to be able to use statically allocated values. */
 /**
@@ -53,7 +53,7 @@ typedef struct s_CtplValue CtplValue;
  * 
  * Represents a generic value.
  */
-struct s_CtplValue
+struct _CtplValue
 {
   /*<private>*/
   int type;
