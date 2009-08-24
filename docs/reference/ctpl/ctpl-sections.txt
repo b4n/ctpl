@@ -33,6 +33,11 @@ ctpl_token_dump
 <SECTION>
 <TITLE>CtplParser</TITLE>
 <FILE>parser</FILE>
+CTPL_PARSER_ERROR
+CtplParserError
+ctpl_parser_parse
+<SUBSECTION Standard>
+ctpl_parser_error_quark
 </SECTION>
 
 <SECTION>

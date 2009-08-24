@@ -22,15 +22,43 @@
 
 #include "token.h"
 #include "environ.h"
+#include <mb.h>
 #include <glib.h>
 
 G_BEGIN_DECLS
 
 
-/*
-gboolean  ctpl_parser_parse   (CtplToken   *tree,
-                               CtplEnviron *env);
-*/
+/**
+ * CTPL_PARSER_ERROR:
+ * 
+ * Error domain of CtplParser.
+ */
+#define CTPL_PARSER_ERROR  (ctpl_parser_error_quark ())
+
+/**
+ * CtplParserError:
+ * @CTPL_PARSER_ERROR_INCOMPATIBLE_SYMBOL: A symbol is incompatible with is
+ *                                         usage.
+ * @CTPL_PARSER_ERROR_SYMBOL_NOT_FOUND: A symbol cannot be found in the
+ *                                      environment.
+ * @CTPL_PARSER_ERROR_FAILED: An error occurred without any precision on what
+ *                            failed.
+ * 
+ * Error codes that parsing functions can throw.
+ */
+typedef enum _CtplParserError
+{
+  CTPL_PARSER_ERROR_INCOMPATIBLE_SYMBOL,
+  CTPL_PARSER_ERROR_SYMBOL_NOT_FOUND,
+  CTPL_PARSER_ERROR_FAILED
+} CtplParserError;
+
+
+GQuark    ctpl_parser_error_quark   (void) G_GNUC_CONST;
+gboolean  ctpl_parser_parse         (const CtplToken *tree,
+                                     CtplEnviron     *env,
+                                     MB              *output,
+                                     GError         **error);
 
 
 G_END_DECLS
