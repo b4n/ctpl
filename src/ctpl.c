@@ -68,6 +68,37 @@ print_value (const CtplValue *value)
   _print_value (value, 0);
 }
 
+static CtplEnviron *
+build_env (void)
+{
+  CtplEnviron  *env;
+  CtplValue     val;
+  
+  ctpl_value_init (&val);
+  
+  env = ctpl_environ_new ();
+  ctpl_environ_push_string (env, "foo", "(was foo)");
+  ctpl_environ_push_string (env, "bar", "(was bar)");
+  ctpl_environ_push_int (env, "num", 42);
+  ctpl_value_set_array_string (&val, 3, "first", "second", "third", NULL);
+  ctpl_environ_push (env, "array", &val);
+  
+  ctpl_value_free_value (&val);
+  
+  return env;
+}
+
+static void
+dump_mb (MB    *mb,
+         FILE  *fp)
+{
+  mb_seek (mb, 0, MB_SEEK_SET);
+  while (! mb_eof (mb)) {
+    fputc (mb_getc (mb), fp);
+  }
+  fputc ('\n', fp);
+}
+
 int
 main (int    argc,
       char **argv)
@@ -75,6 +106,7 @@ main (int    argc,
   int err = 0;
   MB *mb;
   
+  # if 1
   if (argc < 2)
     err = 1;
   else
@@ -89,21 +121,40 @@ main (int    argc,
       
       root = ctpl_lexer_lex (mb, &err);
       if (! root || err) {
-        printf ("Wrong data: %s\n", err ? err->message : "???");
+        fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
         g_error_free (err);
       } else {
+        MB *output;
+        CtplEnviron *env;
+        
         ctpl_lexer_dump_tree (root);
+        
+        env = build_env ();
+        output = mb_new (NULL, 0, MB_FREEABLE | MB_GROWABLE);
+        if (! ctpl_parser_parse (root, env, output, &err)) {
+          fprintf (stderr, "Parser failed: %s\n", err ? err->message : "???");
+          g_error_free (err);
+        } else {
+          fputs ("===== output =====\n", stdout);
+          dump_mb (output, stdout);
+          fputs ("=== end output ===\n", stdout);
+        }
+        mb_free (output);
+        ctpl_environ_free (env);
       }
       ctpl_lexer_free_tree (root);
       mb_free (mb);
     }
   }
+  #endif
   
   #if 0
   {
     CtplStack *stack;
 
     stack = ctpl_stack_new (g_strcmp0, g_free);
+    ctpl_stack_push (stack, g_strdup ("bar"));
+    ctpl_stack_pop (stack);
     ctpl_stack_push (stack, g_strdup ("bar"));
     ctpl_stack_push (stack, g_strdup ("foo"));
     ctpl_stack_push (stack, g_strdup ("foo"));
