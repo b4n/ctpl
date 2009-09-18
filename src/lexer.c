@@ -18,6 +18,7 @@
  */
 
 #include "lexer.h"
+#include "lexer-expr.h"
 #include "token.h"
 #include <mb.h>
 #include <glib.h>
@@ -54,19 +55,6 @@
  * </example>
  */
 
-
-/* characters valid for symbols */
-#define SYMBOLCHARS "abcdefghijklmnopqrstuvwxyz" \
-                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-                    "0123456789" \
-                    "_"
-/* characters valid when blank characters are expected */
-#define BLANKCHARS " \t\v\r\n"
-/* characters valid in expressions */
-#define EXPRCHARS "()+-/*=><%" \
-                  "." /* for floating point values */ \
-                  BLANKCHARS /* allow any blank character in expr */ \
-                  SYMBOLCHARS /* for references to symbols */
 
 /* statements constants */
 enum
@@ -149,13 +137,13 @@ read_word (MB          *mb,
 static char *
 read_symbol (MB *mb)
 {
-  return read_word (mb, SYMBOLCHARS);
+  return read_word (mb, CTPL_SYMBOL_CHARS);
 }
 
 static char *
 read_expr (MB *mb)
 {
-  return read_word (mb, EXPRCHARS);
+  return read_word (mb, CTPL_EXPR_CHARS);
 }
 
 static gsize
@@ -167,8 +155,8 @@ skip_blank (MB *mb)
   do {
     c = mb_getc (mb);
     n++;
-  } while (! mb_eof (mb) && strchr (BLANKCHARS, c));
-  if (! strchr (BLANKCHARS, c))
+  } while (! mb_eof (mb) && strchr (CTPL_BLANK_CHARS, c));
+  if (! strchr (CTPL_BLANK_CHARS, c))
     mb_seek (mb, -1, MB_SEEK_CUR);
   
   return n;
@@ -192,28 +180,34 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Missing expression after 'if' token");
   } else {
-    int c;
+    CtplTokenExpr *texpr;
     
-    skip_blank (mb);
-    if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
-      /* fail */
-      /*g_error ("if: invalid character in condition or missing end character");*/
-      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                   "Unexpected character '%c' before end of 'if' statement",
-                   c);
-    } else {
-      CtplToken *if_token;
-      CtplToken *else_token = NULL;
+    texpr = ctpl_lexer_expr_lex (expr, -1, error);
+    if (texpr) {
+      int c;
       
-      //~ g_debug ("if token: `if %s`", expr);
-      state->block_depth ++;
-      state->last_statement_type_if = S_IF;
-      if_token = ctpl_lexer_lex_internal (mb, state, error);
-      if (state->last_statement_type_if == S_ELSE) {
-        //~ g_debug ("have else");
-        else_token = ctpl_lexer_lex_internal (mb, state, error);
+      skip_blank (mb);
+      if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
+        /* fail */
+        ctpl_token_expr_free (texpr, TRUE);
+        /*g_error ("if: invalid character in condition or missing end character");*/
+        g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                     "Unexpected character '%c' before end of 'if' statement",
+                     c);
+      } else {
+        CtplToken *if_token;
+        CtplToken *else_token = NULL;
+        
+        //~ g_debug ("if token: `if %s`", expr);
+        state->block_depth ++;
+        state->last_statement_type_if = S_IF;
+        if_token = ctpl_lexer_lex_internal (mb, state, error);
+        if (state->last_statement_type_if == S_ELSE) {
+          //~ g_debug ("have else");
+          else_token = ctpl_lexer_lex_internal (mb, state, error);
+        }
+        token = ctpl_token_new_if (texpr, if_token, else_token);
       }
-      token = ctpl_token_new_if (expr, if_token, else_token);
     }
   }
   g_free (expr);
@@ -496,6 +490,8 @@ ctpl_lexer_read_token_data (MB         *mb,
     gsize len;
     char *buf;
     
+    /* TODO: speed up read of data. For example, we don't have to re-read all
+     * character by character to remove escape character if there's no one */
     len = mb_tell (mb) - start;
     buf = g_malloc (len);
     if (buf) {

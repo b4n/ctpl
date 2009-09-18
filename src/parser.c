@@ -18,6 +18,7 @@
  */
 
 #include "parser.h"
+#include "eval.h"
 #include "token.h"
 #include <mb.h>
 #include <glib.h>
@@ -179,7 +180,7 @@ ctpl_parser_parse_token_if (const CtplTokenIf  *token,
 {
   /* FIXME: */
   gboolean  rv = FALSE;
-  #if 0
+  #if 1
   gboolean  eval;
   GError   *err = NULL;
   

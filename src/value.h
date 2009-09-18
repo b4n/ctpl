@@ -183,6 +183,7 @@ void          ctpl_value_array_append_string  (CtplValue       *value,
                                                const char      *val);
 void          ctpl_value_array_prepend_string (CtplValue       *value,
                                                const char      *val);
+gsize         ctpl_value_array_length         (const CtplValue *value);
 CtplValueType ctpl_value_get_held_type    (const CtplValue *value);
 int           ctpl_value_get_int          (const CtplValue *value);
 float         ctpl_value_get_float        (const CtplValue *value);
@@ -195,6 +196,22 @@ float        *ctpl_value_get_array_float  (const CtplValue *value,
 char        **ctpl_value_get_array_string (const CtplValue *value,
                                            gsize           *length);
 char         *ctpl_value_to_string        (const CtplValue *value);
+gboolean      ctpl_value_convert          (CtplValue     *value,
+                                           CtplValueType  vtype);
+
+const char   *ctpl_value_type_get_name    (CtplValueType type);
+/**
+ * ctpl_value_get_held_type_name:
+ * @v: A #CtplValue pointer
+ * 
+ * Gets a human-readable name for the type held by a value.
+ * See also ctpl_value_type_get_name().
+ * 
+ * Returns: A static string of a displayable name of the type held by @v. This
+ *          string must not be modified or freed.
+ */
+#define ctpl_value_get_held_type_name(v) \
+  (ctpl_value_type_get_name (ctpl_value_get_held_type ((v))))
 
 
 #if 0

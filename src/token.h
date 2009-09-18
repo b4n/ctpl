@@ -39,12 +39,22 @@ typedef enum _CtplTokenType
   CTPL_TOKEN_TYPE_DATA,
   CTPL_TOKEN_TYPE_VAR,
   CTPL_TOKEN_TYPE_FOR,
-  CTPL_TOKEN_TYPE_IF
+  CTPL_TOKEN_TYPE_IF/*,
+  CTPL_TOKEN_TYPE_EXPR*/
 } CtplTokenType;
+
+typedef enum _CtplTokenExprType
+{
+  CTPL_TOKEN_EXPR_TYPE_OPERATOR,
+  CTPL_TOKEN_EXPR_TYPE_INTEGER,
+  CTPL_TOKEN_EXPR_TYPE_FLOAT,
+  CTPL_TOKEN_EXPR_TYPE_SYMBOL
+} CtplTokenExprType;
 
 typedef struct _CtplToken     CtplToken;
 typedef struct _CtplTokenFor  CtplTokenFor;
 typedef struct _CtplTokenIf   CtplTokenIf;
+typedef struct _CtplTokenExpr CtplTokenExpr;
 
 /**
  * CtplTokenFor:
@@ -71,9 +81,24 @@ struct _CtplTokenFor
  */
 struct _CtplTokenIf
 {
-  char       *condition;
-  CtplToken  *if_children;
-  CtplToken  *else_children;
+  CtplTokenExpr  *condition;
+  CtplToken      *if_children;
+  CtplToken      *else_children;
+};
+
+struct _CtplTokenExpr
+{
+  CtplTokenExprType type;
+  union {
+    struct {
+      int             operator;
+      CtplTokenExpr  *loperand;
+      CtplTokenExpr  *roperand;
+    }         t_operator;
+    long int  t_integer;
+    double    t_float;
+    char     *t_symbol;
+  } token;
 };
 
 /**
@@ -106,15 +131,25 @@ CtplToken    *ctpl_token_new_var  (const char *var,
 CtplToken    *ctpl_token_new_for  (const char *array,
                                    const char *iterator,
                                    CtplToken  *children);
-CtplToken    *ctpl_token_new_if   (const char *condition,
-                                   CtplToken  *if_children,
-                                   CtplToken  *else_children);
+CtplToken    *ctpl_token_new_if   (CtplTokenExpr *condition,
+                                   CtplToken     *if_children,
+                                   CtplToken     *else_children);
+CtplTokenExpr *ctpl_token_expr_new_operator (int             operator,
+                                             CtplTokenExpr  *loperand,
+                                             CtplTokenExpr  *roperand);
+CtplTokenExpr *ctpl_token_expr_new_integer  (long int integer);
+CtplTokenExpr *ctpl_token_expr_new_float    (double real);
+CtplTokenExpr *ctpl_token_expr_new_symbol   (const char *symbol,
+                                             gssize      len);
+void          ctpl_token_expr_free          (CtplTokenExpr *token,
+                                             gboolean       recurse);
 void          ctpl_token_free     (CtplToken *token,
                                    gboolean   chain);
 void          ctpl_token_append   (CtplToken *token,
                                    CtplToken *brother);
 void          ctpl_token_prepend  (CtplToken *token,
                                    CtplToken *brother);
+void          ctpl_token_expr_dump  (const CtplTokenExpr *token);
 void          ctpl_token_dump     (const CtplToken *token,
                                    gboolean         chain);
 #define ctpl_token_get_type(token) ((token)->type)

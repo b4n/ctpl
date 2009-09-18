@@ -19,6 +19,7 @@
 
 #include "parser.h"
 #include "lexer.h"
+#include "lexer-expr.h"
 #include "token.h"
 #include "stack.h"
 #include "environ.h"
@@ -145,6 +146,28 @@ main (int    argc,
       ctpl_lexer_free_tree (root);
       mb_free (mb);
     }
+  }
+  #else
+  if (argc < 2)
+    err = 1;
+  else
+  {
+    const char *buf = argv[1];
+    CtplTokenExpr *texpr;
+    GError *err = NULL;
+    
+    texpr = ctpl_lexer_expr_lex (buf, -1, &err);
+    if (err) {
+      fprintf (stderr, "Wrong expression: %s\n", err ? err->message : "???");
+      g_error_free (err);
+    }
+    if (err && texpr)
+      fprintf (stderr, "err is set but return value is not NULL!\n");
+    if (! err && ! texpr)
+      fprintf (stderr, "err is not set but return value is NULL!\n");
+    
+    ctpl_token_expr_dump (texpr);
+    ctpl_token_expr_free (texpr, TRUE);
   }
   #endif
   

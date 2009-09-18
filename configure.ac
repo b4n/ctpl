@@ -20,8 +20,11 @@ GTK_DOC_CHECK(1.9)
 PKG_CHECK_MODULES([LIBMB],  [libmb])
 PKG_CHECK_MODULES([GLIB],   [glib-2.0])
 
+# FIXME: hack!
+LIBS="$LIBS -lm"
+
 CFLAGS="$CFLAGS $LIBMB_CFLAGS $GLIB_CFLAGS"
-LDFLAGS="$LDFLAGS $LIBMB_LIBS $GLIB_LIBS"
+LIBS="$LIBS $LIBMB_LIBS $GLIB_LIBS"
 
 # paranoiac compilation
 AC_ARG_ENABLE([paranoia],
@@ -48,14 +51,18 @@ else
 fi
 
 # Checks for header files.
-AC_CHECK_HEADERS([stdlib.h string.h])
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h string.h math.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_CHECK_FUNCS([memchr])
+AC_FUNC_STRTOD
+AC_CHECK_FUNCS([memchr strchr floor fabs])
+AC_CHECK_FUNCS([fpclassify strtof floorf roundf])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile

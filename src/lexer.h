@@ -46,6 +46,21 @@ G_BEGIN_DECLS
  * %CTPL_END_CHAR or %CTPL_ESCAPE_CHAR).
  */
 #define CTPL_ESCAPE_CHAR  '\\'
+/**
+ * CTPL_SYMBOL_CHARS:
+ * 
+ * Characters that are valid for a symbol.
+ */
+#define CTPL_SYMBOL_CHARS "abcdefghijklmnopqrstuvwxyz" \
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+                          "0123456789" \
+                          "_"
+/**
+ * CTPL_BLANK_CHARS:
+ * 
+ * Characters treated as blank, commonly used as a separator.
+ */
+#define CTPL_BLANK_CHARS  " \t\v\r\n"
 
 /**
  * CTPL_LEXER_ERROR:

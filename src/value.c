@@ -18,6 +18,7 @@
  */
 
 #include "value.h"
+#include "mathutils.h"
 #include <glib.h>
 #include <stdarg.h>
 
@@ -765,6 +766,19 @@ ctpl_value_array_prepend_string (CtplValue       *value,
                                           ctpl_value_new_string (val));
 }
 
+/**
+ * ctpl_value_array_length:
+ * @value:  A #CtplValue holding an array
+ * 
+ * Gets the number of elements of the array of a #CtplValue.
+ * 
+ * Returns: The number of elements in @value.
+ */
+gsize
+ctpl_value_array_length (const CtplValue *value)
+{
+  return g_slist_length (value->value.v_array);
+}
 
 /**
  * ctpl_value_get_held_type:
@@ -778,6 +792,37 @@ CtplValueType
 ctpl_value_get_held_type (const CtplValue *value)
 {
   return value->type;
+}
+
+/**
+ * ctpl_value_type_get_name:
+ * @type: A #CtplValueType
+ * 
+ * Gets a human-readable name for a value type.
+ * 
+ * Returns: A static string of a displayable name of the type held by @v. This
+ *          string must not be modified or freed.
+ */
+const char *
+ctpl_value_type_get_name (CtplValueType type)
+{
+  switch (type) {
+    case CTPL_VTYPE_INT:
+      return "integer";
+    
+    case CTPL_VTYPE_FLOAT:
+      return "float";
+    
+    case CTPL_VTYPE_STRING:
+      return "string";
+    
+    case CTPL_VTYPE_ARRAY:
+      /* TODO: return the array type? (e.g. "array of int",
+       * "array of strings and floats", etc?) */
+      return "array";
+  }
+  
+  return "???";
 }
 
 /**
@@ -1029,4 +1074,111 @@ ctpl_value_to_string (const CtplValue *value)
   }
   
   return val;
+}
+
+gboolean
+ctpl_value_convert (CtplValue     *value,
+                    CtplValueType  vtype)
+{
+  gboolean      rv = TRUE;
+  CtplValueType actual_type;
+  
+  actual_type = ctpl_value_get_held_type (value);
+  if (actual_type != vtype) {
+    switch (vtype) {
+      /* convert to array */
+      case CTPL_VTYPE_ARRAY:
+        switch (actual_type) {
+          case CTPL_VTYPE_FLOAT:
+            ctpl_value_set_array_float (value, 1,
+                                        ctpl_value_get_float (value), NULL);
+            break;
+          
+          case CTPL_VTYPE_INT:
+            ctpl_value_set_array_int (value, 1,
+                                      ctpl_value_get_int (value), NULL);
+            break;
+          
+          case CTPL_VTYPE_STRING:
+            ctpl_value_set_array_string (value, 1,
+                                         ctpl_value_get_string (value), NULL);
+            break;
+          
+          default:
+            rv = FALSE;
+        }
+        break;
+      
+      /* convert to float */
+      case CTPL_VTYPE_FLOAT:
+        switch (actual_type) {
+          case CTPL_VTYPE_INT: {
+            int val;
+            
+            val = ctpl_value_get_int (value);
+            ctpl_value_set_float (value, (float)val);
+            break;
+          }
+          
+          case CTPL_VTYPE_STRING: {
+            float vfloat;
+            
+            rv = ctpl_math_string_to_float (ctpl_value_get_string (value), &vfloat);
+            if (rv) {
+              ctpl_value_set_float (value, vfloat);
+            }
+            break;
+          }
+          
+          default:
+            rv = FALSE;
+        }
+        break;
+      
+      /* convert to integer */
+      case CTPL_VTYPE_INT:
+        switch (actual_type) {
+          case CTPL_VTYPE_FLOAT: {
+            float val;
+            float roundval;
+            
+            val = ctpl_value_get_float (value);
+            roundval = ctpl_math_floorf (val);
+            if (! CTPL_MATH_FLOAT_EQ (val, roundval)) {
+              rv = FALSE;
+            } else {
+              ctpl_value_set_int (value, (int)roundval);
+            }
+            break;
+          }
+          
+          case CTPL_VTYPE_STRING: {
+            int vint;
+            
+            rv = ctpl_math_string_to_int (ctpl_value_get_string (value), &vint);
+            if (rv) {
+              ctpl_value_set_int (value, vint);
+            }
+            break;
+          }
+          
+          default:
+            rv = FALSE;
+        }
+        break;
+      
+      /* convert to string */
+      case CTPL_VTYPE_STRING: {
+        char *val;
+        
+        val = ctpl_value_to_string (value);
+        ctpl_value_set_string (value, val);
+        rv = (val != NULL);
+        g_free (val);
+        break;
+      }
+    }
+  }
+  
+  return rv;
 }
