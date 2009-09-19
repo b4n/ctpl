@@ -309,6 +309,8 @@ list_to_array (const GSList *tokens,
   return array;
 }
 
+# if 0
+
 CtplTokenExpr *
 ctpl_lexer_expr_lex (const char  *expr,
                      gssize       len,
@@ -338,7 +340,7 @@ ctpl_lexer_expr_lex (const char  *expr,
         g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
                      "Missing closing brace");
       } else {
-        token = ctpl_lexer_expr_lex (start, end - start, error);
+        token = ctpl_lexer_expr_lex (start, end - start, &err);
         tokens = g_slist_append (tokens, token);
         
         /* skip the read operand */
@@ -361,13 +363,14 @@ ctpl_lexer_expr_lex (const char  *expr,
         /* operator <> looks nice :D */
         op = CTPL_OPERATOR_EQUAL;
         i++;
-      } else {
+      }
+      if (op == CTPL_OPERATOR_NONE) {
         op = c; 
       }
       token = ctpl_token_expr_new_operator (op, NULL, NULL);
       tokens = g_slist_append (tokens, token);
     } else if (strchr (CTPL_OPERAND_CHARS, c)) {
-      /* here, everything that can be an operatand: a symbol or a number */
+      /* here, everything that can be an operand: a symbol or a number */
       /* first, try to read a hexa value (0x[0123456789abcdef]+),
        * then try a numeric value ([-+]?[0123456789]+(\.[0123456789]+)?)
        * finally, fallback to a symbol */
@@ -377,8 +380,6 @@ ctpl_lexer_expr_lex (const char  *expr,
       if (! token) {
         token = read_symbol (&expr[i], length - i, &off);
         if (! token) {
-          /* fail */
-          //~ g_error ("what is this shit? (%d (%c))", c, c);
           g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
                        "Invalid character (ASCII %d: %c)", c, c);
         }
@@ -423,3 +424,167 @@ ctpl_lexer_expr_lex (const char  *expr,
   
   return expr_tok;
 }
+
+#else /* expecting-based lexing */
+
+static CtplTokenExpr *
+lex_operand (const char  *expr,
+             gsize        length,
+             gsize       *n_skiped,
+             GError     **error)
+{
+  CtplTokenExpr  *token;
+  gsize           off = 0;
+  
+  //~ g_debug ("Lexing operand '%.*s'", (int)length, expr);
+  
+  token = read_number (expr, length, &off);
+  if (! token) {
+    token = read_symbol (expr, length, &off);
+    if (! token) {
+      g_set_error (error, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                   "No valid operand at strat of expression '%.*s'", (int)length, expr);
+    }
+  }
+  if (token) {
+    *n_skiped = off;
+  }
+  
+  return token;
+}
+
+static CtplTokenExpr *
+lex_operator (const char  *expr,
+              gsize        length,
+              gsize       *n_skiped,
+              GError     **error)
+{
+  CtplTokenExpr  *token = NULL;
+  gsize           off   = 2;
+  int             c     = *expr;
+  GError         *err   = NULL;
+  int             op    = CTPL_OPERATOR_NONE;
+  
+  //~ g_debug ("Lexing operator '%.*s'", (int)length, expr);
+  
+  if (length > 1) {
+    switch (expr[1]) {
+      case '=':
+        switch (c) {
+          case '<': op = CTPL_OPERATOR_INFEQ; break;
+          case '>': op = CTPL_OPERATOR_SUPEQ; break;
+          case '=': op = CTPL_OPERATOR_EQUAL; break;
+        }
+        break;
+      
+      case '>':
+        if (c == '<') {
+          /* operator <> looks nice :D */
+          op = CTPL_OPERATOR_EQUAL;
+        }
+        break;
+    }
+  }
+  if (op == CTPL_OPERATOR_NONE) {
+    /* no multi-character operator were read, try to read a single one */
+    if (strchr (CTPL_OPERATOR_CHARS, c)) {
+      op = c;
+      off = 1;
+    } else {
+      g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                   "No valid operator at start of expression '%.*s'", (int)length, expr);
+    }
+  }
+  if (! err) {
+    *n_skiped = off;
+    token = ctpl_token_expr_new_operator (op, NULL, NULL);
+  } else {
+    g_propagate_error (error, err);
+  }
+  
+  return token;
+}
+
+CtplTokenExpr *
+ctpl_lexer_expr_lex (const char  *expr,
+                     gssize       len,
+                     GError     **error)
+{
+  gsize           length;
+  gsize           i;
+  CtplTokenExpr  *token = NULL;
+  CtplTokenExpr  *expr_tok = NULL;
+  GSList         *tokens = NULL;
+  GError         *err = NULL;
+  
+  gboolean        expect_operand = TRUE;
+  
+  length = (len < 0) ? strlen (expr) : (gsize)len;
+  //~ g_debug ("Hey, I'm gonna lex expression '%.*s'!", length, expr);
+  
+  for (i = 0; i < length && ! err; i++) {
+    char c = expr[i];
+    
+    if (c == '(') {
+      const char *end;
+      const char *start = &expr[i+1];
+      
+      end = strchr (start, ')');
+      if (! end) {
+        g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                     "Missing closing brace");
+      } else {
+        token = ctpl_lexer_expr_lex (start, end - start, &err);
+        tokens = g_slist_append (tokens, token);
+        /* skip the read operand */
+        i += (end - start) + 1;
+      }
+    } else if (')' == c) {
+      /* should never happen */
+      g_critical ("WTF? ')' reached");
+    } else {
+      gsize n_skip = 0;
+      
+      if (expect_operand) {
+        /* try to read an operand */
+        token = lex_operand (&expr[i], length - i, &n_skip, &err);
+      } else {
+        /* try to read an operator */
+        token = lex_operator (&expr[i], length - i, &n_skip, &err);
+      }
+      if (token) {
+        i += (n_skip > 1) ? n_skip - 1 : 0;
+        expect_operand = ! expect_operand;
+        tokens = g_slist_append (tokens, token);
+      }
+    }
+    /* skip blank chars */
+    for (; i < length && strchr (CTPL_BLANK_CHARS, expr[i+1]); i++);
+  }
+  
+  if (! err) {
+    /* here check validity of token list, then create the final token. */
+    CtplTokenExpr **array;
+    gsize           array_length;
+    
+    array = list_to_array (tokens, &array_length);
+    //~ g_debug ("VALIDATION BEGINS");
+    expr_tok = validate_token_list (array, array_length, NULL, &err);
+    //~ g_debug ("VALIDATION ENDED");
+    g_free (array);
+  }
+  if (err) {
+    GSList *tmp;
+    
+    for (tmp = tokens; tmp; tmp = tmp->next) {
+      ctpl_token_expr_free (tmp->data, FALSE);
+    }
+    g_propagate_error (error, err);
+  }
+  
+  g_slist_free (tokens);
+  
+  return expr_tok;
+}
+
+#endif
