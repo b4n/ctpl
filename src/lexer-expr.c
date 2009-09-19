@@ -516,7 +516,6 @@ ctpl_lexer_expr_lex (const char  *expr,
   CtplTokenExpr  *expr_tok = NULL;
   GSList         *tokens = NULL;
   GError         *err = NULL;
-  
   gboolean        expect_operand = TRUE;
   
   length = (len < 0) ? strlen (expr) : (gsize)len;
@@ -524,39 +523,33 @@ ctpl_lexer_expr_lex (const char  *expr,
   
   for (i = 0; i < length && ! err; i++) {
     char c = expr[i];
+    gsize n_skip = 0;
     
-    if (c == '(') {
-      const char *end;
-      const char *start = &expr[i+1];
-      
-      end = strchr (start, ')');
-      if (! end) {
-        g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                     "Missing closing brace");
+    if (expect_operand) {
+      /* try to read an operand */
+      if (c == '(') {
+        const char *end;
+        const char *start = &expr[i+1];
+        
+        end = strchr (start, ')');
+        if (! end) {
+          g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                       "Missing closing brace");
+        } else {
+          token = ctpl_lexer_expr_lex (start, end - start, &err);
+          n_skip = (end - start) + 2;
+        }
       } else {
-        token = ctpl_lexer_expr_lex (start, end - start, &err);
-        tokens = g_slist_append (tokens, token);
-        /* skip the read operand */
-        i += (end - start) + 1;
-      }
-    } else if (')' == c) {
-      /* should never happen */
-      g_critical ("WTF? ')' reached");
-    } else {
-      gsize n_skip = 0;
-      
-      if (expect_operand) {
-        /* try to read an operand */
         token = lex_operand (&expr[i], length - i, &n_skip, &err);
-      } else {
-        /* try to read an operator */
-        token = lex_operator (&expr[i], length - i, &n_skip, &err);
       }
-      if (token) {
-        i += (n_skip > 1) ? n_skip - 1 : 0;
-        expect_operand = ! expect_operand;
-        tokens = g_slist_append (tokens, token);
-      }
+    } else {
+      /* try to read an operator */
+      token = lex_operator (&expr[i], length - i, &n_skip, &err);
+    }
+    if (token) {
+      i += (n_skip > 1) ? n_skip - 1 : 0;
+      expect_operand = ! expect_operand;
+      tokens = g_slist_append (tokens, token);
     }
     /* skip blank chars */
     for (; i < length && strchr (CTPL_BLANK_CHARS, expr[i+1]); i++);
@@ -566,6 +559,10 @@ ctpl_lexer_expr_lex (const char  *expr,
     /* here check validity of token list, then create the final token. */
     CtplTokenExpr **array;
     gsize           array_length;
+    
+    //~ g_debug ("DUMP BEGINS");
+    //~ g_slist_foreach (tokens, ctpl_token_expr_dump, NULL);
+    //~ g_debug ("DUMP ENDED");
     
     array = list_to_array (tokens, &array_length);
     //~ g_debug ("VALIDATION BEGINS");
