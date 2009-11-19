@@ -9,6 +9,8 @@ AC_CONFIG_MACRO_DIR([build/m4])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_HEADERS([config.h])
 
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LIBTOOL
