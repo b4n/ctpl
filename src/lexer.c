@@ -568,7 +568,8 @@ ctpl_lexer_lex_internal (MB          *mb,
  * 
  * Analyses some given data and try to create a tree of tokens representing it.
  * 
- * Returns: A new #CtplToken tree holding all read tokens or %NULL on error.
+ * Returns: A new #CtplToken tree holding all read tokens or %NULL on error or
+ *          if the source is empty (no character at all).
  *          The new tree should be freed with ctpl_lexer_free_tree() whan no
  *          longer needed.
  */

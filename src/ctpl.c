@@ -104,13 +104,11 @@ int
 main (int    argc,
       char **argv)
 {
-  int err = 0;
+  int rv = 1;
   MB *mb;
   
   # if 1
-  if (argc < 2)
-    err = 1;
-  else
+  if (argc >= 2)
   {
     const char *buf = argv[1];
     
@@ -122,8 +120,15 @@ main (int    argc,
       
       root = ctpl_lexer_lex (mb, &err);
       if (! root || err) {
-        fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
-        g_error_free (err);
+        /* hack to check ctpl correct behaviour */
+        if (! root && mb->length != 0) {
+          if (! err) {
+            g_critical ("CTPL error");
+          } else {
+            fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
+            g_error_free (err);
+          }
+        }
       } else {
         MB *output;
         CtplEnviron *env;
@@ -139,6 +144,7 @@ main (int    argc,
           fputs ("===== output =====\n", stdout);
           dump_mb (output, stdout);
           fputs ("=== end output ===\n", stdout);
+          rv = 0;
         }
         mb_free (output);
         ctpl_environ_free (env);
@@ -149,7 +155,7 @@ main (int    argc,
   }
   #else
   if (argc < 2)
-    err = 1;
+    rv = 1;
   else
   {
     const char *buf = argv[1];
@@ -264,5 +270,5 @@ main (int    argc,
   
   #endif
   
-  return err;
+  return rv;
 }
