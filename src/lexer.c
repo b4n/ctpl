@@ -44,8 +44,13 @@
  * 
  * tree = ctpl_lexer_lex (input, &error);
  * if (! tree) {
- *   fprintf (stderr, "Failed to analyse input data: %s\n", error->message);
- *   g_clear_error (&error);
+ *   // note that tree may be NULL even with no error if the input is empty
+ *   if (error) {
+ *     fprintf (stderr, "Failed to analyse input data: %s\n", error->message);
+ *     g_clear_error (&error);
+ *   } else {
+ *     fprintf (stderr, "Failed to analyse input data: it is empty\n");
+ *   }
  * } else {
  *   // do anything you want with the tree here
  *   
