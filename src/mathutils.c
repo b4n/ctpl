@@ -43,11 +43,11 @@
  */
 gboolean
 ctpl_math_string_to_float (const char *string,
-                           float      *value)
+                           double     *value)
 {
   char *endptr;
   
-  *value = ctpl_math_strtof (string, &endptr);
+  *value = g_ascii_strtod (string, &endptr);
   return (*endptr) == 0;
 }
 
@@ -62,10 +62,10 @@ ctpl_math_string_to_float (const char *string,
  */
 gboolean
 ctpl_math_string_to_int (const char *string,
-                         int        *value)
+                         long int   *value)
 {
   char *endptr;
   
-  *value = (int)strtol (string, &endptr, 0);
+  *value = strtol (string, &endptr, 0);
   return (*endptr) == 0;
 }

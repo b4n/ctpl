@@ -153,7 +153,7 @@ token_type_to_static_string (CtplTokenExprType type)
   static const char *names[] = {
     "operator",
     "integer",
-    "float",
+    "real",
     "symbol"
   };
   

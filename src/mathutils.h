@@ -37,29 +37,11 @@ G_BEGIN_DECLS
 # define CTPL_MATH_FLOAT_EQ(a, b) (fabs ((a) - (b)) < 0.000001)
 #endif
 
-#if defined (HAVE_STRTOF) && 0 /* WTF FIXME pourquoi y'a pas strtof même si HAVE_STRTOF est défini !?*/
-# define ctpl_math_strtof strtof
-#else
-# define ctpl_math_strtof(nptr, endptr) ((float)strtod (nptr, endptr))
-#endif
-
-#ifdef HAVE_FLOORF
-# define ctpl_math_floorf floorf
-#else
-# define ctpl_math_floorf(x) ((float)floor (x))
-#endif
-
-#ifdef HAVE_ROUNDF
-# define ctpl_math_roundf roundf
-#else
-# define ctpl_math_roundf(x) ((float)((int)(x)))
-#endif
-
 
 gboolean    ctpl_math_string_to_float   (const char *string,
-                                         float      *value);
+                                         double     *value);
 gboolean    ctpl_math_string_to_int     (const char *string,
-                                         int        *value);
+                                         long int   *value);
 
 
 G_END_DECLS

@@ -28,8 +28,8 @@ G_BEGIN_DECLS
 
 /**
  * CtplValueType:
- * @CTPL_VTYPE_INT: Integer (C's int)
- * @CTPL_VTYPE_FLOAT: Floating point value (C's float)
+ * @CTPL_VTYPE_INT: Integer (C's long int)
+ * @CTPL_VTYPE_FLOAT: Floating point value (C's double)
  * @CTPL_VTYPE_STRING: 0-terminated string (C string)
  * @CTPL_VTYPE_ARRAY: Array of values
  * 
@@ -58,8 +58,8 @@ struct _CtplValue
   /*<private>*/
   int type;
   union {
-    int         v_int;
-    float       v_float;
+    long int    v_int;
+    double      v_float;
     char       *v_string;
     GSList     *v_array;
   } value;
@@ -126,8 +126,8 @@ void          ctpl_value_copy             (const CtplValue *src_value,
 CtplValue    *ctpl_value_dup              (const CtplValue *value);
 void          ctpl_value_free_value       (CtplValue *value);
 void          ctpl_value_free             (CtplValue *value);
-CtplValue    *ctpl_value_new_int          (int val);
-CtplValue    *ctpl_value_new_float        (float val);
+CtplValue    *ctpl_value_new_int          (long int val);
+CtplValue    *ctpl_value_new_float        (double val);
 CtplValue    *ctpl_value_new_string       (const char *val);
 CtplValue    *ctpl_value_new_arrayv       (CtplValueType type,
                                            gsize         count,
@@ -136,9 +136,9 @@ CtplValue    *ctpl_value_new_array        (CtplValueType  type,
                                            gsize          count,
                                            ...) G_GNUC_NULL_TERMINATED;
 void          ctpl_value_set_int          (CtplValue *value,
-                                           int        val);
+                                           long int   val);
 void          ctpl_value_set_float        (CtplValue *value,
-                                           float      val);
+                                           double     val);
 void          ctpl_value_set_string       (CtplValue   *value,
                                            const char  *val);
 void          ctpl_value_set_arrayv       (CtplValue     *value,
@@ -172,26 +172,26 @@ void          ctpl_value_array_append         (CtplValue       *value,
 void          ctpl_value_array_prepend        (CtplValue       *value,
                                                const CtplValue *val);
 void          ctpl_value_array_append_int     (CtplValue       *value,
-                                               int              val);
+                                               long int         val);
 void          ctpl_value_array_prepend_int    (CtplValue       *value,
-                                               int              val);
+                                               long int         val);
 void          ctpl_value_array_append_float   (CtplValue       *value,
-                                               float            val);
+                                               double           val);
 void          ctpl_value_array_prepend_float  (CtplValue       *value,
-                                               float            val);
+                                               double           val);
 void          ctpl_value_array_append_string  (CtplValue       *value,
                                                const char      *val);
 void          ctpl_value_array_prepend_string (CtplValue       *value,
                                                const char      *val);
 gsize         ctpl_value_array_length         (const CtplValue *value);
 CtplValueType ctpl_value_get_held_type    (const CtplValue *value);
-int           ctpl_value_get_int          (const CtplValue *value);
-float         ctpl_value_get_float        (const CtplValue *value);
+long int      ctpl_value_get_int          (const CtplValue *value);
+double        ctpl_value_get_float        (const CtplValue *value);
 const char   *ctpl_value_get_string       (const CtplValue *value);
 const GSList *ctpl_value_get_array        (const CtplValue *value);
-int          *ctpl_value_get_array_int    (const CtplValue *value,
+long int     *ctpl_value_get_array_int    (const CtplValue *value,
                                            gsize           *length);
-float        *ctpl_value_get_array_float  (const CtplValue *value,
+double       *ctpl_value_get_array_float  (const CtplValue *value,
                                            gsize           *length);
 char        **ctpl_value_get_array_string (const CtplValue *value,
                                            gsize           *length);

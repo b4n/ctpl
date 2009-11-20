@@ -20,6 +20,7 @@
 #include "value.h"
 #include "mathutils.h"
 #include <glib.h>
+#include <math.h>
 #include <stdarg.h>
 
 
@@ -86,7 +87,7 @@ static void   ctpl_value_set_array_internal   (CtplValue     *value,
 void
 ctpl_value_init (CtplValue *value)
 {
-  value->value.v_int     = 0;
+  value->value.v_int     = 0l;
   value->value.v_float   = 0.0f;
   value->value.v_string  = NULL;
   value->value.v_array   = NULL;
@@ -226,7 +227,7 @@ ctpl_value_free (CtplValue *value)
  * Returns: A newly allocated #CtplValue holding @val.
  */
 CtplValue *
-ctpl_value_new_int (int val)
+ctpl_value_new_int (long int val)
 {
   CtplValue *value;
   
@@ -246,7 +247,7 @@ ctpl_value_new_int (int val)
  * Returns: A newly allocated #CtplValue holding @val.
  */
 CtplValue *
-ctpl_value_new_float (float val)
+ctpl_value_new_float (double val)
 {
   CtplValue *value;
   
@@ -350,7 +351,7 @@ ctpl_value_new_array (CtplValueType type,
  */
 void
 ctpl_value_set_int (CtplValue *value,
-                    int        val)
+                    long int   val)
 {
   ctpl_value_free_value (value);
   value->type = CTPL_VTYPE_INT;
@@ -366,7 +367,7 @@ ctpl_value_set_int (CtplValue *value,
  */
 void
 ctpl_value_set_float (CtplValue *value,
-                      float      val)
+                      double     val)
 {
   ctpl_value_free_value (value);
   value->type = CTPL_VTYPE_FLOAT;
@@ -443,7 +444,7 @@ ctpl_value_set_arrayv (CtplValue     *value,
     case CTPL_VTYPE_INT: {
       gsize i;
       for (i = 0; i < count; i++) {
-        ctpl_value_array_append_int (value, va_arg (ap, int));
+        ctpl_value_array_append_int (value, va_arg (ap, long int));
       }
       break;
     }
@@ -451,8 +452,7 @@ ctpl_value_set_arrayv (CtplValue     *value,
     case CTPL_VTYPE_FLOAT: {
       gsize i;
       for (i = 0; i < count; i++) {
-        /* float is promoted to double in varags, the cast back to float */
-        ctpl_value_array_append_float (value, (float)va_arg (ap, double));
+        ctpl_value_array_append_float (value, va_arg (ap, double));
       }
       break;
     }
@@ -519,9 +519,9 @@ ctpl_value_set_array (CtplValue     *value,
  * care have to been taken about.
  */
 void
-ctpl_value_set_array_intv (CtplValue     *value,
-                           gsize          count,
-                           va_list        ap)
+ctpl_value_set_array_intv (CtplValue *value,
+                           gsize      count,
+                           va_list    ap)
 {
   ctpl_value_set_arrayv (value, CTPL_VTYPE_INT, count, ap);
 }
@@ -537,8 +537,8 @@ ctpl_value_set_array_intv (CtplValue     *value,
  * care have to been taken about.
  */
 void
-ctpl_value_set_array_int (CtplValue     *value,
-                          gsize          count,
+ctpl_value_set_array_int (CtplValue  *value,
+                          gsize       count,
                           ...)
 {
   va_list ap;
@@ -559,9 +559,9 @@ ctpl_value_set_array_int (CtplValue     *value,
  * care have to been taken about.
  */
 void
-ctpl_value_set_array_floatv (CtplValue     *value,
-                             gsize          count,
-                             va_list        ap)
+ctpl_value_set_array_floatv (CtplValue *value,
+                             gsize      count,
+                             va_list    ap)
 {
   ctpl_value_set_arrayv (value, CTPL_VTYPE_FLOAT, count, ap);
 }
@@ -577,8 +577,8 @@ ctpl_value_set_array_floatv (CtplValue     *value,
  * care have to been taken about.
  */
 void
-ctpl_value_set_array_float (CtplValue     *value,
-                            gsize          count,
+ctpl_value_set_array_float (CtplValue  *value,
+                            gsize       count,
                             ...)
 {
   va_list ap;
@@ -599,9 +599,9 @@ ctpl_value_set_array_float (CtplValue     *value,
  * care have to been taken about.
  */
 void
-ctpl_value_set_array_stringv (CtplValue     *value,
-                              gsize          count,
-                              va_list        ap)
+ctpl_value_set_array_stringv (CtplValue  *value,
+                              gsize       count,
+                              va_list     ap)
 {
   ctpl_value_set_arrayv (value, CTPL_VTYPE_STRING, count, ap);
 }
@@ -617,8 +617,8 @@ ctpl_value_set_array_stringv (CtplValue     *value,
  * care have to been taken about.
  */
 void
-ctpl_value_set_array_string (CtplValue     *value,
-                             gsize          count,
+ctpl_value_set_array_string (CtplValue *value,
+                             gsize      count,
                              ...)
 {
   va_list ap;
@@ -672,8 +672,8 @@ ctpl_value_array_prepend (CtplValue       *value,
  * Appends an integer to a #CtplValue holding an array.
  */
 void
-ctpl_value_array_append_int (CtplValue       *value,
-                             int              val)
+ctpl_value_array_append_int (CtplValue *value,
+                             long int   val)
 {
   g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
   
@@ -689,8 +689,8 @@ ctpl_value_array_append_int (CtplValue       *value,
  * Prepends an integer to a #CtplValue holding an array.
  */
 void
-ctpl_value_array_prepend_int (CtplValue       *value,
-                              int              val)
+ctpl_value_array_prepend_int (CtplValue  *value,
+                              long int    val)
 {
   g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
   
@@ -706,8 +706,8 @@ ctpl_value_array_prepend_int (CtplValue       *value,
  * Appends a float to a #CtplValue holding an array.
  */
 void
-ctpl_value_array_append_float (CtplValue       *value,
-                               float            val)
+ctpl_value_array_append_float (CtplValue *value,
+                               double     val)
 {
   g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
   
@@ -723,8 +723,8 @@ ctpl_value_array_append_float (CtplValue       *value,
  * Prepends a float to a #CtplValue holding an array.
  */
 void
-ctpl_value_array_prepend_float (CtplValue       *value,
-                                float            val)
+ctpl_value_array_prepend_float (CtplValue  *value,
+                                double      val)
 {
   g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
   
@@ -740,8 +740,8 @@ ctpl_value_array_prepend_float (CtplValue       *value,
  * Appends a string to a #CtplValue holding an array. The string is copied.
  */
 void
-ctpl_value_array_append_string (CtplValue       *value,
-                                const char      *val)
+ctpl_value_array_append_string (CtplValue  *value,
+                                const char *val)
 {
   g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
   
@@ -757,8 +757,8 @@ ctpl_value_array_append_string (CtplValue       *value,
  * Prepends a string to a #CtplValue holding an array. The string is copied.
  */
 void
-ctpl_value_array_prepend_string (CtplValue       *value,
-                                 const char      *val)
+ctpl_value_array_prepend_string (CtplValue   *value,
+                                 const char  *val)
 {
   g_return_if_fail (CTPL_VALUE_HOLDS_ARRAY (value));
   
@@ -833,7 +833,7 @@ ctpl_value_type_get_name (CtplValueType type)
  * 
  * Returns: The integer value held by @value.
  */
-int
+long int
 ctpl_value_get_int (const CtplValue *value)
 {
   g_return_val_if_fail (CTPL_VALUE_HOLDS_INT (value), 0);
@@ -848,7 +848,7 @@ ctpl_value_get_int (const CtplValue *value)
  * 
  * Returns: The float value held by @value.
  */
-float
+double
 ctpl_value_get_float (const CtplValue *value)
 {
   g_return_val_if_fail (CTPL_VALUE_HOLDS_FLOAT (value), 0.0f);
@@ -899,7 +899,7 @@ ctpl_value_get_array (const CtplValue *value)
  * Returns: A newly allocated array of integers that should be freed with
  *          g_free() or %NULL if an error occurs.
  */
-int *
+long int *
 ctpl_value_get_array_int (const CtplValue *value,
                           gsize           *length)
 {
@@ -907,7 +907,7 @@ ctpl_value_get_array_int (const CtplValue *value,
   const GSList *i;
   gsize         n;
   gsize         len;
-  int          *array;
+  long int     *array;
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
@@ -915,7 +915,7 @@ ctpl_value_get_array_int (const CtplValue *value,
   /* cast is because g_slits_length() takes a no-cons pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
-  array = g_new0 (int, len);
+  array = g_new0 (long int, len);
   for (n = 0, i = values; i != NULL; n ++, i = i->next) {
     CtplValue *v = i->data;
     
@@ -945,7 +945,7 @@ ctpl_value_get_array_int (const CtplValue *value,
  * Returns: A newly allocated array of floats that should be freed with g_free()
  *          or %NULL if an error occurs.
  */
-float *
+double *
 ctpl_value_get_array_float (const CtplValue *value,
                             gsize           *length)
 {
@@ -953,7 +953,7 @@ ctpl_value_get_array_float (const CtplValue *value,
   const GSList *i;
   gsize         n;
   gsize         len;
-  float        *array;
+  double       *array;
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
@@ -961,7 +961,7 @@ ctpl_value_get_array_float (const CtplValue *value,
   /* cast is because g_slits_length() takes a no-cons pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
-  array = g_new0 (float, len);
+  array = g_new0 (double, len);
   for (n = 0, i = values; i != NULL; n ++, i = i->next) {
     CtplValue *v = i->data;
     
@@ -1062,7 +1062,7 @@ ctpl_value_to_string (const CtplValue *value)
       break;
     
     case CTPL_VTYPE_INT:
-      val = g_strdup_printf ("%d", value->value.v_int);
+      val = g_strdup_printf ("%ld", value->value.v_int);
       break;
     
     case CTPL_VTYPE_STRING:
@@ -1113,15 +1113,15 @@ ctpl_value_convert (CtplValue     *value,
       case CTPL_VTYPE_FLOAT:
         switch (actual_type) {
           case CTPL_VTYPE_INT: {
-            int val;
+            long int val;
             
             val = ctpl_value_get_int (value);
-            ctpl_value_set_float (value, (float)val);
+            ctpl_value_set_float (value, (double)val);
             break;
           }
           
           case CTPL_VTYPE_STRING: {
-            float vfloat;
+            double vfloat;
             
             rv = ctpl_math_string_to_float (ctpl_value_get_string (value), &vfloat);
             if (rv) {
@@ -1139,21 +1139,21 @@ ctpl_value_convert (CtplValue     *value,
       case CTPL_VTYPE_INT:
         switch (actual_type) {
           case CTPL_VTYPE_FLOAT: {
-            float val;
-            float roundval;
+            double val;
+            double roundval;
             
             val = ctpl_value_get_float (value);
-            roundval = ctpl_math_floorf (val);
+            roundval = floor (val);
             if (! CTPL_MATH_FLOAT_EQ (val, roundval)) {
               rv = FALSE;
             } else {
-              ctpl_value_set_int (value, (int)roundval);
+              ctpl_value_set_int (value, (long int)roundval);
             }
             break;
           }
           
           case CTPL_VTYPE_STRING: {
-            int vint;
+            long int vint;
             
             rv = ctpl_math_string_to_int (ctpl_value_get_string (value), &vint);
             if (rv) {

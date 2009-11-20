@@ -42,7 +42,7 @@ _print_value (const CtplValue *value,
   
   switch (ctpl_value_get_held_type (value)) {
     case CTPL_VTYPE_INT:
-      printf ("I %d\n", ctpl_value_get_int (value));
+      printf ("I %ld\n", ctpl_value_get_int (value));
       break;
     
     case CTPL_VTYPE_FLOAT:

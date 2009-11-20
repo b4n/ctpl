@@ -62,9 +62,8 @@ AC_TYPE_SIZE_T
 
 # Checks for library functions.
 AC_FUNC_MALLOC
-AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memchr strchr floor fabs])
-AC_CHECK_FUNCS([fpclassify strtof floorf roundf])
+AC_CHECK_FUNCS([fpclassify])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile

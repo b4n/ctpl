@@ -153,8 +153,8 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
           tmp = g_strdup_printf ("%s%f", ctpl_value_get_string (lvalue),
                                          ctpl_value_get_float (rvalue));
         } else if (CTPL_VALUE_HOLDS_INT (rvalue)) {
-          tmp = g_strdup_printf ("%s%d", ctpl_value_get_string (lvalue),
-                                         ctpl_value_get_int (rvalue));
+          tmp = g_strdup_printf ("%s%ld", ctpl_value_get_string (lvalue),
+                                          ctpl_value_get_int (rvalue));
         } else {
           tmp = g_strconcat (ctpl_value_get_string (lvalue),
                              ctpl_value_get_string (rvalue), NULL);
@@ -207,7 +207,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
                      ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
       } else {
-        int rval;
+        long int rval;
         
         rval = ctpl_value_get_int (rvalue);
         if (rval < 1) {
@@ -250,8 +250,8 @@ ctpl_eval_operator_div (CtplValue *lvalue,
   
   rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "divide", error);
   if (rv) {
-    float lval;
-    float rval;
+    double lval;
+    double rval;
     
     lval = ctpl_value_get_float (lvalue);
     rval = ctpl_value_get_float (rvalue);
@@ -309,8 +309,8 @@ ctpl_eval_operator_sup_inf_eq_supeq_infeq (CtplValue *lvalue,
     
     case CTPL_VTYPE_INT:
       if (CTPL_VALUE_HOLDS_INT (rvalue)) {
-        int lval;
-        int rval;
+        long int lval;
+        long int rval;
         
         lval = ctpl_value_get_int (lvalue);
         rval = ctpl_value_get_int (rvalue);
@@ -328,8 +328,8 @@ ctpl_eval_operator_sup_inf_eq_supeq_infeq (CtplValue *lvalue,
     case CTPL_VTYPE_FLOAT:
       rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "superior", error);
       if (rv) {
-        float lval;
-        float rval;
+        double lval;
+        double rval;
         
         lval = ctpl_value_get_float (lvalue);
         rval = ctpl_value_get_float (rvalue);
@@ -382,8 +382,8 @@ ctpl_eval_operator_modulo (CtplValue *lvalue,
   
   rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_INT, "modulo", error);
   if (rv) {
-    int lval = ctpl_value_get_int (lvalue);
-    int rval = ctpl_value_get_int (rvalue);
+    long int lval = ctpl_value_get_int (lvalue);
+    long int rval = ctpl_value_get_int (rvalue);
     
     if (rval == 0) {
       g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
