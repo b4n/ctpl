@@ -269,10 +269,10 @@ ctpl_eval_operator_div (CtplValue *lvalue,
 }
 
 /*
- * ctpl_eval_operator_sup_inf_eq_supeq_infeq:
+ * ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq:
  * @lvalue: Input left operand (may be modified for internal purpose)
  * @rvalue: Input right operand (may be modified for internal purpose)
- * @op: The operator, one of CTPL_OPERATOR_SUP, _INF, _EQ, _INFEQ, _SUPEQ.
+ * @op: The operator, one of CTPL_OPERATOR_SUP, _INF, _EQ, _NEQ, _INFEQ, _SUPEQ.
  * @value: Output value, result of the operation
  * @error: a #GError to fill with an eventual error, of %NULL to ignore errors.
  * 
@@ -282,11 +282,11 @@ ctpl_eval_operator_div (CtplValue *lvalue,
  * Returns: %TRUE on success, %FALSE on failure.
  */
 static gboolean
-ctpl_eval_operator_sup_inf_eq_supeq_infeq (CtplValue *lvalue,
-                                           CtplValue *rvalue,
-                                           int              op,
-                                           CtplValue       *value,
-                                           GError         **error)
+ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue *lvalue,
+                                               CtplValue *rvalue,
+                                               int              op,
+                                               CtplValue       *value,
+                                               GError         **error)
 {
   /* boolean operators expands to integers (1:TRUE or 0:FALSE) */
   gboolean rv     = TRUE;
@@ -316,6 +316,7 @@ ctpl_eval_operator_sup_inf_eq_supeq_infeq (CtplValue *lvalue,
         rval = ctpl_value_get_int (rvalue);
         switch (op) {
           case CTPL_OPERATOR_EQUAL: result = (lval == rval); break;
+          case CTPL_OPERATOR_NEQ:   result = (lval != rval); break;
           case CTPL_OPERATOR_INF:   result = (lval <  rval); break;
           case CTPL_OPERATOR_INFEQ: result = (lval <= rval); break;
           case CTPL_OPERATOR_SUP:   result = (lval >  rval); break;
@@ -335,6 +336,7 @@ ctpl_eval_operator_sup_inf_eq_supeq_infeq (CtplValue *lvalue,
         rval = ctpl_value_get_float (rvalue);
         switch (op) {
           case CTPL_OPERATOR_EQUAL: result = CTPL_MATH_FLOAT_EQ (lval, rval); break;
+          case CTPL_OPERATOR_NEQ:   result = ! CTPL_MATH_FLOAT_EQ (lval, rval); break;
           case CTPL_OPERATOR_INF:   result = (lval <  rval); break;
           case CTPL_OPERATOR_INFEQ: result = (lval <= rval); break;
           case CTPL_OPERATOR_SUP:   result = (lval >  rval); break;
@@ -358,6 +360,7 @@ ctpl_eval_operator_sup_inf_eq_supeq_infeq (CtplValue *lvalue,
         strcmp_result = strcmp (ctpl_value_get_string (lvalue), tmp);
         switch (op) {
           case CTPL_OPERATOR_EQUAL: result = (strcmp_result == 0); break;
+          case CTPL_OPERATOR_NEQ:   result = (strcmp_result != 0); break;
           case CTPL_OPERATOR_INF:   result = (strcmp_result <  0); break;
           case CTPL_OPERATOR_INFEQ: result = (strcmp_result <= 0); break;
           case CTPL_OPERATOR_SUP:   result = (strcmp_result >  0); break;
@@ -412,12 +415,14 @@ ctpl_eval_operator_internal (int        operator,
       break;
     
     case CTPL_OPERATOR_EQUAL:
+    case CTPL_OPERATOR_NEQ:
     case CTPL_OPERATOR_INF:
     case CTPL_OPERATOR_INFEQ:
     case CTPL_OPERATOR_SUP:
     case CTPL_OPERATOR_SUPEQ:
-      rv = ctpl_eval_operator_sup_inf_eq_supeq_infeq (lvalue, rvalue, operator,
-                                                      value, error);
+      rv = ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (lvalue, rvalue,
+                                                          operator, value,
+                                                          error);
       break;
     
     case CTPL_OPERATOR_MINUS:

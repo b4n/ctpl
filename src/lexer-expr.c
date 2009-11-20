@@ -122,7 +122,7 @@ operator_is_prior (int op1, int op2)
 {
   if ((op1 == CTPL_OPERATOR_EQUAL || op1 == CTPL_OPERATOR_INF ||
        op1 == CTPL_OPERATOR_INFEQ || op1 == CTPL_OPERATOR_SUP ||
-       op1 == CTPL_OPERATOR_SUPEQ) ||
+       op1 == CTPL_OPERATOR_SUPEQ || op1 == CTPL_OPERATOR_NEQ) ||
        ((op1 == CTPL_OPERATOR_MUL || op1 == CTPL_OPERATOR_DIV ||
          op1 == CTPL_OPERATOR_MODULO) &&
         ! operator_is_prior (op2, CTPL_OPERATOR_EQUAL)) ||
@@ -551,6 +551,7 @@ lex_operator (const char  *expr,
           case '<': op = CTPL_OPERATOR_INFEQ; break;
           case '>': op = CTPL_OPERATOR_SUPEQ; break;
           case '=': op = CTPL_OPERATOR_EQUAL; break;
+          case '!': op = CTPL_OPERATOR_NEQ;   break;
         }
         break;
       

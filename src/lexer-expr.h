@@ -38,6 +38,7 @@ G_BEGIN_DECLS
 #define CTPL_OPERATOR_MODULO  '%'
 #define CTPL_OPERATOR_SUPEQ   1
 #define CTPL_OPERATOR_INFEQ   2
+#define CTPL_OPERATOR_NEQ     3
 
 #define CTPL_OPERATOR_CHARS "+-/*=><%"
 #define CTPL_OPERAND_CHARS  "." /* for floating point values */ \
@@ -45,7 +46,7 @@ G_BEGIN_DECLS
                             CTPL_BLANK_CHARS \
                             CTPL_SYMBOL_CHARS
 #define CTPL_EXPR_CHARS     "()" \
-                            CTPL_OPERATOR_CHARS \
+                            CTPL_OPERATOR_CHARS "!" \
                             CTPL_OPERAND_CHARS
 
 #define CTPL_LEXER_EXPR_ERROR (ctpl_lexer_expr_error_quark ())

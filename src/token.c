@@ -402,10 +402,14 @@ ctpl_token_expr_dump_internal (const CtplTokenExpr *expr)
             
             case CTPL_OPERATOR_INFEQ: g_print (" <= "); break;
             case CTPL_OPERATOR_SUPEQ: g_print (" >= "); break;
+            case CTPL_OPERATOR_NEQ:   g_print (" != "); break;
             
             case CTPL_OPERATOR_NONE:
               /* nothing to dump */
               break;
+            
+            default:
+              g_assert_not_reached ();
           }
         }
         if (expr->token.t_operator.roperand) {
