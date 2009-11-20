@@ -74,12 +74,12 @@ read_number (const char  *data,
              gsize       *read_len)
 {
   CtplTokenExpr  *token = NULL;
-  char           *endptr = NULL;
-  double          value;
-  char           *tmpbuf;
+  gchar          *endptr = NULL;
+  gdouble         value;
+  gchar          *tmpbuf;
   
   tmpbuf = g_strndup (data, length);
-  value = strtod (tmpbuf, &endptr);
+  value = g_ascii_strtod (tmpbuf, &endptr);
   //~ g_print ("ep: '%c'\n", *endptr);
   if (tmpbuf != endptr && ! IS_SYMBOLCHAR (*endptr)) {
     if (CTPL_MATH_FLOAT_EQ (value, floor (value))) {
