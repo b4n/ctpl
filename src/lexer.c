@@ -44,13 +44,8 @@
  * 
  * tree = ctpl_lexer_lex (input, &error);
  * if (! tree) {
- *   // note that tree may be NULL even with no error if the input is empty
- *   if (error) {
- *     fprintf (stderr, "Failed to analyse input data: %s\n", error->message);
- *     g_clear_error (&error);
- *   } else {
- *     fprintf (stderr, "Failed to analyse input data: it is empty\n");
- *   }
+ *   fprintf (stderr, "Failed to analyse input data: %s\n", error->message);
+ *   g_clear_error (&error);
  * } else {
  *   // do anything you want with the tree here
  *   
@@ -602,8 +597,7 @@ ctpl_lexer_lex_internal (MB          *mb,
  * 
  * Analyses some given data and try to create a tree of tokens representing it.
  * 
- * Returns: A new #CtplToken tree holding all read tokens or %NULL on error or
- *          if the source is empty (no character at all).
+ * Returns: A new #CtplToken tree holding all read tokens or %NULL on error.
  *          The new tree should be freed with ctpl_lexer_free_tree() whan no
  *          longer needed.
  */
@@ -613,8 +607,18 @@ ctpl_lexer_lex (MB       *mb,
 {
   CtplToken  *root;
   LexerState  lex_state = {0, S_NONE};
+  GError     *err = NULL;
   
-  root = ctpl_lexer_lex_internal (mb, &lex_state, error);
+  root = ctpl_lexer_lex_internal (mb, &lex_state, &err);
+  if (err) {
+    g_propagate_error (error, err);
+  } else if (! root) {
+    /* if no error but no root, create an empty data rather than returning NULL.
+     * it is useful to have an easy error handling with empty files: only check
+     * if the return is != NULL to know if there was an error rather than
+     * needing to check whether the error was set or not. */
+    root = ctpl_token_new_data ("", 0);
+  }
   
   return root;
 }

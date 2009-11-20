@@ -119,16 +119,9 @@ main (int    argc,
       GError *err = NULL;
       
       root = ctpl_lexer_lex (mb, &err);
-      if (! root || err) {
-        /* hack to check ctpl correct behaviour */
-        if (! root && mb->length != 0) {
-          if (! err) {
-            g_critical ("CTPL error");
-          } else {
-            fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
-            g_error_free (err);
-          }
-        }
+      if (! root) {
+        fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
+        g_error_free (err);
       } else {
         MB *output;
         CtplEnviron *env;
