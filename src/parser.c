@@ -148,7 +148,7 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
 {
   /* we can safely assume token holds array here */
   const CtplValue  *value;
-  gboolean          rv      = TRUE;
+  gboolean          rv = FALSE;
   
   value = lookup_symbol (env, token->array, error);
   if (value) {
@@ -156,10 +156,10 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
       g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_INCOMPATIBLE_SYMBOL,
                    "Symbol '%s' is used as an array but is not",
                    token->array);
-      rv = FALSE;
     } else {
       const GSList *array_items;
       
+      rv = TRUE;
       array_items = ctpl_value_get_array (value);
       for (; rv && array_items; array_items = array_items->next) {
         ctpl_environ_push (env, token->iter, array_items->data);
@@ -206,7 +206,7 @@ ctpl_parser_parse_token_var (const char  *symbol,
                              GError     **error)
 {
   const CtplValue  *value;
-  gboolean          rv = TRUE;
+  gboolean          rv = FALSE;
   
   value = lookup_symbol (env, symbol, error);
   if (value) {
