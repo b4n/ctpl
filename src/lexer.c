@@ -200,18 +200,34 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
                      "Unexpected character '%c' before end of 'if' statement",
                      c);
       } else {
-        CtplToken *if_token;
-        CtplToken *else_token = NULL;
+        CtplToken  *if_token;
+        CtplToken  *else_token = NULL;
+        LexerState  substate = *state;
+        GError     *err = NULL;
         
         //~ g_debug ("if token: `if %s`", expr);
-        state->block_depth ++;
-        state->last_statement_type_if = S_IF;
-        if_token = ctpl_lexer_lex_internal (mb, state, error);
-        if (state->last_statement_type_if == S_ELSE) {
-          //~ g_debug ("have else");
-          else_token = ctpl_lexer_lex_internal (mb, state, error);
+        substate.block_depth ++;
+        substate.last_statement_type_if = S_IF;
+        if_token = ctpl_lexer_lex_internal (mb, &substate, &err);
+        if (! err) {
+          if (substate.last_statement_type_if == S_ELSE) {
+            //~ g_debug ("have else");
+            else_token = ctpl_lexer_lex_internal (mb, &substate, &err);
+          }
+          if (! err /* don't override errors */ &&
+              state->block_depth != substate.block_depth) {
+            /* if a block was not closed, fail */
+            g_set_error (&err, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                         "Unclosed 'if/else' block");
+          }
+          /*g_assert (state->block_depth == substate.block_depth);*/
         }
-        token = ctpl_token_new_if (texpr, if_token, else_token);
+        if (err) {
+          g_propagate_error (error, err);
+          ctpl_token_expr_free (texpr, TRUE);
+        } else {
+          token = ctpl_token_new_if (texpr, if_token, else_token);
+        }
       }
     }
   }
@@ -270,12 +286,25 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
                        "statement",
                        c);
         } else {
-          CtplToken *for_children;
+          CtplToken  *for_children;
+          LexerState  substate = *state;
+          GError     *err = NULL;
           
           //~ g_debug ("for token: `for %s in %s`", iter_name, array_name);
-          state->block_depth ++;
-          for_children = ctpl_lexer_lex_internal (mb, state, error);
-          token = ctpl_token_new_for (array_name, iter_name, for_children);
+          substate.block_depth ++;
+          for_children = ctpl_lexer_lex_internal (mb, &substate, &err);
+          //~ g_debug ("for child: %d", (void *)for_children);
+          if (! err) {
+            if (state->block_depth != substate.block_depth) {
+              g_set_error (&err, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                           "Unclosed 'for' block");
+            } else {
+              token = ctpl_token_new_for (array_name, iter_name, for_children);
+            }
+          }
+          if (err) {
+            g_propagate_error (error, err);
+          }
         }
       }
       g_free (array_name);
@@ -584,23 +613,8 @@ ctpl_lexer_lex (MB       *mb,
 {
   CtplToken  *root;
   LexerState  lex_state = {0, S_NONE};
-  GError     *err = NULL;
   
-  root = ctpl_lexer_lex_internal (mb, &lex_state, &err);
-  if (! err /* don't report another error if there is already one */ &&
-      lex_state.block_depth != 0) {
-    /*g_error ("syntax error: block close count doesn't match block open count");*/
-    g_set_error (&err, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                 "Closed block count doesn't match open block count "
-                 "(%d %s)",
-                 ABS (lex_state.block_depth),
-                 (lex_state.block_depth > 0)
-                 ? "blocks still opened"
-                 : "unclosed blocks");
-  }
-  if (err) {
-    g_propagate_error (error, err);
-  }
+  root = ctpl_lexer_lex_internal (mb, &lex_state, error);
   
   return root;
 }
