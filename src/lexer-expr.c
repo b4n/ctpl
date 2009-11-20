@@ -133,6 +133,8 @@ operator_is_prior (int op1, int op2)
   return FALSE;
 }
 
+# if 0
+
 /* gets if the token should be treated as operator or symbol */
 static CtplTokenExprType
 get_token_type (const CtplTokenExpr *token)
@@ -157,8 +159,6 @@ token_type_to_static_string (CtplTokenExprType type)
   
   return names[type];
 }
-
-# if 0
 
 static CtplTokenExpr *
 validate_token_list (CtplTokenExpr **tokens,

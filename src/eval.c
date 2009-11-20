@@ -215,15 +215,15 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
         } else {
           const char *lval;
           char       *buf;
-          int         buf_len;
+          gsize       buf_len;
           gsize       lval_len;
-          int         i, j;
+          gsize       i, j;
           
           lval = ctpl_value_get_string (lvalue);
           lval_len = strlen (lval);
-          buf_len = lval_len * rval;
+          buf_len = lval_len * (gsize)rval;
           buf = g_malloc (buf_len + 1);
-          for (i = 0; i < rval; i++) {
+          for (i = 0; i < (gsize)rval; i++) {
             for (j = 0; j < lval_len; j++) {
               buf[lval_len * i + j] = lval[j];
             }
