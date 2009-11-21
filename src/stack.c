@@ -71,9 +71,9 @@ ctpl_stack_entry_init (CtplStackEntry  *entry,
                        CtplStack       *stack,
                        void            *data)
 {
-  entry->ref_count  = 1;
-  entry->data       = data;
-  entry->parent     = stack->last;
+  g_atomic_int_set (&entry->ref_count, 1);
+  entry->data   = data;
+  entry->parent = stack->last;
 }
 
 /* creates a new stack entry */
@@ -111,7 +111,7 @@ ctpl_stack_entry_free (CtplStackEntry  *entry,
 static CtplStackEntry *
 ctpl_stack_entry_ref (CtplStackEntry *entry)
 {
-  entry->ref_count ++;
+  g_atomic_int_inc (&entry->ref_count);
   return entry;
 }
 
@@ -121,8 +121,7 @@ ctpl_stack_entry_unref (CtplStackEntry *entry)
 {
   CtplStackEntry *parent = entry;
   
-  entry->ref_count --;
-  if (entry->ref_count < 1) {
+  if (g_atomic_int_dec_and_test (&entry->ref_count)) {
     /*parent = ctpl_stack_entry_free (entry);*/
     g_warning ("Ref cont reached 0, this shouldn't happend");
   }
@@ -276,7 +275,7 @@ ctpl_stack_pop (CtplStack *stack)
   if (stack->last) {
     data = stack->last->data;
     /*stack->last =*/ ctpl_stack_entry_unref (stack->last);
-    if (stack->last->ref_count < 2)
+    if (g_atomic_int_get (&stack->last->ref_count) < 2)
       stack->last = stack->last->parent;
   }
   

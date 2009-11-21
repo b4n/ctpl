@@ -38,7 +38,7 @@ typedef struct _CtplStackEntry  CtplStackEntry;
  */
 struct _CtplStackEntry
 {
-  guint           ref_count;
+  gint            ref_count;
   void           *data;
   CtplStackEntry *parent;
 };
