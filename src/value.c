@@ -1147,10 +1147,14 @@ ctpl_value_convert (CtplValue     *value,
                                       ctpl_value_get_int (value), NULL);
             break;
           
-          case CTPL_VTYPE_STRING:
-            ctpl_value_set_array_string (value, 1,
-                                         ctpl_value_get_string (value), NULL);
+          case CTPL_VTYPE_STRING: {
+            gchar *v;
+            
+            v = g_strdup (ctpl_value_get_string (value));
+            ctpl_value_set_array_string (value, 1, v, NULL);
+            g_free (v);
             break;
+          }
           
           default:
             rv = FALSE;
