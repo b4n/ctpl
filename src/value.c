@@ -1027,6 +1027,24 @@ ctpl_value_get_array_string (const CtplValue *value,
   return NULL;
 }
 
+/**
+ * ctpl_value_to_string:
+ * @value: A #CtplValue
+ * 
+ * Converts a #CtplValue to a string.
+ * 
+ * <note>
+ *   <para>
+ *     Arrays are flattened to the form [val1, val2, val3]. It may not be what
+ *     you want, but flattening an array is not the primary goal of this
+ *     function and you should consider doing this yourself if it is what you
+ *     want - flattening an array.
+ *   </para>
+ * </note>
+ * 
+ * Returns: A newly allocated string representing the value. You should free
+ *          this value with g_free() when no longer needed.
+ */
 char *
 ctpl_value_to_string (const CtplValue *value)
 {
@@ -1076,6 +1094,36 @@ ctpl_value_to_string (const CtplValue *value)
   return val;
 }
 
+/**
+ * ctpl_value_convert:
+ * @value: A #CtplValue to convert
+ * @vtype: The type to which convert @value
+ * 
+ * Tries to convert a #CtplValue to another type.
+ * 
+ * The performed conversion might be called "non-destructive": the value will
+ * not loose precision, but the conversion will rather fail if it would lead to
+ * a loss.
+ * An good example is converting a floating-point value to an integer one:
+ * the conversion will only happen if it would not truncate the floating part.
+ * 
+ * <warning>
+ *   <para>
+ *     The current implementation of floating-point value comparison might be
+ *     lossy, and then the above example might be somewhat wrong in practice.
+ *   </para>
+ * </warning>
+ * 
+ * <note>
+ *   <para>
+ *     Converting to a string uses ctpl_value_to_string().
+ *     Even if it will never fail, the result might not be the one you expect
+ *     when converting an array.
+ *   </para>
+ * </note>
+ * 
+ * Returns: %TRUE if the conversion succeeded, %FALSE otherwise.
+ */
 gboolean
 ctpl_value_convert (CtplValue     *value,
                     CtplValueType  vtype)

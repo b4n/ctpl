@@ -43,6 +43,15 @@ typedef enum _CtplTokenType
   CTPL_TOKEN_TYPE_EXPR*/
 } CtplTokenType;
 
+/**
+ * CtplTokenExprType:
+ * @CTPL_TOKEN_EXPR_TYPE_OPERATOR:  An operator (CTPL_OPERATOR_*)
+ * @CTPL_TOKEN_EXPR_TYPE_INTEGER:   An integer
+ * @CTPL_TOKEN_EXPR_TYPE_FLOAT:     A floating-point value
+ * @CTPL_TOKEN_EXPR_TYPE_SYMBOL:    A symbol (a name to be found in the environ)
+ * 
+ * Possibles types of an expression token.
+ */
 typedef enum _CtplTokenExprType
 {
   CTPL_TOKEN_EXPR_TYPE_OPERATOR,
@@ -86,6 +95,13 @@ struct _CtplTokenIf
   CtplToken      *else_children;
 };
 
+/**
+ * CtplTokenExpr:
+ * @type: The type of the expression token
+ * @token: The expression token
+ * 
+ * Represents a token of an expression.
+ */
 struct _CtplTokenExpr
 {
   CtplTokenExprType type;
@@ -152,6 +168,14 @@ void          ctpl_token_prepend  (CtplToken *token,
 void          ctpl_token_expr_dump  (const CtplTokenExpr *token);
 void          ctpl_token_dump     (const CtplToken *token,
                                    gboolean         chain);
+/**
+ * ctpl_token_get_type:
+ * @token: A #CtplToken
+ * 
+ * Gets the type of a #CtplToken
+ * 
+ * Returns: The <link linkend="CtplTokenType">type</link> of @token.
+ */
 #define ctpl_token_get_type(token) ((token)->type)
 
 

@@ -4,6 +4,8 @@
 CTPL_START_CHAR
 CTPL_END_CHAR
 CTPL_ESCAPE_CHAR
+CTPL_SYMBOL_CHARS
+CTPL_BLANK_CHARS
 CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex
@@ -14,12 +16,39 @@ ctpl_lexer_error_quark
 </SECTION>
 
 <SECTION>
+<TITLE>CtplLexerExpr</TITLE>
+<FILE>lexer-expr</FILE>
+CTPL_EXPR_CHARS
+CTPL_OPERAND_CHARS
+CTPL_OPERATOR_CHARS
+CTPL_OPERATOR_NONE
+CTPL_OPERATOR_MINUS
+CTPL_OPERATOR_PLUS
+CTPL_OPERATOR_MUL
+CTPL_OPERATOR_DIV
+CTPL_OPERATOR_MODULO
+CTPL_OPERATOR_EQUAL
+CTPL_OPERATOR_NEQ
+CTPL_OPERATOR_INF
+CTPL_OPERATOR_INFEQ
+CTPL_OPERATOR_SUP
+CTPL_OPERATOR_SUPEQ
+CTPL_LEXER_EXPR_ERROR
+CtplLexerExprError
+ctpl_lexer_expr_lex
+<SUBSECTION Standard>
+ctpl_lexer_expr_error_quark
+</SECTION>
+
+<SECTION>
 <TITLE>CtplToken</TITLE>
 <FILE>token</FILE>
 CtplTokenType
 CtplToken
 CtplTokenFor
 CtplTokenIf
+CtplTokenExprType
+CtplTokenExpr
 ctpl_token_new_data
 ctpl_token_new_var
 ctpl_token_new_for
@@ -27,7 +56,14 @@ ctpl_token_new_if
 ctpl_token_free
 ctpl_token_append
 ctpl_token_prepend
+ctpl_token_get_type
 ctpl_token_dump
+ctpl_token_expr_new_operator
+ctpl_token_expr_new_integer
+ctpl_token_expr_new_float
+ctpl_token_expr_new_symbol
+ctpl_token_expr_free
+ctpl_token_expr_dump
 </SECTION>
 
 <SECTION>
@@ -38,6 +74,17 @@ CtplParserError
 ctpl_parser_parse
 <SUBSECTION Standard>
 ctpl_parser_error_quark
+</SECTION>
+
+<SECTION>
+<TITLE>CtplEval</TITLE>
+<FILE>eval</FILE>
+CTPL_EVAL_ERROR
+CtplEvalError
+ctpl_eval_value
+ctpl_eval_bool
+<SUBSECTION Standard>
+ctpl_eval_error_quark
 </SECTION>
 
 <SECTION>
@@ -94,6 +141,7 @@ ctpl_value_array_append_float
 ctpl_value_array_prepend_float
 ctpl_value_array_append_string
 ctpl_value_array_prepend_string
+ctpl_value_array_length
 ctpl_value_get_held_type
 ctpl_value_get_int
 ctpl_value_get_float
@@ -102,6 +150,10 @@ ctpl_value_get_array
 ctpl_value_get_array_int
 ctpl_value_get_array_float
 ctpl_value_get_array_string
+ctpl_value_to_string
+ctpl_value_convert
+ctpl_value_type_get_name
+ctpl_value_get_held_type_name
 </SECTION>
 
 <SECTION>
@@ -116,5 +168,13 @@ ctpl_stack_push_ref
 ctpl_stack_pop
 ctpl_stack_peek
 ctpl_stack_is_empty
+</SECTION>
+
+<SECTION>
+<TITLE>Math utilities</TITLE>
+<FILE>mathutils</FILE>
+CTPL_MATH_FLOAT_EQ
+ctpl_math_string_to_float
+ctpl_math_string_to_int
 </SECTION>
 

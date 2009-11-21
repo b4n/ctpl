@@ -90,7 +90,9 @@ ctpl_parser_error_quark (void)
 }
 
 
-/* report error on failure, no need to be done by the caller */
+/* Tries to write @buf[0:@len] to @mb.
+ * Returns: %TRUE on success, %FALSE otherwise, in which case @error contains
+ *          the error message. */
 static gboolean
 write_buf (MB          *mb,
            const char  *buf,
@@ -132,6 +134,7 @@ lookup_symbol (const CtplEnviron *env,
   return value;
 }
 
+/* "parses" a data token */
 static gboolean
 ctpl_parser_parse_token_data (const char *data,
                               MB         *output,
@@ -140,6 +143,7 @@ ctpl_parser_parse_token_data (const char *data,
   return write_buf (output, data, -1, error);
 }
 
+/* Tries to parse a `for` token */
 static gboolean
 ctpl_parser_parse_token_for (const CtplTokenFor  *token,
                              CtplEnviron         *env,
@@ -172,6 +176,7 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
   return rv;
 }
 
+/* Tries to parse an `if` token */
 static gboolean
 ctpl_parser_parse_token_if (const CtplTokenIf  *token,
                             CtplEnviron        *env,
@@ -199,6 +204,7 @@ ctpl_parser_parse_token_if (const CtplTokenIf  *token,
   return rv;
 }
 
+/* Tries to parse a reference to a variable/constant. */
 static gboolean
 ctpl_parser_parse_token_var (const char  *symbol,
                              CtplEnviron *env,
@@ -220,6 +226,7 @@ ctpl_parser_parse_token_var (const char  *symbol,
   return rv;
 }
 
+/* Tries to parse a token by dispatching calls to specific parsers. */
 static gboolean
 ctpl_parser_parse_token (const CtplToken *token,
                          CtplEnviron     *env,

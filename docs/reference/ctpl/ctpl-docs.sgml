@@ -50,9 +50,12 @@
     <xi:include href="xml/environ.xml"/>
     <xi:include href="xml/token.xml"/>
     <xi:include href="xml/lexer.xml"/>
+    <xi:include href="xml/lexer-expr.xml"/>
     <xi:include href="xml/parser.xml"/>
+    <xi:include href="xml/eval.xml"/>
     <xi:include href="xml/value.xml"/>
     <xi:include href="xml/stack.xml"/>
+    <xi:include href="xml/mathutils.xml"/>
   </chapter>
   <!--chapter id="object-tree">
     <title>Object Hierarchy</title>

@@ -30,6 +30,15 @@
 G_BEGIN_DECLS
 
 
+/**
+ * CTPL_MATH_FLOAT_EQ:
+ * @a: a floating-point value
+ * @b: another floating-point value
+ * 
+ * Checks whether two floating-point values are equal.
+ * 
+ * Returns: %TRUE if @a and @b are equal, %FALSE otherwise.
+ */
 #ifdef HAVE_FPCLASSIFY
 # define CTPL_MATH_FLOAT_EQ(a, b) (fpclassify ((a) - (b)) == FP_ZERO)
 #else

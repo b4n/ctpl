@@ -26,6 +26,21 @@
 #include <glib.h>
 
 
+/**
+ * SECTION: eval
+ * @short_description: Expression evaluation
+ * @include: ctpl/eval.h
+ * 
+ * Computes a #CtplTokenExpr against a #CtplEnviron. It is the equivalent of
+ * <link linkend="ctpl-CtplParser">the parser</link> for expressions.
+ * 
+ * Theses functions computes an expressions and flattens it to a single value:
+ * the result.
+ * To evaluate an expression, use ctpl_eval_value(). You can evaluate an
+ * expression to a boolean with ctpl_eval_bool().
+ */
+
+
 /*<standard>*/
 GQuark
 ctpl_eval_error_quark (void)
@@ -78,6 +93,7 @@ ensure_operands_type (CtplValue     *lvalue,
    ? ctpl_value_get_float (v) \
    : ctpl_value_get_int (v))
 
+/* Tries to evaluate a subtraction operation */
 static gboolean
 ctpl_eval_operator_minus (CtplValue  *lvalue,
                           CtplValue  *rvalue,
@@ -95,6 +111,7 @@ ctpl_eval_operator_minus (CtplValue  *lvalue,
   return rv;
 }
 
+/* Tries to evaluate a addition operation */
 static gboolean
 ctpl_eval_operator_plus (CtplValue *lvalue,
                          CtplValue *rvalue,
@@ -168,6 +185,7 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
   return rv;
 }
 
+/* Tries to evaluate a multiplication operation */
 static gboolean
 ctpl_eval_operator_mul (CtplValue *lvalue,
                         CtplValue *rvalue,
@@ -240,6 +258,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
   return rv;
 }
 
+/* Tries to evaluate a division operation */
 static gboolean
 ctpl_eval_operator_div (CtplValue *lvalue,
                         CtplValue *rvalue,
@@ -375,6 +394,7 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue *lvalue,
   return rv;
 }
 
+/* Tries to evaluate a modulo operation */
 static gboolean
 ctpl_eval_operator_modulo (CtplValue *lvalue,
                            CtplValue *rvalue,
@@ -400,6 +420,7 @@ ctpl_eval_operator_modulo (CtplValue *lvalue,
   return rv;
 }
 
+/* dispatches evaluation to specific functions. */
 static gboolean
 ctpl_eval_operator_internal (int        operator,
                              CtplValue *lvalue,
@@ -449,6 +470,17 @@ ctpl_eval_operator_internal (int        operator,
   return rv;
 }
 
+/* 
+ * ctpl_eval_operator:
+ * @operator: An operator token
+ * @env: then environment for the evaluation
+ * @value: Value to fill with the operation result
+ * @error: return location for an error, or %NULL to ignore them
+ * 
+ * Tries to evaluate an operation.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
 static gboolean
 ctpl_eval_operator (CtplTokenExpr      *operator,
                     const CtplEnviron  *env,
@@ -479,6 +511,7 @@ ctpl_eval_operator (CtplTokenExpr      *operator,
   return rv;
 }
 
+/* Tries to evaluate a value */
 static gboolean
 ctpl_eval_value_internal (CtplTokenExpr      *expr,
                           const CtplEnviron  *env,
@@ -525,6 +558,16 @@ ctpl_eval_value_internal (CtplTokenExpr      *expr,
   return rv;
 }
 
+/**
+ * ctpl_eval_value:
+ * @expr: The #CtplTokenExpr to evaluate
+ * @env: The expression's environment, where lookup symbols
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Computes the given expression.
+ * 
+ * Returns: The result of the expression evaluation.
+ */
 CtplValue *
 ctpl_eval_value (CtplTokenExpr     *expr,
                  const CtplEnviron *env,
@@ -538,6 +581,19 @@ ctpl_eval_value (CtplTokenExpr     *expr,
   return value;
 }
 
+/**
+ * ctpl_eval_bool:
+ * @expr: The #CtplTokenExpr to evaluate
+ * @env: The expression's environment, where lookup symbols
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Computes the given expression to a boolean.
+ * 
+ * Computing to a boolean means computing the expression's value and then check
+ * if this value should be considered as %FALSE or %TRUE.
+ * 
+ * Returns: The result of the expression evaluation.
+ */
 gboolean
 ctpl_eval_bool (CtplTokenExpr      *expr,
                 const CtplEnviron  *env,

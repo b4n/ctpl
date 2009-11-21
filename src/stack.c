@@ -65,6 +65,7 @@
  */
 
 
+/* initialises a stack entry */
 static void
 ctpl_stack_entry_init (CtplStackEntry  *entry,
                        CtplStack       *stack,
@@ -75,6 +76,7 @@ ctpl_stack_entry_init (CtplStackEntry  *entry,
   entry->parent     = stack->last;
 }
 
+/* creates a new stack entry */
 static CtplStackEntry *
 ctpl_stack_entry_new (CtplStack  *stack,
                       void       *data)
@@ -89,6 +91,7 @@ ctpl_stack_entry_new (CtplStack  *stack,
   return entry;
 }
 
+/* frees a stack entry */
 static CtplStackEntry *
 ctpl_stack_entry_free (CtplStackEntry  *entry,
                        GFreeFunc        free_func)
@@ -104,6 +107,7 @@ ctpl_stack_entry_free (CtplStackEntry  *entry,
   return parent;
 }
 
+/* adds a reference to a stack entry */
 static CtplStackEntry *
 ctpl_stack_entry_ref (CtplStackEntry *entry)
 {
@@ -111,6 +115,7 @@ ctpl_stack_entry_ref (CtplStackEntry *entry)
   return entry;
 }
 
+/* removes a reference from a stack entry */
 static CtplStackEntry *
 ctpl_stack_entry_unref (CtplStackEntry *entry)
 {
@@ -126,7 +131,7 @@ ctpl_stack_entry_unref (CtplStackEntry *entry)
 }
 
 
-
+/* initialises a stack */
 static void
 ctpl_stack_init (CtplStack   *stack,
                  GCompareFunc compare_func,
@@ -181,6 +186,7 @@ ctpl_stack_free (CtplStack *stack)
   g_free (stack);
 }
 
+/* actually pushes a reference to the last stack's element */
 static void
 _ctpl_stack_push_ref (CtplStack *stack)
 {

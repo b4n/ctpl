@@ -32,9 +32,12 @@
  * Represents a CTPL language token.
  */
 
+/* returns the length of @s. If @max is >= 0, return it, return the computed
+ * length of @s otherwise. */
 #define GET_LEN(s, max) (((max) < 0) ? strlen (s) : (gsize)max)
 
 
+/* allocates a #CtplToken and initialize prev and next */
 static CtplToken *
 token_new (void)
 {
@@ -165,6 +168,7 @@ ctpl_token_new_if (CtplTokenExpr *condition,
   return token;
 }
 
+/* allocates a #CtplTokenExpr */
 static CtplTokenExpr *
 ctpl_token_expr_new (void)
 {
@@ -178,6 +182,17 @@ ctpl_token_expr_new (void)
   return token;
 }
 
+/**
+ * ctpl_token_expr_new_operator:
+ * @operator: A binary operator (one of the CTPL_OPERATOR_*)
+ * @loperand: The left operand of the operator
+ * @roperand: The right operand of the operator
+ * 
+ * Creates a new #CtplTokenExpr holding an operator.
+ * 
+ * Returns: A new #CtplTokenExpr that should be freed with
+ *          ctpl_token_expr_free() when no longer needed.
+ */
 CtplTokenExpr *
 ctpl_token_expr_new_operator (int             operator,
                               CtplTokenExpr  *loperand,
@@ -196,6 +211,15 @@ ctpl_token_expr_new_operator (int             operator,
   return token;
 }
 
+/**
+ * ctpl_token_expr_new_integer:
+ * @integer: The value of the integer token
+ * 
+ * Creates a new #CtplTokenExpr holding an integer.
+ * 
+ * Returns: A new #CtplTokenExpr that should be freed with
+ *          ctpl_token_expr_free() when no longer needed.
+ */
 CtplTokenExpr *
 ctpl_token_expr_new_integer (long int integer)
 {
@@ -210,6 +234,15 @@ ctpl_token_expr_new_integer (long int integer)
   return token;
 }
 
+/**
+ * ctpl_token_expr_new_float:
+ * @real: The value of the floating-point token
+ * 
+ * Creates a new #CtplTokenExpr holding a floating-point value.
+ * 
+ * Returns: A new #CtplTokenExpr that should be freed with
+ *          ctpl_token_expr_free() when no longer needed.
+ */
 CtplTokenExpr *
 ctpl_token_expr_new_float (double real)
 {
@@ -224,6 +257,16 @@ ctpl_token_expr_new_float (double real)
   return token;
 }
 
+/**
+ * ctpl_token_expr_new_symbol:
+ * @symbol: String holding the symbol name
+ * @len: Length to read from @symbol or -1 to read the whole string.
+ * 
+ * Creates a new #CtplTokenExpr holding a symbol.
+ * 
+ * Returns: A new #CtplTokenExpr that should be freed with
+ *          ctpl_token_expr_free() when no longer needed.
+ */
 CtplTokenExpr *
 ctpl_token_expr_new_symbol (const char *symbol,
                             gssize      len)
@@ -240,6 +283,13 @@ ctpl_token_expr_new_symbol (const char *symbol,
 }
 
 
+/**
+ * ctpl_token_expr_free:
+ * @token: A #CtplTokenExpr to free
+ * @recurse: Whether to free sub-tokens too.
+ * 
+ * Frees all memory used by a #CtplTokenExpr.
+ */
 void
 ctpl_token_expr_free (CtplTokenExpr *token,
                       gboolean       recurse)
@@ -271,7 +321,7 @@ ctpl_token_expr_free (CtplTokenExpr *token,
  * @token: A #CtplToken to free
  * @chain: Whether all next tokens should be freed too or not.
  * 
- * Frees all memory used bey a #CtplToken.
+ * Frees all memory used by a #CtplToken.
  * If @chain is %TRUE, all tokens attached at the right of @token (appended
  * ones) will be freed too. Then, if this function is called with @chain set to
  * %TRUE on the root token of a tree, all the tree will be freed.
@@ -357,6 +407,7 @@ ctpl_token_prepend (CtplToken *token,
   brother->next = token;
 }
 
+/* prints indentation for @depth */
 static void
 print_depth_prefix (gsize depth)
 {
@@ -367,6 +418,8 @@ print_depth_prefix (gsize depth)
   }
 }
 
+/* dumps @expr, without newlines or anything. Meant to be called by a wrapper;
+ * this function is recursive. */
 static void
 ctpl_token_expr_dump_internal (const CtplTokenExpr *expr)
 {
@@ -425,6 +478,9 @@ ctpl_token_expr_dump_internal (const CtplTokenExpr *expr)
   g_print (")");
 }
 
+/* dumps @token indented of @depth. Meant to be called by a wrapper;
+ * this function is recursive.
+ * @chain: whether to dump token's brothers (next same-level tokens) */
 static void
 ctpl_token_dump_internal (const CtplToken *token,
                           gboolean         chain,
@@ -481,6 +537,12 @@ ctpl_token_dump_internal (const CtplToken *token,
   }
 }
 
+/**
+ * ctpl_token_expr_dump:
+ * @token: A #CtplTokenExpr
+ * 
+ * Dumps the given #CtplTokenExpr using g_print().
+ */
 void
 ctpl_token_expr_dump (const CtplTokenExpr *token)
 {

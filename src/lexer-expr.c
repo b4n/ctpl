@@ -47,6 +47,7 @@ struct _LexerExprState
 };
 
 
+/*<standard>*/
 GQuark
 ctpl_lexer_expr_error_quark (void)
 {
@@ -60,6 +61,7 @@ ctpl_lexer_expr_error_quark (void)
 }
 
 
+/* Checks whether @c is a valid character for a symbol */
 #define IS_SYMBOLCHAR(c) ((c) != 0 && strchr (CTPL_SYMBOL_CHARS, (c)))
 
 /* @data: String to convert to number token. String must be @length+1 long or
@@ -96,6 +98,9 @@ read_number (const char  *data,
   return token;
 }
 
+/* Reads a symbol from @data[0:@length]
+ * Returns: A nex #CtplTokenExpr holding the symbol, or %NULL if no symbol was
+ *          read. */
 static CtplTokenExpr *
 read_symbol (const char  *data,
              gsize        length,
@@ -428,6 +433,22 @@ ctpl_lexer_expr_lex (const char  *expr,
 #else /* expecting-based lexing */
 
 
+/*
+ * validate_token_list:
+ * @tokens: The list of tokens to validate
+ * @error: Return location for an error, or %NULL to ignore them
+ * 
+ * Builds a #CtplTokenExpr from a list. It computes the priority of operators
+ * when needed and builds a single fully valid root token linking the others.
+ * If checks whether the token list is meaningful, e.g. that each binary
+ * operator have two operands and so.
+ * 
+ * Note that this function relies on the token list to be valid; the only thing
+ * that may be wrong is the last token being a operator, then missing it right
+ * operand.
+ * 
+ * Returns: A new #CtplTokenExpr on success.
+ */
 static CtplTokenExpr *
 validate_token_list (GSList  *tokens,
                      GError **error)
@@ -503,6 +524,8 @@ validate_token_list (GSList  *tokens,
   return operands[0];
 }
 
+/* Reads an operand.
+ * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
 lex_operand (const char  *expr,
              gsize        length,
@@ -530,6 +553,8 @@ lex_operand (const char  *expr,
   return token;
 }
 
+/* Reads an operator.
+ * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
 lex_operator (const char  *expr,
               gsize        length,
@@ -606,6 +631,16 @@ skip_to_closing_parenthesis (const gchar *str)
   return (n == 0) ? s : NULL;
 }
 
+/**
+ * ctpl_lexer_expr_lex:
+ * @expr: An expression to lex
+ * @len: The length to read from @expr, or -1 to read the whole string
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Tries to lex @expr.
+ * 
+ * Returns: A new #CtplTokenExpr or %NULL on error.
+ */
 CtplTokenExpr *
 ctpl_lexer_expr_lex (const char  *expr,
                      gssize       len,

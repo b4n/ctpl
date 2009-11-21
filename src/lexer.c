@@ -76,7 +76,7 @@ typedef struct s_LexerState LexerState;
  *                           - S_NONE if no previous token;
  *                           - S_IF when encountering an if statement;
  *                           - S_ELSE when encountering an else statement;
- *                           - S_END xhen encountering an end statement.
+ *                           - S_END when encountering an end statement.
  * 
  * State informations of the lexer.
  */
@@ -95,6 +95,7 @@ static CtplToken   *ctpl_lexer_read_token     (MB          *mb,
                                                GError     **error);
 
 
+/* <standard> */
 GQuark
 ctpl_lexer_error_quark (void)
 {
@@ -107,6 +108,17 @@ ctpl_lexer_error_quark (void)
   return error_quark;
 }
 
+/*
+ * read_word:
+ * @mb: A #MB
+ * @accept: String of acceptable characters for the word
+ * 
+ * Reads a word composed of @accept characters.
+ * 
+ * Returns: A newly allocated string containing the read word or %NULL if there
+ *          was no word to read (e.g. no characters matching @accept was found
+ *          before one not matching it).
+ */
 static char *
 read_word (MB          *mb,
            const char  *accept)
@@ -134,18 +146,21 @@ read_word (MB          *mb,
   return word;
 }
 
+/* reads a symbol (e.g. a variable/constant) */
 static char *
 read_symbol (MB *mb)
 {
   return read_word (mb, CTPL_SYMBOL_CHARS);
 }
 
+/* reads an expression (if condition for example) */
 static char *
 read_expr (MB *mb)
 {
   return read_word (mb, CTPL_EXPR_CHARS);
 }
 
+/* skips all blank characters (those from CTPL_BLANK_CHARS) */
 static gsize
 skip_blank (MB *mb)
 {
@@ -380,7 +395,7 @@ ctpl_lexer_read_token_tpl_else (MB          *mb,
   return rv;
 }
 
-/* reads a real token */
+/* reads a real ctpl token */
 static CtplToken *
 ctpl_lexer_read_token_tpl (MB          *mb,
                            LexerState  *state,
@@ -534,6 +549,11 @@ ctpl_lexer_read_token_data (MB         *mb,
   return token;
 }
 
+/* Reads the next token from @mb
+ * Returns: The read token, or %NULL if an error occurred or if there was no
+ *          token to read.
+ *          Note that even if it returns %NULL without error, it may have
+ *          updated the @state */
 static CtplToken *
 ctpl_lexer_read_token (MB          *mb,
                        LexerState  *state,
@@ -563,6 +583,20 @@ ctpl_lexer_read_token (MB          *mb,
   return token;
 }
 
+/*
+ * ctpl_lexer_lex_internal:
+ * @mb: A #MB
+ * @state: The current lexer state
+ * @error: Return location for an error, or %NULL to ignore errors
+ * 
+ * Lexes all tokens of the current state from @mb.
+ * To lex the whole input, give a state set to {0, S_NONE}.
+ * 
+ * Returns: A new #CtplToken tree holding all read tokens or %NULL if an error
+ *          occurred or if the @mb was empty (as the point of view of the lexer
+ *          with its current state, then %NULL can be returned for empty if or
+ *          for blocks).
+ */
 static CtplToken *
 ctpl_lexer_lex_internal (MB          *mb,
                          LexerState  *state,
