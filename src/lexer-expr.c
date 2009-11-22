@@ -432,6 +432,44 @@ ctpl_lexer_expr_lex (const char  *expr,
 
 #else /* expecting-based lexing */
 
+/* Gets a human-readable name of the token's operator */
+static const char *
+token_operator_to_static_string (CtplTokenExpr *token)
+{
+  /* Don't forget to update this when adding an operator */
+  static struct {
+    int         op;
+    const char *name;
+  } operators[] =  {
+    { CTPL_OPERATOR_DIV,    "/" },
+    { CTPL_OPERATOR_EQUAL,  "==" },
+    { CTPL_OPERATOR_INF,    "<" },
+    { CTPL_OPERATOR_INFEQ,  "<=" },
+    { CTPL_OPERATOR_MINUS,  "-" },
+    { CTPL_OPERATOR_MODULO, "%" },
+    { CTPL_OPERATOR_MUL,    "*" },
+    { CTPL_OPERATOR_NEQ,    "!=" },
+    { CTPL_OPERATOR_PLUS,   "+" },
+    { CTPL_OPERATOR_SUP,    ">" },
+    { CTPL_OPERATOR_SUPEQ,  ">=" },
+    /* must be last */
+    { CTPL_OPERATOR_NONE,   "not an operator" }
+  };
+  static const gsize n_ops  = G_N_ELEMENTS (operators) - 1;
+  gsize i                   = n_ops; /* by default, index the last op (error) */
+  
+  if (token->type == CTPL_TOKEN_EXPR_TYPE_OPERATOR) {
+    /* if not an operator, final incrementation leads to index (n_ops + 1),
+     * the error message; otherwise, we break then i indexes the operator. */
+    for (i = 0; i < n_ops; i++) {
+      if (operators[i].op == token->token.t_operator.operator) {
+        break;
+      }
+    }
+  }
+  
+  return operators[i].name;
+}
 
 /*
  * validate_token_list:
@@ -512,13 +550,9 @@ validate_token_list (GSList  *tokens,
     nexpr->token.t_operator.roperand = operands[1];
     expr = nexpr;
   } else {
-    if (opt > (opd / 2)) {
-      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,
-                   "To few operands");
-    } else {
-      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERATOR,
-                   "To few operators");
-    }
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,
+                 "To few operands for operator %s",
+                 token_operator_to_static_string (operators[opt - 1]));
   }
   
   //~ g_debug ("done.");
