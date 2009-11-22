@@ -447,12 +447,13 @@ ctpl_lexer_expr_lex (const char  *expr,
  * that may be wrong is the last token being a operator, then missing it right
  * operand.
  * 
- * Returns: A new #CtplTokenExpr on success.
+ * Returns: A new #CtplTokenExpr or %NULL on error.
  */
 static CtplTokenExpr *
 validate_token_list (GSList  *tokens,
                      GError **error)
 {
+  CtplTokenExpr  *expr = NULL;
   CtplTokenExpr  *operands[2] = {NULL, NULL};
   CtplTokenExpr  *operators[2] = {NULL, NULL};
   int             opt = 0;
@@ -502,13 +503,14 @@ validate_token_list (GSList  *tokens,
   }
   if (opt == 0 && opd == 1) {
     /* nothing to do, just return the operand */
+    expr = operands[0];
   } else if (opt == 1 && opd == 2) {
     CtplTokenExpr *nexpr;
     
     nexpr = operators[0];
     nexpr->token.t_operator.loperand = operands[0];
     nexpr->token.t_operator.roperand = operands[1];
-    operands[0] = nexpr;
+    expr = nexpr;
   } else {
     if (opt > (opd / 2)) {
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,
@@ -521,7 +523,7 @@ validate_token_list (GSList  *tokens,
   
   //~ g_debug ("done.");
   
-  return operands[0];
+  return expr;
 }
 
 /* Reads an operand.
