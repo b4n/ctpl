@@ -185,6 +185,48 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
   return rv;
 }
 
+/*
+ * do_multiply_string:
+ * @str: A string to multiply
+ * @n: multiplication factor
+ * 
+ * Multiplies a string.
+ * If @n is < 1, returns and empty string, otherwise, returns a new string
+ * containing @str @n times.
+ * 
+ * Returns: The result of the string multiplication, that must be freed with
+ *          g_free() when no longer needed.
+ */
+static gchar *
+do_multiply_string (const gchar  *str,
+                    glong         n)
+{
+  gchar *buf = NULL;
+  
+  if (n < 1) {
+    buf = g_strdup ("");
+  } else if (n == 1) {
+    buf = g_strdup (str);
+  } else {
+    gsize       buf_len;
+    gsize       str_len;
+    gsize       i, j;
+    
+    str_len = strlen (str);
+    buf_len = str_len * (gsize)n;
+    buf = g_malloc (buf_len + 1);
+    for (i = 0; i < (gsize)n; i++) {
+      for (j = 0; j < str_len; j++) {
+        buf[str_len * i + j] = str[j];
+      }
+    }
+    buf[buf_len] = 0;
+  }
+  g_debug ("mutiplied string: '%s'", buf);
+  
+  return buf;
+}
+
 /* Tries to evaluate a multiplication operation */
 static gboolean
 ctpl_eval_operator_mul (CtplValue *lvalue,
@@ -192,68 +234,100 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
                         CtplValue *value,
                         GError   **error)
 {
-  gboolean rv = TRUE;
+  gboolean      rv      = TRUE;
+  CtplValueType lvtype  = ctpl_value_get_held_type (lvalue);
+  CtplValueType rvtype  = ctpl_value_get_held_type (rvalue);
+  CtplValueType desttype;
   
-  switch (ctpl_value_get_held_type (lvalue)) {
-    case CTPL_VTYPE_ARRAY:
-      /* fail, cannot multiply arrays */
+  #define L_OR_R_IS(type) ((lvtype) == type || (rvtype) == type)
+  
+  /* first, if types are valid for a multiplication */
+  if (L_OR_R_IS (CTPL_VTYPE_ARRAY)) {
+    /* cannot multiply arrays */
+    g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                 "Invalid operands for operator 'mul' (have '%s' and '%s'): "
+                 "cannot multiply arrays.",
+                 ctpl_value_get_held_type_name (lvalue),
+                 ctpl_value_get_held_type_name (rvalue));
+    rv = FALSE;
+  } else if (L_OR_R_IS (CTPL_VTYPE_STRING)) {
+    if (L_OR_R_IS (CTPL_VTYPE_INT) || L_OR_R_IS (CTPL_VTYPE_FLOAT)) {
+      desttype = CTPL_VTYPE_STRING;
+    } else {
+      /* cannot multiply a string with something not a number */
+      g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                   "Invalid operands for operator 'mul' (have '%s' and '%s'): "
+                   "cannot multiply a string with something not a number.",
+                   ctpl_value_get_held_type_name (lvalue),
+                   ctpl_value_get_held_type_name (rvalue));
       rv = FALSE;
-      break;
-    
-    case CTPL_VTYPE_INT:
-      if (CTPL_VALUE_HOLDS_INT (rvalue)) {
-        ctpl_value_set_int (value, ctpl_value_get_int (lvalue) *
-                                   ctpl_value_get_int (rvalue));
+    }
+  } else if (L_OR_R_IS (CTPL_VTYPE_FLOAT)) {
+    desttype = CTPL_VTYPE_FLOAT;
+  } else if (L_OR_R_IS (CTPL_VTYPE_INT)) {
+    desttype = CTPL_VTYPE_INT;
+  } else {
+    rv = FALSE;
+    g_assert_not_reached ();
+  }
+  /* then, if all was right, do the computation */
+  if (rv) {
+    switch (desttype) {
+      case CTPL_VTYPE_ARRAY:
+        /* fail, cannot multiply arrays */
+        rv = FALSE;
+        break;
+      
+      case CTPL_VTYPE_INT:
+        rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_INT, "mul", error);
+        if (rv) {
+          ctpl_value_set_int (value, ctpl_value_get_int (lvalue) *
+                                     ctpl_value_get_int (rvalue));
+        }
+        break;
+      
+      case CTPL_VTYPE_FLOAT:
+        rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "mul", error);
+        if (rv) {
+          ctpl_value_set_float (value, ctpl_value_get_float (lvalue) *
+                                       ctpl_value_get_float (rvalue));
+        }
+        break;
+      
+      case CTPL_VTYPE_STRING: {
+        CtplValue *str_val;
+        CtplValue *num_val;
+        
+        if (lvtype == CTPL_VTYPE_STRING) {
+          str_val = lvalue;
+          num_val = rvalue;
+        } else {
+          str_val = rvalue;
+          num_val = lvalue;
+        }
+        
+        rv = ctpl_value_convert (num_val, CTPL_VTYPE_INT);
+        if (! rv) {
+          g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                       "Invalid operands for operator 'mul' (have '%s' and '%s')",
+                       ctpl_value_get_held_type_name (lvalue),
+                       ctpl_value_get_held_type_name (rvalue));
+          rv = FALSE;
+        } else {
+          char *str;
+          
+          /* hum, may we optimise for 1 and < 1 multiplications? */
+          str = do_multiply_string (ctpl_value_get_string (str_val),
+                                    ctpl_value_get_int (num_val));
+          ctpl_value_set_string (value, str);
+          g_free (str);
+        }
         break;
       }
-      /* WARNING: conditional break to fall back to floating conversion if one
-       * operand is float */
-    case CTPL_VTYPE_FLOAT:
-      rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "plus", error);
-      if (rv) {
-        ctpl_value_set_float (value, ctpl_value_get_float (lvalue) *
-                                     ctpl_value_get_float (rvalue));
-      }
-      break;
-    
-    case CTPL_VTYPE_STRING:
-      rv = ctpl_value_convert (rvalue, CTPL_VTYPE_INT);
-      if (! rv) {
-        g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                     "Invalid operands for operator 'plus' (have '%s' and '%s')",
-                     ctpl_value_get_held_type_name (lvalue),
-                     ctpl_value_get_held_type_name (rvalue));
-        rv = FALSE;
-      } else {
-        long int rval;
-        
-        rval = ctpl_value_get_int (rvalue);
-        if (rval < 1) {
-          ctpl_value_set_string (value, "");
-        } else {
-          const char *lval;
-          char       *buf;
-          gsize       buf_len;
-          gsize       lval_len;
-          gsize       i, j;
-          
-          lval = ctpl_value_get_string (lvalue);
-          lval_len = strlen (lval);
-          buf_len = lval_len * (gsize)rval;
-          buf = g_malloc (buf_len + 1);
-          for (i = 0; i < (gsize)rval; i++) {
-            for (j = 0; j < lval_len; j++) {
-              buf[lval_len * i + j] = lval[j];
-            }
-          }
-          buf[buf_len] = 0;
-          ctpl_value_set_string (value, buf);
-          g_free (buf);
-          g_debug ("mutiplied string: '%s'", ctpl_value_get_string (value));
-        }
-      }
-      break;
+    }
   }
+  
+  #undef L_OR_R_IS
   
   return rv;
 }
