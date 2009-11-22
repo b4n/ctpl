@@ -326,7 +326,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
 }
 
 /* reads a end block end (} of a {end} block)
- * Return a new token or %NULL on error */
+ * Returns: %TRUE on success, %FALSE otherwise. */
 static gboolean
 ctpl_lexer_read_token_tpl_end (MB          *mb,
                                LexerState  *state,
@@ -361,7 +361,7 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
 }
 
 /* reads an else block end (} of a {else} block)
- * Return a new token or %NULL on error */
+ * Returns: %TRUE on success, %FALSE otherwise. */
 static gboolean
 ctpl_lexer_read_token_tpl_else (MB          *mb,
                                 LexerState  *state,
