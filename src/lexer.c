@@ -195,21 +195,20 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Missing expression after 'if' token");
   } else {
-    CtplTokenExpr *texpr;
+    int c;
     
-    texpr = ctpl_lexer_expr_lex (expr, -1, error);
-    if (texpr) {
-      int c;
+    skip_blank (mb);
+    if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
+      /* fail */
+      /*g_error ("if: invalid character in condition or missing end character");*/
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Unexpected character '%c' before end of 'if' statement",
+                   c);
+    } else {
+      CtplTokenExpr *texpr;
       
-      skip_blank (mb);
-      if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
-        /* fail */
-        ctpl_token_expr_free (texpr, TRUE);
-        /*g_error ("if: invalid character in condition or missing end character");*/
-        g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                     "Unexpected character '%c' before end of 'if' statement",
-                     c);
-      } else {
+      texpr = ctpl_lexer_expr_lex (expr, -1, error);
+      if (texpr) {
         CtplToken  *if_token;
         CtplToken  *else_token = NULL;
         LexerState  substate = *state;
