@@ -394,6 +394,44 @@ ctpl_lexer_read_token_tpl_else (MB          *mb,
   return rv;
 }
 
+/* Reads an expression token (:BLANKCHARS:?:EXPRCHARS::BLANKCHARS:?}, without
+ * the opening character) */
+static CtplToken *
+ctpl_lexer_read_token_tpl_expr (MB          *mb,
+                                LexerState  *state,
+                                GError     **error)
+{
+  CtplToken  *token = NULL;
+  gchar      *expr;
+  
+  skip_blank (mb);
+  expr = read_expr (mb);
+  if (! expr) {
+    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "No valid expression in statement");
+  } else {
+    int c;
+    
+    skip_blank (mb);
+    if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
+      /* fail */
+      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                   "Unexpected character '%c' before end of statement",
+                   c);
+    } else {
+      CtplTokenExpr *texpr;
+      
+      texpr = ctpl_lexer_expr_lex (expr, -1, error);
+      if (texpr) {
+        token = ctpl_token_new_expr (texpr);
+      }
+    }
+  }
+  g_free (expr);
+  
+  return token;
+}
+
 /* reads a real ctpl token */
 static CtplToken *
 ctpl_lexer_read_token_tpl (MB          *mb,
@@ -411,50 +449,37 @@ ctpl_lexer_read_token_tpl (MB          *mb,
                  "Unexpected character '%c' before start of statement",
                  c);
   } else {
-    gboolean  need_end = TRUE; /* whether the block needs an {end} statement */
-    char     *first_word;
+    char   *first_word;
+    gsize   start_off;
     
     skip_blank (mb);
+    start_off = mb_tell (mb);
     first_word = read_symbol (mb);
-    //~ g_debug ("read word '%s'", first_word);
-    if (first_word == NULL) {
-      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                   "Empty statements are not allowed");
-    } else if (strcmp (first_word, "if") == 0) {
+    if (g_strcmp0 (first_word, "if") == 0) {
       /* an if condition:
        * if expr */
       token = ctpl_lexer_read_token_tpl_if (mb, state, error);
-    } else if (strcmp (first_word, "for") == 0) {
+    } else if (g_strcmp0 (first_word, "for") == 0) {
       /* a for loop:
        * for iter in array */
       token = ctpl_lexer_read_token_tpl_for (mb, state, error);
-    } else if (strcmp (first_word, "end") == 0) {
+    } else if (g_strcmp0 (first_word, "end") == 0) {
       /* a block end:
        * {end} */
       ctpl_lexer_read_token_tpl_end (mb, state, error);
       /* here we will return NULL, which is fine as it simply stops token
        * reading, and as we use nested lexing calls for nested blocks */
-    } else if (strcmp (first_word, "else") == 0) {
+    } else if (g_strcmp0 (first_word, "else") == 0) {
       /* an else statement:
        * {else} */
       ctpl_lexer_read_token_tpl_else (mb, state, error);
       /* return NULL, see above */
     } else {
-      /* a var:
-       * {:BLANKCHARS:?:WORDCHARS::BLANKCHARS:?} */
-      //~ g_debug ("var?");
-      need_end = FALSE;
-      skip_blank (mb);
-      if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
-        /* fail, missing } at the end */
-        /*g_error ("var: missing '%c' at block end", CTPL_END_CHAR);*/
-        g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                     "Unexpected character '%c' before end of 'var' statement",
-                     c);
-      } else {
-        //~ g_debug ("var: %s", first_word);
-        token = ctpl_token_new_var (first_word, -1);
-      }
+      /* an expression, or nothing valid */
+      /* expression lexing need to be at the start, with the first word, then
+       * move back */
+      mb_seek (mb, start_off, MB_SEEK_SET);
+      token = ctpl_lexer_read_token_tpl_expr (mb, state, error);
     }
     g_free (first_word);
   }

@@ -37,10 +37,9 @@ G_BEGIN_DECLS
 typedef enum _CtplTokenType
 {
   CTPL_TOKEN_TYPE_DATA,
-  CTPL_TOKEN_TYPE_VAR,
   CTPL_TOKEN_TYPE_FOR,
-  CTPL_TOKEN_TYPE_IF/*,
-  CTPL_TOKEN_TYPE_EXPR*/
+  CTPL_TOKEN_TYPE_IF,
+  CTPL_TOKEN_TYPE_EXPR
 } CtplTokenType;
 
 /**
@@ -130,10 +129,10 @@ struct _CtplToken
 {
   CtplTokenType type;
   union {
-    char         *t_data;
-    char         *t_var;
-    CtplTokenFor  t_for;
-    CtplTokenIf   t_if;
+    char           *t_data;
+    CtplTokenExpr  *t_expr;
+    CtplTokenFor    t_for;
+    CtplTokenIf     t_if;
   } token;
   CtplToken    *prev;
   CtplToken    *next;
@@ -142,8 +141,7 @@ struct _CtplToken
 
 CtplToken    *ctpl_token_new_data (const char *data,
                                    gssize      len);
-CtplToken    *ctpl_token_new_var  (const char *var,
-                                   gssize      len);
+CtplToken    *ctpl_token_new_expr (CtplTokenExpr *expr);
 CtplToken    *ctpl_token_new_for  (const char *array,
                                    const char *iterator,
                                    CtplToken  *children);

@@ -50,7 +50,7 @@ CtplTokenIf
 CtplTokenExprType
 CtplTokenExpr
 ctpl_token_new_data
-ctpl_token_new_var
+ctpl_token_new_expr
 ctpl_token_new_for
 ctpl_token_new_if
 ctpl_token_free

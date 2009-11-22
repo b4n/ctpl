@@ -80,27 +80,26 @@ ctpl_token_new_data (const char *data,
 }
 
 /**
- * ctpl_token_new_var:
- * @var: Buffer containing token symbol name
- * @len: length of the @var or -1 if 0-terminated
+ * ctpl_token_new_expr:
+ * @expr: The expression
  * 
- * Creates a new token holding a symbol (variable/constant).
+ * Creates a new token holding an expression.
+ * Such tokens are used to represent any expression that will be simply
+ * replaced, including simple reference to variables or constants, as of complex
+ * expressions with or without variable or expression references.
  * 
  * Returns: A new #CtplToken that should be freed with ctpl_token_free() when no
  *          longer needed.
  */
 CtplToken *
-ctpl_token_new_var (const char *var,
-                    gssize      len)
+ctpl_token_new_expr (CtplTokenExpr *expr)
 {
   CtplToken  *token;
-  gsize       length;
   
   token = token_new ();
   if (token) {
-    token->type = CTPL_TOKEN_TYPE_VAR;
-    length = GET_LEN (var, len);
-    token->token.t_var = g_strndup (var, length);
+    token->type = CTPL_TOKEN_TYPE_EXPR;
+    token->token.t_expr = expr;
   }
   
   return token;
@@ -338,8 +337,8 @@ ctpl_token_free (CtplToken *token,
         g_free (token->token.t_data);
         break;
       
-      case CTPL_TOKEN_TYPE_VAR:
-        g_free (token->token.t_var);
+      case CTPL_TOKEN_TYPE_EXPR:
+        ctpl_token_expr_free (token->token.t_expr, TRUE);
         break;
       
       case CTPL_TOKEN_TYPE_FOR:
@@ -496,8 +495,10 @@ ctpl_token_dump_internal (const CtplToken *token,
         g_print ("data: '%s'\n", token->token.t_data);
         break;
       
-      case CTPL_TOKEN_TYPE_VAR:
-        g_print ("var: '%s'\n", token->token.t_var);
+      case CTPL_TOKEN_TYPE_EXPR:
+        g_print ("expr: ");
+        ctpl_token_expr_dump_internal (token->token.t_expr);
+        g_print ("\n");
         break;
       
       case CTPL_TOKEN_TYPE_FOR:

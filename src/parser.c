@@ -204,24 +204,30 @@ ctpl_parser_parse_token_if (const CtplTokenIf  *token,
   return rv;
 }
 
-/* Tries to parse a reference to a variable/constant. */
+/* Tries to parse an expression (a variable, a complete expression, ...). */
 static gboolean
-ctpl_parser_parse_token_var (const char  *symbol,
-                             CtplEnviron *env,
-                             MB          *output,
-                             GError     **error)
+ctpl_parser_parse_token_expr (CtplTokenExpr  *expr,
+                              CtplEnviron    *env,
+                              MB             *output,
+                              GError        **error)
 {
-  const CtplValue  *value;
-  gboolean          rv = FALSE;
+  CtplValue  *eval_value;
+  gboolean    rv = FALSE;
   
-  value = lookup_symbol (env, symbol, error);
-  if (value) {
-    char *val;
+  eval_value = ctpl_eval_value (expr, env, error);
+  if (eval_value) {
+    gchar *strval;
     
-    val = ctpl_value_to_string (value);
-    rv = write_buf (output, val, -1, error);
-    g_free (val);
+    strval = ctpl_value_to_string (eval_value);
+    if (! strval) {
+      g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_FAILED,
+                   "Cannot convert expression to a printable format");
+    } else {
+      rv = write_buf (output, strval, -1, error);
+    }
+    g_free (strval);
   }
+  ctpl_value_free (eval_value);
   
   return rv;
 }
@@ -248,8 +254,8 @@ ctpl_parser_parse_token (const CtplToken *token,
       rv = ctpl_parser_parse_token_if (&token->token.t_if, env, output, error);
       break;
     
-    case CTPL_TOKEN_TYPE_VAR:
-      rv = ctpl_parser_parse_token_var (token->token.t_var, env, output, error);
+    case CTPL_TOKEN_TYPE_EXPR:
+      rv = ctpl_parser_parse_token_expr (token->token.t_expr, env, output, error);
       break;
     
     default:
