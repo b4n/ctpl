@@ -110,9 +110,22 @@ main (int    argc,
   # if 1
   if (argc >= 2)
   {
-    const char *buf = argv[1];
+    gchar *buf = NULL;
+    gsize  len = 0;
     
-    mb = mb_new (buf, strlen (buf), MB_DONTCOPY);
+    if (g_file_test (argv[1], G_FILE_TEST_EXISTS)) {
+      GError *err = NULL;
+      
+      if (! g_file_get_contents (argv[1], &buf, &len, &err)) {
+        g_error ("Failed to open file '%s': %s", argv[1], err->message);
+        g_error_free (err);
+      }
+    } else {
+      buf = g_strdup (argv[1]);
+      len = strlen (buf);
+    }
+    
+    mb = mb_new (buf, len, MB_DONTCOPY);
     if (mb)
     {
       CtplToken *root;
@@ -145,6 +158,7 @@ main (int    argc,
       ctpl_lexer_free_tree (root);
       mb_free (mb);
     }
+    g_free (buf);
   }
   #else
   if (argc < 2)
