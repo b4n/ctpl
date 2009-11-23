@@ -28,7 +28,8 @@
  * @short_description: Mathematical utilities
  * @include: ctpl/mathutils.h
  * 
- * Various math utility function and macros.
+ * Various math utility function and macros that are use by the implementation
+ * of CTPL.
  */
 
 

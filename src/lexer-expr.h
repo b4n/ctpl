@@ -70,15 +70,17 @@ G_BEGIN_DECLS
 /**
  * CTPL_LEXER_EXPR_ERROR:
  * 
- * Error domain of CtplLexerExpr.
+ * Error domain of #CtplLexerExprError.
  */
 #define CTPL_LEXER_EXPR_ERROR (ctpl_lexer_expr_error_quark ())
 
 /**
  * CtplLexerExprError:
- * @CTPL_LEXER_ERROR_SYNTAX_ERROR: The input data contains invalid syntax
- * @CTPL_LEXER_ERROR_FAILED: An error occurred without any precision on what
- *                           failed.
+ * @CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND:  An operand is missing
+ * @CTPL_LEXER_EXPR_ERROR_MISSING_OPERATOR: An operator is missing
+ * @CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR:     The expression has invalid syntax
+ * @CTPL_LEXER_EXPR_ERROR_FAILED:           An error occurred without any
+ *                                          precision on what failed.
  * 
  * Error codes that lexing functions can throw.
  */

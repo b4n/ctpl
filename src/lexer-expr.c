@@ -35,7 +35,89 @@
  * Syntax analyser for mathematical or test expressions creating a token tree
  * from an expression.
  * 
- * To analyse an expression, use ctpl_lexer_expr_lex().
+ * To analyse an expression, use ctpl_lexer_expr_lex(). The resulting expression
+ * should be freed with ctpl_token_expr_free() when no longer needed.
+ * 
+ * An expression is something like a mathematical expression that can include
+ * references to variables. The allowed things are:
+ * <variablelist>
+ *   <varlistentry>
+ *     <term>Binary operators</term>
+ *     <listitem>
+ *       <para>
+ *         addition (<code>+</code>),
+ *         subtraction (<code>-</code>),
+ *         multiplication (<code>*</code>),
+ *         division (<code>/</code>),
+ *         modulo (<code>%</code>),
+ *         and the boolean
+ *         equality (<code>==</code>),
+ *         non-equality (<code>!=</code>),
+ *         inferiority (<code>&lt;</code>),
+ *         inferiority-or-equality (<code>&lt;=</code>),
+ *         superiority (<code>&gt;</code>)
+ *         and
+ *         superiority-or-equality (<code>&gt;=</code>).
+ *       </para>
+ *       <para>
+ *         The boolean operators results to the integer 0 if their expression
+ *         evaluates to false, or to the positive integer 1 if their expression
+ *         evaluates to true.
+ *         This result might be used as a plain integer.
+ *       </para>
+ *       <para>
+ *         The operators' priority is very common: boolean operators have the
+ *         higher priority, followed by division, modulo and multiplication, and
+ *         finally addition and subtraction which have the lower priority.
+ *         When two operators have the same priority, the left one is prior over
+ *         the right one.
+ *       </para>
+ *     </listitem>
+ *   </varlistentry>
+ *   <varlistentry>
+ *     <term>Unary operators</term>
+ *     <listitem>
+ *       <para>
+ *         The unary operators plus (<code>+</code>) and minus (<code>-</code>),
+ *         that may precede any numeric operand.
+ *       </para>
+ *     </listitem>
+ *   </varlistentry>
+ *   <varlistentry>
+ *     <term>Operands</term>
+ *     <listitem>
+ *       <para>
+ *         Any numeric constant written in C notation (period (<code>.</code>)
+ *         as the fraction separator, if any), or any reference to any
+ *         <link linkend="ctpl-CtplEnviron">environment</link> variable.
+ *       </para>
+ *     </listitem>
+ *   </varlistentry>
+ *   <varlistentry>
+ *     <term>Parentheses</term>
+ *     <listitem>
+ *       <para>
+ *         Parentheses may be placed to delimit sub-expressions, allowing a fine
+ *         control over operator priority.
+ *       </para>
+ *     </listitem>
+ *   </varlistentry>
+ * </variablelist>
+ * 
+ * <example>
+ *   <title>A simple expression</title>
+ *   <programlisting>
+ *     42 * 2
+ *   </programlisting>
+ * </example>
+ * <example>
+ *   <title>A more complicated expression</title>
+ *   <programlisting>
+ *     (foo + 2) * 3 - 1 * bar
+ *   </programlisting>
+ * </example>
+ * Of course, the latter example supposes that the environment contains the two
+ * variables @foo and @bar.
  */
 
 

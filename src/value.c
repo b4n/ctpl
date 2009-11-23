@@ -44,6 +44,17 @@
  * ctpl_value_array_prepend_float(), ctpl_value_array_append_string() and
  * ctpl_value_array_prepend_string().
  * 
+ * To get the value held by a #CtplValue, use ctpl_value_get_int(), 
+ * ctpl_value_get_float(), ctpl_value_get_string(), ctpl_value_get_array_int(),
+ * ctpl_value_get_array_float() or ctpl_value_get_array_string() depending on
+ * the type of the value.
+ * For array value, yo can also use ctpl_value_get_array() to get the list that
+ * holds the different values.
+ * You can get the type held by a value with ctpl_value_get_held_type().
+ * 
+ * Value may be converted to other types with ctpl_value_convert(), and to a
+ * string representation using ctpl_value_to_string().
+ * 
  * <example>
  * <title>Simple usage of allocated generic values</title>
  * <programlisting>

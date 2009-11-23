@@ -98,6 +98,13 @@ struct _CtplTokenIf
  * CtplTokenExpr:
  * @type: The type of the expression token
  * @token: The expression token
+ * @token.t_operator: The value of an operator token
+ * @token.t_operator.operator: The operator
+ * @token.t_operator.loperand: The left operand
+ * @token.t_operator.roperand: The right operand
+ * @token.t_integer: The value of an integer token
+ * @token.t_float: The value of a floating-point token
+ * @token.t_symbol: The name of a symbol token
  * 
  * Represents a token of an expression.
  */
@@ -120,6 +127,10 @@ struct _CtplTokenExpr
  * CtplToken:
  * @type: Type of the token
  * @token: Union holding the corresponding token (according to @type)
+ * @token.t_data: The data of a data token
+ * @token.t_expr: The value of an expression token
+ * @token.t_for: The value of a for token
+ * @token.t_if: The value of an if token
  * @prev: Previous token
  * @next: Next token
  * 

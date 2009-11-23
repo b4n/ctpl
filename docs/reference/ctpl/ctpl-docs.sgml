@@ -19,42 +19,342 @@
 
   <chapter>
     <title>CTPL overview</title>
-    <para>
-      CTPL is a template library written in C.
-    </para>
-    <para>
-      CTPL depends on the following libraries:
-      <variablelist>
-        <varlistentry>
-          <term><ulink url="http://www.gtk.org">GLib</ulink></term>
-          <listitem>
-            <para>
-              General purpose C utility library
-            </para>
-          </listitem>
-        </varlistentry>
-        <varlistentry>
-          <term><ulink url="http://ban.free-h.net/libmb/">LibMB</ulink></term>
-          <listitem>
-            <para>
-              FILE-like API for memory buffer read
-            </para>
-          </listitem>
-        </varlistentry>
-      </variablelist>
-    </para>
+    
+    <section>
+      <title>Introduction</title>
+      <para>
+        CTPL is a template library written in C. It allows in-memory fast and
+        easy parsing of templates and fine control over template parsing
+        environment.
+      </para>
+      <para>
+        CTPL depends on the following libraries:
+        <variablelist>
+          <varlistentry>
+            <term><ulink url="http://www.gtk.org">GLib</ulink></term>
+            <listitem>
+              <para>
+                General purpose C utility library
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term><ulink url="http://ban.free-h.net/libmb/">LibMB</ulink></term>
+            <listitem>
+              <para>
+                FILE-like API for memory buffer read/write
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+      
+      <section>
+        <title>Advantages and disadvantages</title>
+        
+        <section>
+          <title>Advantages</title>
+          <itemizedlist>
+            <listitem>
+              <para>
+                It is a library, then it can be easily used from programs
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                It is written in standard C, which gives portability, speed and
+                easy portage to other languages (as most of languages supports
+                additions written in C).
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Simple syntax
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Fast and strict parsing
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                In-memory parsing, allowing non-file data parsing and
+                avoiding I/O-latencies.
+              </para>
+            </listitem>
+          </itemizedlist>
+        </section>
+        
+        <section>
+          <title>Disadvantages</title>
+          <itemizedlist>
+            <listitem>
+              <para>
+                Full in-memory parsing requires to load the whole template in
+                memory, which may lead to huge memory consumption with large
+                templates. The memory usage is about 2 times the input template
+                size.
+              </para>
+              <para>
+                Note that the memory consumption may be reduced if we or LibMB
+                start supporting file-stream read/write.
+              </para>
+            </listitem>
+          </itemizedlist>
+        </section>
+      </section>
+    </section>
+    
+    <section>
+      <title>Working design</title>
+      <para>
+        The CTPL engine is split, as most parsers, in two distinct parts:
+        the lexer and the parser.
+      </para>
+      <section>
+        <title>The lexer</title>
+        <para>
+          The <link linkend="ctpl-CtplLexer">lexer</link> is the part that reads
+          the actual input data, and tries to create a
+          <link linkend="ctpl-CtplToken">token</link> tree (internal
+          representation of the input) that the
+          <link linkend="ctpl-CtplParser">parser</link> will use.
+        </para>
+      </section>
+      <section>
+        <title>The parser</title>
+        <para>
+          The parser reads a <link linkend="ctpl-CtplToken">token</link> tree
+          and an <link linkend="ctpl-CtplEnviron">environment</link>, and
+          outputs the computed template.
+        </para>
+      </section>
+      <para>
+        By exposing this separation of the tasks to the user, it is possible
+        to <link linkend="ctpl-CtplParser">parse</link> a single template many
+        times with a different environment without needing to
+        re-<link linkend="ctpl-CtplLexer">lex</link> it, which will save
+        computation time and resources.
+      </para>
+      <example>
+        <title>Using the library to lex and parse a template</title>
+        <programlisting>
+/**
+ * procede_template:
+ * @input:  The input template, needs to be readable.
+ * @env:    The environment against which parse the input.
+ * @output: The output buffer, needs to be writeable.
+ * @error:  Return location for an error, or %NULL to ignore them.
+ * 
+ * Parses and lexes a template.
+ * 
+ * Returns: %TRUE on success, %FALSE on error.
+ */
+gboolean
+procede_template (MB           *input,
+                  CtplEnviron  *env,
+                  MB           *output,
+                  GError      **error)
+{
+  gboolean    success = FALSE;
+  CtplToken  *tree;
+  
+  /* first, create a token tree from the input template */
+  tree = ctpl_lexer_lex (input, error);
+  if (tree != NULL) {
+    /* then, parse this tree against the environment */
+    success = ctpl_parser_parse (tree, env, output, error);
+  }
+  /* free the built tree */
+  ctpl_lexer_free_tree (tree);
+  
+  return success;
+}
+        </programlisting>
+      </example>
+    </section>
+    
+    <section>
+      <title>Syntax</title>
+      <para>
+        CTPL supports 2 kind of data:
+        <variablelist>
+          <varlistentry>
+            <term>Raw data</term>
+            <listitem>
+              <para>
+                The actual content of your template, or at least most of it:
+                unparsed data that will remain unchanged.
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>Template blocks</term>
+            <listitem>
+              <para>
+                The instructions that makes the template engine useful.
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </para>
+      <section>
+        <title>Raw data</title>
+        <para>
+          There is no syntax for the raw data: everything that is not a
+          template block is raw data. The only exception to this rule is that
+          the template-blocks-delimiters <code>{</code> and <code>}</code>
+          must be escaped using a backslash (<code>\</code>). For example, to
+          produce a opening bracket, you need to write <code>\{</code>.
+        </para>
+      </section>
+      <section>
+        <title>Template blocks</title>
+        <para>
+          Template blocks are delimited with brackets: they are opened with an
+          unescaped opening bracket (<code>{</code>) and closed with an
+          unescaped closing bracket (<code>}</code>). All data inside these two
+          brackets is template instructions.
+        </para>
+        <para>
+          There is 3 instruction types:
+          <variablelist>
+            <varlistentry>
+              <term>The <code>for</code> loop</term>
+              <listitem>
+                <para>
+                  The <code>for</code> loop allows to iterate over an array from
+                  the environment, and computes the loop body for each element
+                  in the array.
+                </para>
+                <para>
+                  The syntax is the following:
+                  <informalexample>
+                    <programlisting>
+{for &lt;iterator&gt; in &lt;array&gt;}&lt;loop body&gt;{end}
+                    </programlisting>
+                  </informalexample>
+                  <code>iterator</code> is the variable name referring to
+                  the current array's element;
+                  <code>array</code> is the array over which iterate, as named
+                  in the environment;
+                  <code>loop body</code> is the data that will be evaluated on
+                  each iteration of the loop, and may contain any elements
+                  (raw data or instructions).
+                </para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>The <code>if</code> switch</term>
+              <listitem>
+                <para>
+                  The <code>if</code> block is a conditional branching.
+                </para>
+                <para>
+                  The syntax is the following:
+                  <informalexample>
+                    <programlisting>
+{if &lt;expression&gt;}&lt;if body&gt;[{else}&lt;else body&gt;]{end}
+                    </programlisting>
+                  </informalexample>
+                  <code>expression</code> is an expression (see below) that will
+                  be evaluated to a boolean value,
+                  <code>TRUE</code> or <code>FALSE</code>.
+                </para>
+                <para>
+                  If the <code>expression</code> evaluates to <code>TRUE</code>,
+                  the <code>if body</code> will be parsed.
+                  If the <code>expression</code> evaluates to <code>FALSE</code>,
+                  the <code>else body</code> will be parsed if any, or nothing
+                  will be done if the <code>else</code> is missing.
+                </para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>An expression</term>
+              <listitem>
+                <para>
+                  An expression that will be replaced by its computation result.
+                </para>
+                <para>
+                  See <link linkend="ctpl-CtplLexerExpr">CtplLexerExpr</link>
+                  for details on the syntax of expressions. Basically, it may be
+                  any mathematical-like expression that may include reference(s)
+                  to variable(s).
+                </para>
+              </listitem>
+            </varlistentry>
+          </variablelist>
+        </para>
+      </section>
+      
+      <section>
+        <title>Examples</title>
+        <example>
+          <title>Short template</title>
+          <para>
+            <informalexample>
+              <programlisting>
+{for i in array}
+  {i}
+{end}
+              </programlisting>
+            </informalexample>
+            This example will output each item of <code>array</code> on a
+            newline. Supposing the array <code>[1, 2, 3]</code>, the output will
+            be:
+            <informalexample>
+              <programlisting>
+
+&nbsp;&nbsp;1
+
+&nbsp;&nbsp;2
+
+&nbsp;&nbsp;3
+
+              </programlisting>
+            </informalexample>
+          </para>
+        </example>
+        
+        <example>
+          <title>Longer template</title>
+          <para>
+            Here what may be a template for a member list HTML page:
+            <informalexample>
+              <programlisting>
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Member list&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;List of our members&lt;h1&gt;
+    &lt;ul class="memberlist"&gt;
+    {for member in members}
+      &lt;li&gt;{member}&lt;/li&gt;
+    {end}
+    &lt;/ul&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+              </programlisting>
+            </informalexample>
+          </para>
+        </example>
+      </section>
+    </section>
   </chapter>
 
   <chapter>
     <title>API reference</title>
+    <xi:include href="xml/stack.xml"/>
+    <xi:include href="xml/value.xml"/>
     <xi:include href="xml/environ.xml"/>
     <xi:include href="xml/token.xml"/>
     <xi:include href="xml/lexer.xml"/>
     <xi:include href="xml/lexer-expr.xml"/>
     <xi:include href="xml/parser.xml"/>
     <xi:include href="xml/eval.xml"/>
-    <xi:include href="xml/value.xml"/>
-    <xi:include href="xml/stack.xml"/>
     <xi:include href="xml/mathutils.xml"/>
   </chapter>
   <!--chapter id="object-tree">

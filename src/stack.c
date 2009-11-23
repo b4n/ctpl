@@ -28,11 +28,11 @@
  * @include: ctpl/stack.h
  * 
  * A stack optimised for storing same data multiple times at once.
- * E.g., pushing "foo", "bar", "bar", "bar" could only uses 2 data structures
- * and not 4 as the three last values shares the same structure.
+ * E.g., pushing "foo", "bar", "bar", "bar" could use only 2 data structures
+ * and not 4 as the three last values may shares the same structure.
  * 
  * If a comparison function was given when creating the stack with
- * ctpl_stack_new(), if you push an element in the stack that the comparison
+ * ctpl_stack_new(), when you push an element in the stack that the comparison
  * function reports as being the same as the last pushed one, a reference to it
  * will be created in place of a new entry, and the data that was queried to be
  * pushed will be free using the free function, if any.
