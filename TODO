@@ -1,4 +1,3 @@
-* Add boolean operators AND and OR
 * Add support for string literals in expressions
 * Cleanup test application
 
