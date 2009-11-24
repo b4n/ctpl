@@ -379,11 +379,11 @@ ctpl_eval_operator_div (CtplValue *lvalue,
  * Returns: %TRUE on success, %FALSE on failure.
  */
 static gboolean
-ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue *lvalue,
-                                               CtplValue *rvalue,
-                                               int              op,
-                                               CtplValue       *value,
-                                               GError         **error)
+ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
+                                               CtplValue     *rvalue,
+                                               CtplOperator   op,
+                                               CtplValue     *value,
+                                               GError       **error)
 {
   /* boolean operators expands to integers (1:TRUE or 0:FALSE) */
   gboolean rv     = TRUE;
@@ -418,6 +418,7 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue *lvalue,
           case CTPL_OPERATOR_INFEQ: result = (lval <= rval); break;
           case CTPL_OPERATOR_SUP:   result = (lval >  rval); break;
           case CTPL_OPERATOR_SUPEQ: result = (lval >= rval); break;
+          default: /* avoid compiler warnings about non-handled cases */ break;
         }
         break;
       }
@@ -438,6 +439,7 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue *lvalue,
           case CTPL_OPERATOR_INFEQ: result = (lval <= rval); break;
           case CTPL_OPERATOR_SUP:   result = (lval >  rval); break;
           case CTPL_OPERATOR_SUPEQ: result = (lval >= rval); break;
+          default: /* avoid compiler warnings about non-handled cases */ break;
         }
       }
       break;
@@ -462,6 +464,7 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue *lvalue,
           case CTPL_OPERATOR_INFEQ: result = (strcmp_result <= 0); break;
           case CTPL_OPERATOR_SUP:   result = (strcmp_result >  0); break;
           case CTPL_OPERATOR_SUPEQ: result = (strcmp_result >= 0); break;
+          default: /* avoid compiler warnings about non-handled cases */ break;
         }
         g_free (tmp);
       }
@@ -500,13 +503,13 @@ ctpl_eval_operator_modulo (CtplValue *lvalue,
 
 /* dispatches evaluation to specific functions. */
 static gboolean
-ctpl_eval_operator_internal (int        operator,
-                             CtplValue *lvalue,
-                             CtplValue *rvalue,
-                             CtplValue *value,
-                             GError   **error)
+ctpl_eval_operator_internal (CtplOperator operator,
+                             CtplValue   *lvalue,
+                             CtplValue   *rvalue,
+                             CtplValue   *value,
+                             GError     **error)
 {
-  gboolean rv = TRUE;
+  gboolean rv = FALSE;
   
   switch (operator) {
     case CTPL_OPERATOR_DIV:
@@ -540,9 +543,8 @@ ctpl_eval_operator_internal (int        operator,
       rv = ctpl_eval_operator_plus (lvalue, rvalue, value, error);
       break;
     
-    default:
+    case CTPL_OPERATOR_NONE:
       g_critical ("Unknown operator ID: %d", operator);
-      rv = FALSE;
   }
   
   return rv;

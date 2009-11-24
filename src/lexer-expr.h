@@ -27,28 +27,12 @@
 G_BEGIN_DECLS
 
 
-#define CTPL_OPERATOR_NONE    0
-#define CTPL_OPERATOR_PLUS    '+'
-#define CTPL_OPERATOR_MINUS   '-'
-#define CTPL_OPERATOR_DIV     '/'
-#define CTPL_OPERATOR_MUL     '*'
-#define CTPL_OPERATOR_EQUAL   '='
-#define CTPL_OPERATOR_INF     '<'
-#define CTPL_OPERATOR_SUP     '>'
-#define CTPL_OPERATOR_MODULO  '%'
-#define CTPL_OPERATOR_SUPEQ   1
-#define CTPL_OPERATOR_INFEQ   2
-#define CTPL_OPERATOR_NEQ     3
-
 /**
  * CTPL_OPERATOR_CHARS:
  * 
- * Characters that are operators and that matches their own value.
- * It is used to convert them automatically.
- * 
- * This is NOT the list of characters can be part of an operator.
+ * Characters valid for an operator.
  */
-#define CTPL_OPERATOR_CHARS "+-/*=><%"
+#define CTPL_OPERATOR_CHARS "+-/*=><%!"
 /**
  * CTPL_OPERAND_CHARS:
  * 
@@ -64,7 +48,7 @@ G_BEGIN_DECLS
  * Characters valid inside an expression
  */
 #define CTPL_EXPR_CHARS     "()" \
-                            CTPL_OPERATOR_CHARS "!" \
+                            CTPL_OPERATOR_CHARS \
                             CTPL_OPERAND_CHARS
 
 /**
@@ -97,6 +81,10 @@ GQuark          ctpl_lexer_expr_error_quark (void) G_GNUC_CONST;
 CtplTokenExpr  *ctpl_lexer_expr_lex         (const char  *expr,
                                              gssize       len,
                                              GError     **error);
+const gchar    *ctpl_operator_to_string     (CtplOperator op);
+CtplOperator    ctpl_operator_from_string   (const gchar *str,
+                                             gssize       len,
+                                             gsize       *operator_len);
 
 
 G_END_DECLS

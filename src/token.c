@@ -205,7 +205,7 @@ ctpl_token_expr_new (void)
  *          ctpl_token_expr_free() when no longer needed.
  */
 CtplTokenExpr *
-ctpl_token_expr_new_operator (int             operator,
+ctpl_token_expr_new_operator (CtplOperator    operator,
                               CtplTokenExpr  *loperand,
                               CtplTokenExpr  *roperand)
 {
@@ -454,31 +454,8 @@ ctpl_token_expr_dump_internal (const CtplTokenExpr *expr)
         if (expr->token.t_operator.loperand) {
           ctpl_token_expr_dump_internal (expr->token.t_operator.loperand);
         }
-        if (expr->token.t_operator.operator) {
-          switch (expr->token.t_operator.operator) {
-            case CTPL_OPERATOR_PLUS:
-            case CTPL_OPERATOR_MINUS:
-            case CTPL_OPERATOR_DIV:
-            case CTPL_OPERATOR_MUL:
-            case CTPL_OPERATOR_EQUAL:
-            case CTPL_OPERATOR_INF:
-            case CTPL_OPERATOR_SUP:
-            case CTPL_OPERATOR_MODULO:
-              g_print (" %c ", expr->token.t_operator.operator);
-              break;
-            
-            case CTPL_OPERATOR_INFEQ: g_print (" <= "); break;
-            case CTPL_OPERATOR_SUPEQ: g_print (" >= "); break;
-            case CTPL_OPERATOR_NEQ:   g_print (" != "); break;
-            
-            case CTPL_OPERATOR_NONE:
-              /* nothing to dump */
-              break;
-            
-            default:
-              g_assert_not_reached ();
-          }
-        }
+        g_print (" %s ",
+                 ctpl_operator_to_string (expr->token.t_operator.operator));
         if (expr->token.t_operator.roperand) {
           ctpl_token_expr_dump_internal (expr->token.t_operator.roperand);
         }

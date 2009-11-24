@@ -59,6 +59,41 @@ typedef enum _CtplTokenExprType
   CTPL_TOKEN_EXPR_TYPE_SYMBOL
 } CtplTokenExprType;
 
+/**
+ * CtplOperator:
+ * @CTPL_OPERATOR_PLUS:   Addition operator
+ * @CTPL_OPERATOR_MINUS:  Subtraction operator
+ * @CTPL_OPERATOR_DIV:    Division operator
+ * @CTPL_OPERATOR_MUL:    Multiplication operator
+ * @CTPL_OPERATOR_EQUAL:  Equality test operator
+ * @CTPL_OPERATOR_INF:    Inferiority test operator
+ * @CTPL_OPERATOR_SUP:    Superiority test operator
+ * @CTPL_OPERATOR_MODULO: Modulo operator
+ * @CTPL_OPERATOR_SUPEQ:  @CTPL_OPERATOR_SUP || @CTPL_OPERATOR_EQUAL
+ * @CTPL_OPERATOR_INFEQ:  @CTPL_OPERATOR_INF || @CTPL_OPERATOR_EQUAL
+ * @CTPL_OPERATOR_NEQ:    Non-equality test operator (! @CTPL_OPERATOR_EQUAL)
+ * @CTPL_OPERATOR_NONE:   Not an operator, denoting no operator
+ * 
+ * Operators constants.
+ * 
+ * See also ctpl_operator_to_string() and ctpl_operator_from_string().
+ */
+typedef enum {
+  CTPL_OPERATOR_PLUS,
+  CTPL_OPERATOR_MINUS,
+  CTPL_OPERATOR_DIV,
+  CTPL_OPERATOR_MUL,
+  CTPL_OPERATOR_EQUAL,
+  CTPL_OPERATOR_INF,
+  CTPL_OPERATOR_SUP,
+  CTPL_OPERATOR_MODULO,
+  CTPL_OPERATOR_SUPEQ,
+  CTPL_OPERATOR_INFEQ,
+  CTPL_OPERATOR_NEQ,
+  /* must be last */
+  CTPL_OPERATOR_NONE
+} CtplOperator;
+
 typedef struct _CtplToken     CtplToken;
 typedef struct _CtplTokenFor  CtplTokenFor;
 typedef struct _CtplTokenIf   CtplTokenIf;
@@ -113,7 +148,7 @@ struct _CtplTokenExpr
   CtplTokenExprType type;
   union {
     struct {
-      int             operator;
+      CtplOperator    operator;
       CtplTokenExpr  *loperand;
       CtplTokenExpr  *roperand;
     }         t_operator;
@@ -159,7 +194,7 @@ CtplToken    *ctpl_token_new_for  (const char *array,
 CtplToken    *ctpl_token_new_if   (CtplTokenExpr *condition,
                                    CtplToken     *if_children,
                                    CtplToken     *else_children);
-CtplTokenExpr *ctpl_token_expr_new_operator (int             operator,
+CtplTokenExpr *ctpl_token_expr_new_operator (CtplOperator    operator,
                                              CtplTokenExpr  *loperand,
                                              CtplTokenExpr  *roperand);
 CtplTokenExpr *ctpl_token_expr_new_integer  (long int integer);

@@ -21,21 +21,11 @@ ctpl_lexer_error_quark
 CTPL_EXPR_CHARS
 CTPL_OPERAND_CHARS
 CTPL_OPERATOR_CHARS
-CTPL_OPERATOR_NONE
-CTPL_OPERATOR_MINUS
-CTPL_OPERATOR_PLUS
-CTPL_OPERATOR_MUL
-CTPL_OPERATOR_DIV
-CTPL_OPERATOR_MODULO
-CTPL_OPERATOR_EQUAL
-CTPL_OPERATOR_NEQ
-CTPL_OPERATOR_INF
-CTPL_OPERATOR_INFEQ
-CTPL_OPERATOR_SUP
-CTPL_OPERATOR_SUPEQ
 CTPL_LEXER_EXPR_ERROR
 CtplLexerExprError
 ctpl_lexer_expr_lex
+ctpl_operator_to_string
+ctpl_operator_from_string
 <SUBSECTION Standard>
 ctpl_lexer_expr_error_quark
 </SECTION>
@@ -43,6 +33,7 @@ ctpl_lexer_expr_error_quark
 <SECTION>
 <TITLE>CtplToken</TITLE>
 <FILE>token</FILE>
+CtplOperator
 CtplTokenType
 CtplToken
 CtplTokenFor
@@ -179,4 +170,3 @@ ctpl_math_string_to_int
 ctpl_math_float_to_string
 ctpl_math_int_to_string
 </SECTION>
-

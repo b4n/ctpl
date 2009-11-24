@@ -205,7 +205,8 @@ read_symbol (const char  *data,
  * If both operators have the same priority, returns %TRUE */
 /* FIXME: the prior op must be the left one if they have the same priority */
 static gboolean
-operator_is_prior (int op1, int op2)
+operator_is_prior (CtplOperator op1,
+                   CtplOperator op2)
 {
   if ((op1 == CTPL_OPERATOR_EQUAL || op1 == CTPL_OPERATOR_INF ||
        op1 == CTPL_OPERATOR_INFEQ || op1 == CTPL_OPERATOR_SUP ||
@@ -514,43 +515,108 @@ ctpl_lexer_expr_lex (const char  *expr,
 
 #else /* expecting-based lexing */
 
-/* Gets a human-readable name of the token's operator */
-static const char *
-token_operator_to_static_string (CtplTokenExpr *token)
+/* 
+ * operators_array:
+ * 
+ * List of operators, with their representation in the CTPL language.
+ * Don't forget to update this when adding an operator */
+static const struct {
+  CtplOperator  op;       /* The operator ID */
+  const char   *str;      /* Its string representation */
+  gsize         str_len;  /* Cached length of @str */
+} operators_array[] = {
+  { CTPL_OPERATOR_DIV,    "/",  1 },
+  { CTPL_OPERATOR_EQUAL,  "==", 2 },
+  { CTPL_OPERATOR_EQUAL,  "=",  1 },
+  { CTPL_OPERATOR_EQUAL,  "<>", 2 }, /* operator <> looks nice */
+  { CTPL_OPERATOR_INF,    "<",  1 },
+  { CTPL_OPERATOR_INFEQ,  "<=", 2 },
+  { CTPL_OPERATOR_MINUS,  "-",  1 },
+  { CTPL_OPERATOR_MODULO, "%",  1 },
+  { CTPL_OPERATOR_MUL,    "*",  1 },
+  { CTPL_OPERATOR_NEQ,    "!=", 2 },
+  { CTPL_OPERATOR_PLUS,   "+",  1 },
+  { CTPL_OPERATOR_SUP,    ">",  1 },
+  { CTPL_OPERATOR_SUPEQ,  ">=", 2 },
+  /* must be last */
+  { CTPL_OPERATOR_NONE,   "not an operator", 15 }
+};
+/* number of true operators, without the NONE at the end */
+static const gsize operators_array_length = G_N_ELEMENTS (operators_array) - 1;
+
+
+/**
+ * ctpl_operator_to_string:
+ * @op: A #CtplOperator
+ * 
+ * Gets the string representation of an operator.
+ * This representation is understood by the lexer if @op is valid.
+ * 
+ * Returns: A string representing the operator. This string should not be
+ *          modified or freed.
+ */
+const gchar *
+ctpl_operator_to_string (CtplOperator op)
 {
-  /* Don't forget to update this when adding an operator */
-  static struct {
-    int         op;
-    const char *name;
-  } operators[] =  {
-    { CTPL_OPERATOR_DIV,    "/" },
-    { CTPL_OPERATOR_EQUAL,  "==" },
-    { CTPL_OPERATOR_INF,    "<" },
-    { CTPL_OPERATOR_INFEQ,  "<=" },
-    { CTPL_OPERATOR_MINUS,  "-" },
-    { CTPL_OPERATOR_MODULO, "%" },
-    { CTPL_OPERATOR_MUL,    "*" },
-    { CTPL_OPERATOR_NEQ,    "!=" },
-    { CTPL_OPERATOR_PLUS,   "+" },
-    { CTPL_OPERATOR_SUP,    ">" },
-    { CTPL_OPERATOR_SUPEQ,  ">=" },
-    /* must be last */
-    { CTPL_OPERATOR_NONE,   "not an operator" }
-  };
-  static const gsize n_ops  = G_N_ELEMENTS (operators) - 1;
-  gsize i                   = n_ops; /* by default, index the last op (error) */
+  gsize i = operators_array_length; /* by default, index the last op (error) */
   
-  if (token->type == CTPL_TOKEN_EXPR_TYPE_OPERATOR) {
-    /* if not an operator, final incrementation leads to index (n_ops + 1),
-     * the error message; otherwise, we break then i indexes the operator. */
-    for (i = 0; i < n_ops; i++) {
-      if (operators[i].op == token->token.t_operator.operator) {
-        break;
-      }
+  /* if not an operator, final incrementation leads to index (n_ops + 1),
+   * the error message; otherwise, we break then i indexes the operator. */
+  for (i = 0; i < operators_array_length; i++) {
+    if (operators_array[i].op == op) {
+      break;
     }
   }
   
-  return operators[i].name;
+  return operators_array[i].str;
+}
+
+/**
+ * ctpl_operator_from_string:
+ * @str: A string starting with an operator
+ * @len: length to read from @str, or -1 to read the whole string.
+ * @operator_len: Return location for the length of the read operator, or %NULL.
+ * 
+ * Tries to convert a string to an operator, as the lexer may do.
+ * 
+ * Returns: The read operator or @CTPL_OPERATOR_NONE if none successfully read.
+ */
+CtplOperator
+ctpl_operator_from_string (const gchar *str,
+                           gssize       len,
+                           gsize       *operator_len)
+{
+  CtplOperator  op = CTPL_OPERATOR_NONE;
+  gsize         i;
+  gsize         length;
+  
+  length = (len < 0) ? strlen (str) : (gsize)len;
+  for (i = 0; op == CTPL_OPERATOR_NONE &&
+              i < operators_array_length; i++) {
+    if (length >= operators_array[i].str_len &&
+        strncmp (operators_array[i].str, str,
+                 operators_array[i].str_len) == 0) {
+      op = operators_array[i].op;
+      if (operator_len) *operator_len = operators_array[i].str_len;
+    }
+  }
+  
+  return op;
+}
+
+/* Gets a human-readable name of the token's operator */
+static const char *
+token_operator_to_string (CtplTokenExpr *token)
+{
+  const char *str;
+  
+  /* by default, index the last op (error) */
+  str = operators_array[operators_array_length].str;
+  if (token->type == CTPL_TOKEN_EXPR_TYPE_OPERATOR) {
+    str = ctpl_operator_to_string (token->token.t_operator.operator);
+  }
+  
+  return str;
 }
 
 /*
@@ -634,7 +700,7 @@ validate_token_list (GSList  *tokens,
   } else {
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,
                  "To few operands for operator %s",
-                 token_operator_to_static_string (operators[opt - 1]));
+                 token_operator_to_string (operators[opt - 1]));
   }
   
   //~ g_debug ("done.");
@@ -680,48 +746,18 @@ lex_operator (const char  *expr,
               GError     **error)
 {
   CtplTokenExpr  *token = NULL;
-  gsize           off   = 2;
-  int             c     = *expr;
-  GError         *err   = NULL;
-  int             op    = CTPL_OPERATOR_NONE;
+  gsize           off   = 0;
+  CtplOperator    op    = CTPL_OPERATOR_NONE;
   
   //~ g_debug ("Lexing operator '%.*s'", (int)length, expr);
-  
-  if (length > 1) {
-    switch (expr[1]) {
-      case '=':
-        switch (c) {
-          case '<': op = CTPL_OPERATOR_INFEQ; break;
-          case '>': op = CTPL_OPERATOR_SUPEQ; break;
-          case '=': op = CTPL_OPERATOR_EQUAL; break;
-          case '!': op = CTPL_OPERATOR_NEQ;   break;
-        }
-        break;
-      
-      case '>':
-        if (c == '<') {
-          /* operator <> looks nice :D */
-          op = CTPL_OPERATOR_EQUAL;
-        }
-        break;
-    }
-  }
+  op = ctpl_operator_from_string (expr, length, &off);
   if (op == CTPL_OPERATOR_NONE) {
-    /* no multi-character operator were read, try to read a single one */
-    if (strchr (CTPL_OPERATOR_CHARS, c)) {
-      op = c;
-      off = 1;
-    } else {
-      g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                   "No valid operator at start of expression '%.*s'",
-                   (int)length, expr);
-    }
-  }
-  if (! err) {
+    g_set_error (error, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERATOR,
+                 "No valid operator at start of expression '%.*s'",
+                 (int)length, expr);
+  } else {
     *n_skiped = off;
     token = ctpl_token_expr_new_operator (op, NULL, NULL);
-  } else {
-    g_propagate_error (error, err);
   }
   
   return token;
