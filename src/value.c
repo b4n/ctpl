@@ -20,7 +20,6 @@
 #include "value.h"
 #include "mathutils.h"
 #include <glib.h>
-#include <math.h>
 #include <stdarg.h>
 
 
@@ -1205,14 +1204,12 @@ ctpl_value_convert (CtplValue     *value,
         switch (actual_type) {
           case CTPL_VTYPE_FLOAT: {
             double val;
-            double roundval;
             
             val = ctpl_value_get_float (value);
-            roundval = floor (val);
-            if (! CTPL_MATH_FLOAT_EQ (val, roundval)) {
+            if (! CTPL_MATH_FLOAT_EQ (val, (double)(long int)val)) {
               rv = FALSE;
             } else {
-              ctpl_value_set_int (value, (long int)roundval);
+              ctpl_value_set_int (value, (long int)val);
             }
             break;
           }

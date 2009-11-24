@@ -24,7 +24,6 @@
 #include <mb.h>
 #include <glib.h>
 #include <string.h>
-#include <math.h>
 #include <errno.h>
 
 
@@ -167,7 +166,7 @@ read_number (const char  *data,
   value = g_ascii_strtod (tmpbuf, &endptr);
   //~ g_print ("ep: '%c'\n", *endptr);
   if (tmpbuf != endptr && errno != ERANGE && ! IS_SYMBOLCHAR (*endptr)) {
-    if (CTPL_MATH_FLOAT_EQ (value, floor (value))) {
+    if (CTPL_MATH_FLOAT_EQ (value, (double)(long int)value)) {
       token = ctpl_token_expr_new_integer ((long int)value);
     } else {
       token = ctpl_token_expr_new_float (value);
