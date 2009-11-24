@@ -55,9 +55,11 @@
  *         non-equality (<code>!=</code>),
  *         inferiority (<code>&lt;</code>),
  *         inferiority-or-equality (<code>&lt;=</code>),
- *         superiority (<code>&gt;</code>)
+ *         superiority (<code>&gt;</code>),
+ *         superiority-or-equality (<code>&gt;=</code>),
+ *         AND (<code>&&</code>),
  *         and
- *         superiority-or-equality (<code>&gt;=</code>).
+ *         OR (<code>||</code>).
  *       </para>
  *       <para>
  *         The boolean operators results to the integer 0 if their expression
@@ -525,6 +527,7 @@ static const struct {
   const char   *str;      /* Its string representation */
   gsize         str_len;  /* Cached length of @str */
 } operators_array[] = {
+  { CTPL_OPERATOR_AND,    "&&", 2 },
   { CTPL_OPERATOR_DIV,    "/",  1 },
   { CTPL_OPERATOR_EQUAL,  "==", 2 },
   { CTPL_OPERATOR_INF,    "<",  1 },
@@ -533,6 +536,7 @@ static const struct {
   { CTPL_OPERATOR_MODULO, "%",  1 },
   { CTPL_OPERATOR_MUL,    "*",  1 },
   { CTPL_OPERATOR_NEQ,    "!=", 2 },
+  { CTPL_OPERATOR_OR,     "||", 2 },
   { CTPL_OPERATOR_PLUS,   "+",  1 },
   { CTPL_OPERATOR_SUP,    ">",  1 },
   { CTPL_OPERATOR_SUPEQ,  ">=", 2 },

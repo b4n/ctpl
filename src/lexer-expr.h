@@ -32,7 +32,7 @@ G_BEGIN_DECLS
  * 
  * Characters valid for an operator.
  */
-#define CTPL_OPERATOR_CHARS "+-/*=><%!"
+#define CTPL_OPERATOR_CHARS "+-/*=><%!&|"
 /**
  * CTPL_OPERAND_CHARS:
  * 

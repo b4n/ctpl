@@ -72,6 +72,8 @@ typedef enum _CtplTokenExprType
  * @CTPL_OPERATOR_SUPEQ:  @CTPL_OPERATOR_SUP || @CTPL_OPERATOR_EQUAL
  * @CTPL_OPERATOR_INFEQ:  @CTPL_OPERATOR_INF || @CTPL_OPERATOR_EQUAL
  * @CTPL_OPERATOR_NEQ:    Non-equality test operator (! @CTPL_OPERATOR_EQUAL)
+ * @CTPL_OPERATOR_AND:    Boolean AND operator
+ * @CTPL_OPERATOR_OR:     Boolean OR operator
  * @CTPL_OPERATOR_NONE:   Not an operator, denoting no operator
  * 
  * Operators constants.
@@ -90,6 +92,8 @@ typedef enum {
   CTPL_OPERATOR_SUPEQ,
   CTPL_OPERATOR_INFEQ,
   CTPL_OPERATOR_NEQ,
+  CTPL_OPERATOR_AND,
+  CTPL_OPERATOR_OR,
   /* must be last */
   CTPL_OPERATOR_NONE
 } CtplOperator;

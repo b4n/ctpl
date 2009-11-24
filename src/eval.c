@@ -59,6 +59,7 @@ static gboolean   ctpl_eval_value_internal  (CtplTokenExpr      *expr,
                                              const CtplEnviron  *env,
                                              CtplValue          *value,
                                              GError            **error);
+static gboolean   ctpl_eval_bool_value      (const CtplValue *value);
 
 
 /* check if value types matches @vtype and try to convert if necessary
@@ -475,6 +476,32 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
   return rv;
 }
 
+static gboolean
+ctpl_eval_operator_and_or (CtplValue     *lvalue,
+                           CtplValue     *rvalue,
+                           CtplOperator   op,
+                           CtplValue     *value,
+                           GError       **error)
+{
+  gboolean success = TRUE;
+  gboolean result = FALSE;
+  gboolean lres, rres;
+  
+  lres = ctpl_eval_bool_value (lvalue);
+  rres = ctpl_eval_bool_value (rvalue);
+  switch (op) {
+    case CTPL_OPERATOR_AND: result = (lres && rres);  break;
+    case CTPL_OPERATOR_OR:  result = (lres || rres);  break;
+    default:
+      g_critical ("Invalid operator in %s", G_STRLOC);
+      success = FALSE;
+      break;
+  }
+  ctpl_value_set_int (value, result ? 1 : 0);
+  
+  return success;
+}
+
 /* Tries to evaluate a modulo operation */
 static gboolean
 ctpl_eval_operator_modulo (CtplValue *lvalue,
@@ -541,6 +568,11 @@ ctpl_eval_operator_internal (CtplOperator operator,
     
     case CTPL_OPERATOR_PLUS:
       rv = ctpl_eval_operator_plus (lvalue, rvalue, value, error);
+      break;
+    
+    case CTPL_OPERATOR_AND:
+    case CTPL_OPERATOR_OR:
+      rv = ctpl_eval_operator_and_or (lvalue, rvalue, operator, value, error);
       break;
     
     case CTPL_OPERATOR_NONE:
@@ -663,6 +695,39 @@ ctpl_eval_value (CtplTokenExpr     *expr,
   return value;
 }
 
+/* Gets a boolean form a value */
+static gboolean
+ctpl_eval_bool_value (const CtplValue *value)
+{
+  /* Should we allow non-existing symbol check if it is alone? e.g.
+   * {if symbol_that_may_be_missing} ... */
+  gboolean eval = FALSE;
+  
+  switch (ctpl_value_get_held_type (value)) {
+    case CTPL_VTYPE_ARRAY:
+      eval = ctpl_value_array_length (value) != 0;
+      break;
+    
+    case CTPL_VTYPE_FLOAT:
+      eval = ! CTPL_MATH_FLOAT_EQ (ctpl_value_get_float (value), 0);
+      break;
+    
+    case CTPL_VTYPE_INT:
+      eval = ctpl_value_get_int (value) != 0;
+      break;
+    
+    case CTPL_VTYPE_STRING: {
+      const char *string;
+      
+      string = ctpl_value_get_string (value);
+      eval = (string && (*string != 0));
+      break;
+    }
+  }
+  
+  return eval;
+}
+
 /**
  * ctpl_eval_bool:
  * @expr: The #CtplTokenExpr to evaluate
@@ -692,27 +757,7 @@ ctpl_eval_bool (CtplTokenExpr      *expr,
   
   ctpl_value_init (&value);
   if (ctpl_eval_value_internal (expr, env, &value, error)) {
-    switch (ctpl_value_get_held_type (&value)) {
-      case CTPL_VTYPE_ARRAY:
-        eval = ctpl_value_array_length (&value) != 0;
-        break;
-      
-      case CTPL_VTYPE_FLOAT:
-        eval = ! CTPL_MATH_FLOAT_EQ (ctpl_value_get_float (&value), 0);
-        break;
-      
-      case CTPL_VTYPE_INT:
-        eval = ctpl_value_get_int (&value) != 0;
-        break;
-      
-      case CTPL_VTYPE_STRING: {
-        const char *string;
-        
-        string = ctpl_value_get_string (&value);
-        eval = (string && (*string != 0));
-        break;
-      }
-    }
+    eval = ctpl_eval_bool_value (&value);
   }
   ctpl_value_free_value (&value);
   
