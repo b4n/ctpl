@@ -21,6 +21,7 @@
 #include "mathutils.h"
 #include <stdlib.h>
 #include <glib.h>
+#include <errno.h>
 
 
 /**
@@ -49,7 +50,7 @@ ctpl_math_string_to_float (const char *string,
   char *endptr;
   
   *value = g_ascii_strtod (string, &endptr);
-  return (*endptr) == 0;
+  return (*endptr) == 0 && string != endptr && errno != ERANGE;
 }
 
 /**
@@ -68,5 +69,6 @@ ctpl_math_string_to_int (const char *string,
   char *endptr;
   
   *value = strtol (string, &endptr, 0);
-  return (*endptr) == 0;
+  return (*endptr) == 0 && string != endptr &&
+         (errno != EINVAL && errno != ERANGE);
 }
