@@ -644,7 +644,7 @@ ctpl_eval_value_internal (CtplTokenExpr      *expr,
  * 
  * Computes the given expression.
  * 
- * Returns: The result of the expression evaluation.
+ * Returns: The result of the expression evaluation or %NULL on error.
  */
 CtplValue *
 ctpl_eval_value (CtplTokenExpr     *expr,
@@ -654,7 +654,9 @@ ctpl_eval_value (CtplTokenExpr     *expr,
   CtplValue *value;
   
   value = ctpl_value_new ();
-  ctpl_eval_value_internal (expr, env, value, error);
+  if (! ctpl_eval_value_internal (expr, env, value, error)) {
+    ctpl_value_free (value), value = NULL;
+  }
   
   return value;
 }
@@ -666,11 +668,14 @@ ctpl_eval_value (CtplTokenExpr     *expr,
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Computes the given expression to a boolean.
- * 
  * Computing to a boolean means computing the expression's value and then check
  * if this value should be considered as %FALSE or %TRUE.
  * 
- * Returns: The result of the expression evaluation.
+ * As the returned value is not sufficient to know whether the evaluation
+ * actually succeeded or not, you should check whether an error was set or not
+ * to know it reliably.
+ * 
+ * Returns: The result of the expression evaluation, or %FALSE on error.
  */
 gboolean
 ctpl_eval_bool (CtplTokenExpr      *expr,
@@ -684,30 +689,29 @@ ctpl_eval_bool (CtplTokenExpr      *expr,
   gboolean  eval = FALSE;
   
   ctpl_value_init (&value);
-  ctpl_eval_value_internal (expr, env, &value, error);
-  
-  switch (ctpl_value_get_held_type (&value)) {
-    case CTPL_VTYPE_ARRAY:
-      eval = ctpl_value_array_length (&value) != 0;
-      break;
-    
-    case CTPL_VTYPE_FLOAT:
-      eval = ! CTPL_MATH_FLOAT_EQ (ctpl_value_get_float (&value), 0);
-      break;
-    
-    case CTPL_VTYPE_INT:
-      eval = ctpl_value_get_int (&value) != 0;
-      break;
-    
-    case CTPL_VTYPE_STRING: {
-      const char *string;
+  if (ctpl_eval_value_internal (expr, env, &value, error)) {
+    switch (ctpl_value_get_held_type (&value)) {
+      case CTPL_VTYPE_ARRAY:
+        eval = ctpl_value_array_length (&value) != 0;
+        break;
       
-      string = ctpl_value_get_string (&value);
-      eval = (string && (*string != 0));
-      break;
+      case CTPL_VTYPE_FLOAT:
+        eval = ! CTPL_MATH_FLOAT_EQ (ctpl_value_get_float (&value), 0);
+        break;
+      
+      case CTPL_VTYPE_INT:
+        eval = ctpl_value_get_int (&value) != 0;
+        break;
+      
+      case CTPL_VTYPE_STRING: {
+        const char *string;
+        
+        string = ctpl_value_get_string (&value);
+        eval = (string && (*string != 0));
+        break;
+      }
     }
   }
-  
   ctpl_value_free_value (&value);
   
   return eval;
