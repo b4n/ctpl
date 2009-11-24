@@ -1,0 +1,26 @@
+This file groups information on how to do some hacking on CTPL.
+It is not complete for now, but still useful though.
+
+
+# Adding a binary operator
+
+You first need to add a new constant CTPL_OPERATOR_<NAME> on the
+CtplOperator enum. Then, add the new operator constant and its
+representation in the template on the `operators_array` array in
+src/lexer-expr.c.
+Also update the CTPL_OPERATOR_CHARS if needed: it should list all
+characters that may be part of an operator, then if your operator
+introduces new operator characters, you must add them here.
+Then, you're finished for the lexing part. Lets parse this brand new
+operator.
+
+The parsing part is not really more complicated. Go to eval.c, and:
+1) Write a function that evaluates your operator (look at other operator
+   evaluation functions like ctpl_eval_operator_minus() or
+   ctpl_eval_operator_and_or() for example);
+2) Update ctpl_eval_operator_internal() to handle your new operator and
+   call your evaluation function.
+
+Last but not least, remember to add it in the documentation (on top of
+lexer-expr.c).
+That's it, your new operator is ready!
