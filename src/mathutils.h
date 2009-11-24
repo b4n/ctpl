@@ -52,6 +52,31 @@ gboolean    ctpl_math_string_to_float   (const char *string,
 gboolean    ctpl_math_string_to_int     (const char *string,
                                          long int   *value);
 
+/**
+ * ctpl_math_float_to_string:
+ * @f: A floating-point number (C's double)
+ * 
+ * Converts a floating-point number to a string.
+ * 
+ * Returns: A newly allocated string holding a representation of @f in the C
+ *          locale. This string should be free with g_free().
+ */
+#define ctpl_math_float_to_string(f) \
+  (g_ascii_dtostr (g_malloc (G_ASCII_DTOSTR_BUF_SIZE), \
+                   G_ASCII_DTOSTR_BUF_SIZE, \
+                   (f)))
+/**
+ * ctpl_math_int_to_string:
+ * @i: An integer number (C's long int)
+ * 
+ * Converts an integer number to a string.
+ * 
+ * Returns: A newly allocated string holding a representation of @i in the C
+ *          locale. This string should be free with g_free().
+ */
+#define ctpl_math_int_to_string(i) \
+  (g_strdup_printf ("%ld", (i)))
+
 
 G_END_DECLS
 

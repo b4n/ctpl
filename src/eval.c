@@ -167,8 +167,12 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
         char *tmp = NULL;
         
         if (CTPL_VALUE_HOLDS_FLOAT (rvalue)) {
-          tmp = g_strdup_printf ("%s%f", ctpl_value_get_string (lvalue),
-                                         ctpl_value_get_float (rvalue));
+          char buf[G_ASCII_DTOSTR_BUF_SIZE];
+          
+          tmp = g_strconcat (ctpl_value_get_string (lvalue),
+                             g_ascii_dtostr (buf, sizeof (buf),
+                                             ctpl_value_get_float (rvalue)),
+                             NULL);
         } else if (CTPL_VALUE_HOLDS_INT (rvalue)) {
           tmp = g_strdup_printf ("%s%ld", ctpl_value_get_string (lvalue),
                                           ctpl_value_get_int (rvalue));

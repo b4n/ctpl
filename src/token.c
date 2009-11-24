@@ -439,9 +439,12 @@ ctpl_token_expr_dump_internal (const CtplTokenExpr *expr)
     g_print ("nil");
   } else {
     switch (expr->type) {
-      case CTPL_TOKEN_EXPR_TYPE_FLOAT:
-        g_print ("%f", expr->token.t_float);
+      case CTPL_TOKEN_EXPR_TYPE_FLOAT: {
+        char buf[G_ASCII_DTOSTR_BUF_SIZE];
+        
+        g_print ("%s", g_ascii_dtostr (buf, sizeof (buf), expr->token.t_float));
         break;
+      }
       
       case CTPL_TOKEN_EXPR_TYPE_INTEGER:
         g_print ("%ld", expr->token.t_integer);

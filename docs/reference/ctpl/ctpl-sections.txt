@@ -176,5 +176,7 @@ ctpl_stack_is_empty
 CTPL_MATH_FLOAT_EQ
 ctpl_math_string_to_float
 ctpl_math_string_to_int
+ctpl_math_float_to_string
+ctpl_math_int_to_string
 </SECTION>
 
