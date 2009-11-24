@@ -527,8 +527,6 @@ static const struct {
 } operators_array[] = {
   { CTPL_OPERATOR_DIV,    "/",  1 },
   { CTPL_OPERATOR_EQUAL,  "==", 2 },
-  { CTPL_OPERATOR_EQUAL,  "=",  1 },
-  { CTPL_OPERATOR_EQUAL,  "<>", 2 }, /* operator <> looks nice */
   { CTPL_OPERATOR_INF,    "<",  1 },
   { CTPL_OPERATOR_INFEQ,  "<=", 2 },
   { CTPL_OPERATOR_MINUS,  "-",  1 },
