@@ -17,13 +17,7 @@
  * 
  */
 
-#include "parser.h"
-#include "lexer.h"
-#include "lexer-expr.h"
-#include "token.h"
-#include "stack.h"
-#include "environ.h"
-#include "value.h"
+#include "ctpl.h"
 #include <mb.h>
 #include <stdlib.h>
 #include <stdio.h>

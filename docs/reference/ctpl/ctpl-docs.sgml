@@ -140,6 +140,8 @@
       <example>
         <title>Using the library to lex and parse a template</title>
         <programlisting>
+#include &lt;ctpl/ctpl.h&gt;
+
 /**
  * procede_template:
  * @input:  The input template, needs to be readable.
