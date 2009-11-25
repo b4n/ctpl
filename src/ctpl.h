@@ -20,14 +20,14 @@
 #ifndef H_CTPL_H
 #define H_CTPL_H
 
-#include <glib.h>
-
-G_BEGIN_DECLS
-
-
-
-
-
-G_END_DECLS
+#include "environ.h"
+#include "eval.h"
+#include "lexer-expr.h"
+#include "lexer.h"
+#include "mathutils.h"
+#include "parser.h"
+#include "stack.h"
+#include "token.h"
+#include "value.h"
 
 #endif /* guard */
