@@ -144,7 +144,7 @@ ctpl_stack_init (CtplStack   *stack,
 
 /**
  * ctpl_stack_new:
- * @compare_func: A #GComapreFunc to compare data, or %NULL
+ * @compare_func: A #GCompareFunc to compare data, or %NULL
  * @free_func: A #GFreeFunc to free pushed data, or %NULL
  * 
  * Creates a new empty #CtplStack.

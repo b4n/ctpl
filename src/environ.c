@@ -242,8 +242,8 @@ ctpl_environ_push_string (CtplEnviron     *env,
  * @env: A #CtplEnviron
  * @symbol: A symbol name
  * 
- * Pops a symbol from a #CtplValue. See ctpl_value_push() for details on pushing
- * and poping.
+ * Pops a symbol from a #CtplValue. See ctpl_environ_push() for details on
+ * pushing and poping.
  * Use ctpl_environ_lookup() if you want to get the symbol's value without
  * poping it from the environ.
  * 
