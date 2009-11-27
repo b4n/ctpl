@@ -74,7 +74,7 @@ ctpl_environ_new (void)
 {
   CtplEnviron *env;
   
-  env = g_new0 (CtplEnviron, 1);
+  env = g_slice_alloc (sizeof *env);
   if (env) {
     ctpl_environ_init (env);
   }
@@ -93,7 +93,7 @@ ctpl_environ_free (CtplEnviron *env)
 {
   if (env) {
     g_hash_table_destroy (env->symbol_table);
-    g_free (env);
+    g_slice_free1 (sizeof *env, env);
   }
 }
 

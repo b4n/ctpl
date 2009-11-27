@@ -98,7 +98,7 @@ ctpl_stack_entry_new (CtplStack  *stack,
 {
   CtplStackEntry *entry;
   
-  entry = g_new0 (CtplStackEntry, 1);
+  entry = g_slice_alloc (sizeof *entry);
   if (entry) {
     ctpl_stack_entry_init (entry, stack, data);
   }
@@ -117,7 +117,7 @@ ctpl_stack_entry_free (CtplStackEntry  *entry,
   if (free_func) {
     free_func (entry->data);
   }
-  g_free (entry);
+  g_slice_free1 (sizeof *entry, entry);
   
   return parent;
 }
@@ -173,7 +173,7 @@ ctpl_stack_new (GCompareFunc  compare_func,
 {
   CtplStack *stack;
   
-  stack = g_new0 (CtplStack, 1);
+  stack = g_slice_alloc (sizeof *stack);
   if (stack) {
     ctpl_stack_init (stack, compare_func, free_func);
   }
@@ -198,7 +198,7 @@ ctpl_stack_free (CtplStack *stack)
   g_slist_free (stack->free_stack);
   stack->free_stack = NULL;
   stack->last = NULL;
-  g_free (stack);
+  g_slice_free1 (sizeof *stack, stack);
 }
 
 /* actually pushes a reference to the last stack's element */

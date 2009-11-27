@@ -117,7 +117,7 @@ ctpl_value_new (void)
 {
   CtplValue *value;
   
-  value = g_new0 (CtplValue, 1);
+  value = g_slice_alloc (sizeof *value);
   if (value) {
     ctpl_value_init (value);
   }
@@ -223,7 +223,7 @@ ctpl_value_free (CtplValue *value)
 {
   if (value) {
     ctpl_value_free_value (value);
-    g_free (value);
+    g_slice_free1 (sizeof *value, value);
   }
 }
 

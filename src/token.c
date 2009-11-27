@@ -55,7 +55,7 @@ token_new (void)
 {
   CtplToken *token;
   
-  token = g_malloc (sizeof *token);
+  token = g_slice_alloc (sizeof *token);
   if (token) {
     token->prev = NULL;
     token->next = NULL;
@@ -183,7 +183,7 @@ ctpl_token_expr_new (void)
 {
   CtplTokenExpr *token;
   
-  token = g_malloc0 (sizeof *token);
+  token = g_slice_alloc (sizeof *token);
   /*if (token) {
     // ...
   }*/
@@ -321,7 +321,7 @@ ctpl_token_expr_free (CtplTokenExpr *token,
         /* nothing to free for integers and floats */
         break;
     }
-    g_free (token);
+    g_slice_free1 (sizeof *token, token);
   }
 }
 
@@ -375,7 +375,7 @@ ctpl_token_free (CtplToken *token,
       if (token->next)
         token->next->prev = token->prev;
     }
-    g_free (token);
+    g_slice_free1 (sizeof *token, token);
   }
 }
 
