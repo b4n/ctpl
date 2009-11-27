@@ -151,7 +151,6 @@ ctpl_value_get_held_type_name
 <TITLE>CtplStack</TITLE>
 <FILE>stack</FILE>
 CtplStack
-CtplStackEntry
 ctpl_stack_new
 ctpl_stack_free
 ctpl_stack_push
