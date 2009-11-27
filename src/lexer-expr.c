@@ -155,7 +155,7 @@ ctpl_lexer_expr_error_quark (void)
  *          number.
  */
 static CtplTokenExpr *
-read_number (const char  *data,
+read_number (const gchar *data,
              gsize        length,
              gsize       *read_len)
 {
@@ -168,8 +168,8 @@ read_number (const char  *data,
   value = g_ascii_strtod (tmpbuf, &endptr);
   //~ g_debug ("ep: '%c'\n", *endptr);
   if (tmpbuf != endptr && errno != ERANGE && ! IS_SYMBOLCHAR (*endptr)) {
-    if (CTPL_MATH_FLOAT_EQ (value, (double)(long int)value)) {
-      token = ctpl_token_expr_new_integer ((long int)value);
+    if (CTPL_MATH_FLOAT_EQ (value, (gdouble)(glong)value)) {
+      token = ctpl_token_expr_new_integer ((glong)value);
     } else {
       token = ctpl_token_expr_new_float (value);
     }
@@ -185,7 +185,7 @@ read_number (const char  *data,
  * Returns: A nex #CtplTokenExpr holding the symbol, or %NULL if no symbol was
  *          read. */
 static CtplTokenExpr *
-read_symbol (const char  *data,
+read_symbol (const gchar *data,
              gsize        length,
              gsize       *read_len)
 {
@@ -229,7 +229,7 @@ operator_is_prior (CtplOperator op1,
  * Don't forget to update this when adding an operator */
 static const struct {
   CtplOperator  op;       /* The operator ID */
-  const char   *str;      /* Its string representation */
+  const gchar  *str;      /* Its string representation */
   gsize         str_len;  /* Cached length of @str */
 } operators_array[] = {
   { CTPL_OPERATOR_AND,    "&&", 2 },
@@ -312,10 +312,10 @@ ctpl_operator_from_string (const gchar *str,
 }
 
 /* Gets a human-readable name of the token's operator */
-static const char *
+static const gchar *
 token_operator_to_string (CtplTokenExpr *token)
 {
-  const char *str;
+  const gchar *str;
   
   /* by default, index the last op (error) */
   str = operators_array[operators_array_length].str;
@@ -349,9 +349,9 @@ validate_token_list (GSList  *tokens,
   CtplTokenExpr  *expr = NULL;
   CtplTokenExpr  *operands[2] = {NULL, NULL};
   CtplTokenExpr  *operators[2] = {NULL, NULL};
-  int             opt = 0;
-  int             opd = 0;
-  int             i = 0;
+  gint            opt = 0;
+  gint            opd = 0;
+  gint            i = 0;
   GSList         *tmp;
   GSList         *last_opd = NULL;
   
@@ -417,7 +417,7 @@ validate_token_list (GSList  *tokens,
 /* Reads an operand.
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
-lex_operand (const char  *expr,
+lex_operand (const gchar *expr,
              gsize        length,
              gsize       *n_skiped,
              GError     **error)
@@ -445,7 +445,7 @@ lex_operand (const char  *expr,
 /* Reads an operator.
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
-lex_operator (const char  *expr,
+lex_operator (const gchar *expr,
               gsize        length,
               gsize       *n_skiped,
               GError     **error)
@@ -501,7 +501,7 @@ skip_to_closing_parenthesis (const gchar *str)
  * Returns: A new #CtplTokenExpr or %NULL on error.
  */
 CtplTokenExpr *
-ctpl_lexer_expr_lex (const char  *expr,
+ctpl_lexer_expr_lex (const gchar *expr,
                      gssize       len,
                      GError     **error)
 {
@@ -515,15 +515,15 @@ ctpl_lexer_expr_lex (const char  *expr,
   length = (len < 0) ? strlen (expr) : (gsize)len;
   //~ g_debug ("Hey, I'm gonna lex expression '%.*s'!", length, expr);
   for (i = 0; i < length && ! err; i++) {
-    char            c = expr[i];
+    gchar           c = expr[i];
     gsize           n_skip = 0;
     CtplTokenExpr  *token = NULL;
     
     if (expect_operand) {
       /* try to read an operand */
       if (c == '(') {
-        const char *end;
-        const char *start = &expr[i+1];
+        const gchar  *end;
+        const gchar  *start = &expr[i+1];
         
         end = skip_to_closing_parenthesis (start);
         if (! end) {

@@ -44,10 +44,10 @@
  * Returns: %TRUE if the string was correctly converted, %FALSE otherwise.
  */
 gboolean
-ctpl_math_string_to_float (const char *string,
-                           double     *value)
+ctpl_math_string_to_float (const gchar *string,
+                           gdouble     *value)
 {
-  char *endptr;
+  gchar *endptr;
   
   *value = g_ascii_strtod (string, &endptr);
   return (*endptr) == 0 && string != endptr && errno != ERANGE;
@@ -63,10 +63,10 @@ ctpl_math_string_to_float (const char *string,
  * Returns: %TRUE if the string was correctly converted, %FALSE otherwise.
  */
 gboolean
-ctpl_math_string_to_int (const char *string,
-                         long int   *value)
+ctpl_math_string_to_int (const gchar *string,
+                         glong       *value)
 {
-  char *endptr;
+  gchar *endptr;
   
   *value = strtol (string, &endptr, 0);
   return (*endptr) == 0 && string != endptr &&

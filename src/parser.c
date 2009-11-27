@@ -95,7 +95,7 @@ ctpl_parser_error_quark (void)
  *          the error message. */
 static gboolean
 write_buf (MB          *mb,
-           const char  *buf,
+           const gchar *buf,
            gssize       len,
            GError     **error)
 {
@@ -120,7 +120,7 @@ write_buf (MB          *mb,
  * could not be found */
 static const CtplValue *
 lookup_symbol (const CtplEnviron *env,
-               const char        *symbol,
+               const gchar       *symbol,
                GError           **error)
 {
   const CtplValue *value;

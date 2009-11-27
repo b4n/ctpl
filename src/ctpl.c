@@ -159,7 +159,7 @@ main (int    argc,
     rv = 1;
   else
   {
-    const char *buf = argv[1];
+    const gchar *buf = argv[1];
     CtplTokenExpr *texpr;
     GError *err = NULL;
     
@@ -198,7 +198,7 @@ main (int    argc,
 
 
     while (! ctpl_stack_is_empty (stack)) {
-      printf ("%s\n", (char *)ctpl_stack_pop (stack));
+      printf ("%s\n", (gchar *)ctpl_stack_pop (stack));
     }
     
     ctpl_stack_free (stack);

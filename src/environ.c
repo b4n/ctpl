@@ -55,7 +55,7 @@
  * Inits a #CtplEnviron.
  */
 static void
-ctpl_environ_init (CtplEnviron    *env)
+ctpl_environ_init (CtplEnviron *env)
 {
   env->symbol_table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                              g_free,
@@ -108,7 +108,7 @@ ctpl_environ_free (CtplEnviron *env)
  */
 static CtplStack *
 ctpl_environ_lookup_stack (const CtplEnviron *env,
-                           const char        *symbol)
+                           const gchar       *symbol)
 {
   return g_hash_table_lookup (env->symbol_table, symbol);
 }
@@ -125,7 +125,7 @@ ctpl_environ_lookup_stack (const CtplEnviron *env,
  */
 const CtplValue *
 ctpl_environ_lookup (const CtplEnviron *env,
-                     const char        *symbol)
+                     const gchar       *symbol)
 {
   CtplStack  *stack;
   CtplValue  *value = NULL;
@@ -153,7 +153,7 @@ ctpl_environ_lookup (const CtplEnviron *env,
  */
 void
 ctpl_environ_push (CtplEnviron     *env,
-                   const char      *symbol,
+                   const gchar     *symbol,
                    const CtplValue *value)
 {
   CtplStack *stack;
@@ -181,9 +181,9 @@ ctpl_environ_push (CtplEnviron     *env,
  * Pushes an integer symbol into a #CtplEnviron. See ctpl_environ_push().
  */
 void
-ctpl_environ_push_int (CtplEnviron     *env,
-                       const char      *symbol,
-                       int              value)
+ctpl_environ_push_int (CtplEnviron *env,
+                       const gchar *symbol,
+                       glong        value)
 {
   CtplValue val;
   
@@ -202,9 +202,9 @@ ctpl_environ_push_int (CtplEnviron     *env,
  * Pushes a float symbol into a #CtplEnviron. See ctpl_environ_push().
  */
 void
-ctpl_environ_push_float (CtplEnviron     *env,
-                         const char      *symbol,
-                         float            value)
+ctpl_environ_push_float (CtplEnviron *env,
+                         const gchar *symbol,
+                         gdouble      value)
 {
   CtplValue val;
   
@@ -223,9 +223,9 @@ ctpl_environ_push_float (CtplEnviron     *env,
  * Pushes a string symbol into a #CtplEnviron. See ctpl_environ_push().
  */
 void
-ctpl_environ_push_string (CtplEnviron     *env,
-                          const char      *symbol,
-                          const char      *value)
+ctpl_environ_push_string (CtplEnviron  *env,
+                          const gchar  *symbol,
+                          const gchar  *value)
 {
   CtplValue val;
   
@@ -250,7 +250,7 @@ ctpl_environ_push_string (CtplEnviron     *env,
  */
 const CtplValue *
 ctpl_environ_pop (CtplEnviron *env,
-                  const char  *symbol)
+                  const gchar *symbol)
 {
   CtplStack  *stack;
   CtplValue  *value = NULL;

@@ -113,8 +113,8 @@ typedef struct _CtplTokenExpr CtplTokenExpr;
  */
 struct _CtplTokenFor
 {
-  char       *array;
-  char       *iter;
+  gchar      *array;
+  gchar      *iter;
   CtplToken  *children;
 };
 
@@ -156,9 +156,9 @@ struct _CtplTokenExpr
       CtplTokenExpr  *loperand;
       CtplTokenExpr  *roperand;
     }         t_operator;
-    long int  t_integer;
-    double    t_float;
-    char     *t_symbol;
+    glong     t_integer;
+    gdouble   t_float;
+    gchar    *t_symbol;
   } token;
 };
 
@@ -179,7 +179,7 @@ struct _CtplToken
 {
   CtplTokenType type;
   union {
-    char           *t_data;
+    gchar          *t_data;
     CtplTokenExpr  *t_expr;
     CtplTokenFor    t_for;
     CtplTokenIf     t_if;
@@ -189,22 +189,22 @@ struct _CtplToken
 };
 
 
-CtplToken    *ctpl_token_new_data           (const char *data,
-                                             gssize      len);
+CtplToken    *ctpl_token_new_data           (const gchar *data,
+                                             gssize       len);
 CtplToken    *ctpl_token_new_expr           (CtplTokenExpr *expr);
-CtplToken    *ctpl_token_new_for            (const char *array,
-                                             const char *iterator,
-                                             CtplToken  *children);
+CtplToken    *ctpl_token_new_for            (const gchar *array,
+                                             const gchar *iterator,
+                                             CtplToken   *children);
 CtplToken    *ctpl_token_new_if             (CtplTokenExpr *condition,
                                              CtplToken     *if_children,
                                              CtplToken     *else_children);
 CtplTokenExpr *ctpl_token_expr_new_operator (CtplOperator    operator,
                                              CtplTokenExpr  *loperand,
                                              CtplTokenExpr  *roperand);
-CtplTokenExpr *ctpl_token_expr_new_integer  (long int integer);
-CtplTokenExpr *ctpl_token_expr_new_float    (double real);
-CtplTokenExpr *ctpl_token_expr_new_symbol   (const char *symbol,
-                                             gssize      len);
+CtplTokenExpr *ctpl_token_expr_new_integer  (glong integer);
+CtplTokenExpr *ctpl_token_expr_new_float    (gdouble real);
+CtplTokenExpr *ctpl_token_expr_new_symbol   (const gchar *symbol,
+                                             gssize       len);
 void          ctpl_token_free               (CtplToken *token,
                                              gboolean   chain);
 void          ctpl_token_expr_free          (CtplTokenExpr *token,

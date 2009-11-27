@@ -47,10 +47,10 @@ G_BEGIN_DECLS
 #endif
 
 
-gboolean    ctpl_math_string_to_float   (const char *string,
-                                         double     *value);
-gboolean    ctpl_math_string_to_int     (const char *string,
-                                         long int   *value);
+gboolean    ctpl_math_string_to_float   (const gchar *string,
+                                         gdouble     *value);
+gboolean    ctpl_math_string_to_int     (const gchar *string,
+                                         glong       *value);
 
 /**
  * ctpl_math_float_to_string:

@@ -76,7 +76,7 @@
 struct _CtplStackEntry
 {
   gint            ref_count;
-  void           *data;
+  gpointer        data;
   CtplStackEntry *parent;
 };
 
@@ -84,7 +84,7 @@ struct _CtplStackEntry
 static void
 ctpl_stack_entry_init (CtplStackEntry  *entry,
                        CtplStack       *stack,
-                       void            *data)
+                       gpointer         data)
 {
   g_atomic_int_set (&entry->ref_count, 1);
   entry->data   = data;
@@ -94,7 +94,7 @@ ctpl_stack_entry_init (CtplStackEntry  *entry,
 /* creates a new stack entry */
 static CtplStackEntry *
 ctpl_stack_entry_new (CtplStack  *stack,
-                      void       *data)
+                      gpointer    data)
 {
   CtplStackEntry *entry;
   
@@ -249,7 +249,7 @@ ctpl_stack_push_ref (CtplStack *stack)
  */
 void
 ctpl_stack_push (CtplStack *stack,
-                 void      *data)
+                 gpointer   data)
 {
   /* check if a ref can be used, and use if if possible */
   if (stack->last && stack->compare_func &&
@@ -283,10 +283,10 @@ ctpl_stack_push (CtplStack *stack,
  *          ctpl_stack_is_empty() to check whether the stack contains or not
  *          some elements.
  */
-void *
+gpointer
 ctpl_stack_pop (CtplStack *stack)
 {
-  void *data = NULL;
+  gpointer data = NULL;
   
   if (stack->last) {
     data = stack->last->data;
@@ -307,7 +307,7 @@ ctpl_stack_pop (CtplStack *stack)
  * 
  * Returns: The top-level data of @stack, or %NULL if the stack is empty.
  */
-void *
+gpointer
 ctpl_stack_peek (const CtplStack *stack)
 {
   return (stack->last) ? stack->last->data : NULL;

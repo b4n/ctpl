@@ -82,8 +82,8 @@ typedef struct s_LexerState LexerState;
  */
 struct s_LexerState
 {
-  int block_depth;
-  int last_statement_type_if;
+  gint  block_depth;
+  gint  last_statement_type_if;
 };
 
 
@@ -119,14 +119,14 @@ ctpl_lexer_error_quark (void)
  *          was no word to read (e.g. no characters matching @accept was found
  *          before one not matching it).
  */
-static char *
+static gchar *
 read_word (MB          *mb,
-           const char  *accept)
+           const gchar *accept)
 {
-  int   c;
-  gsize start;
-  gsize len;
-  char *word = NULL;
+  gint    c;
+  gsize   start;
+  gsize   len;
+  gchar  *word = NULL;
   
   start = mb_tell (mb);
   do {
@@ -147,14 +147,14 @@ read_word (MB          *mb,
 }
 
 /* reads a symbol (e.g. a variable/constant) */
-static char *
+static gchar *
 read_symbol (MB *mb)
 {
   return read_word (mb, CTPL_SYMBOL_CHARS);
 }
 
 /* reads an expression (if condition for example) */
-static char *
+static gchar *
 read_expr (MB *mb)
 {
   return read_word (mb, CTPL_EXPR_CHARS);
@@ -165,7 +165,7 @@ static gsize
 skip_blank (MB *mb)
 {
   gsize n = 0;
-  int   c;
+  gint  c;
   
   do {
     c = mb_getc (mb);
@@ -186,7 +186,7 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
                               LexerState  *state,
                               GError     **error)
 {
-  char       *expr;
+  gchar      *expr;
   CtplToken  *token = NULL;
   
   //~ g_debug ("if?");
@@ -196,7 +196,7 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Missing expression after 'if' token");
   } else {
-    int c;
+    gint c;
     
     skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
@@ -251,10 +251,10 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
                                LexerState  *state,
                                GError     **error)
 {
-  CtplToken *token = NULL;
-  char *iter_name;
-  char *keyword_in;
-  char *array_name;
+  CtplToken  *token = NULL;
+  gchar      *iter_name;
+  gchar      *keyword_in;
+  gchar      *array_name;
   
   //~ g_debug ("for?");
   skip_blank (mb);
@@ -280,7 +280,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
         g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                      "No array identifier for 'for' loop");
       } else {
-        int c;
+        gint c;
         
         skip_blank (mb);
         if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
@@ -327,8 +327,8 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
                                LexerState  *state,
                                GError     **error)
 {
-  int c;
-  gboolean rv = FALSE;
+  gint      c;
+  gboolean  rv = FALSE;
   
   //~ g_debug ("end?");
   skip_blank (mb);
@@ -360,8 +360,8 @@ ctpl_lexer_read_token_tpl_else (MB          *mb,
                                 LexerState  *state,
                                 GError     **error)
 {
-  int c;
-  gboolean rv = FALSE;
+  gint      c;
+  gboolean  rv = FALSE;
   
   //~ g_debug ("else?");
   skip_blank (mb);
@@ -401,7 +401,7 @@ ctpl_lexer_read_token_tpl_expr (MB          *mb,
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "No valid expression in statement");
   } else {
-    int c;
+    gint c;
     
     skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
@@ -429,8 +429,8 @@ ctpl_lexer_read_token_tpl (MB          *mb,
                            LexerState  *state,
                            GError     **error)
 {
-  int c;
-  CtplToken *token = NULL;
+  gint        c;
+  CtplToken  *token = NULL;
   
   /* ensure the first character is a start character */
   if ((c = mb_getc (mb)) != CTPL_START_CHAR) {
@@ -439,7 +439,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
                  "Unexpected character '%c' before start of statement",
                  c);
   } else {
-    char   *first_word;
+    gchar  *first_word;
     gsize   start_off;
     
     skip_blank (mb);
@@ -483,8 +483,8 @@ ctpl_lexer_read_token_tpl (MB          *mb,
 static gboolean
 forward_to_non_data (MB *mb)
 {
-  int       prev_c;
-  int       c       = 0;
+  gint      prev_c;
+  gint      c       = 0;
   gboolean  rv      = TRUE;
   gboolean  escaped = FALSE;
   
@@ -507,12 +507,12 @@ forward_to_non_data (MB *mb)
 /* stores read data in @buf by removing unescaped CTPL_ESCAPE_CHAR.
  * Returns the length filled in @buf */
 static gsize
-do_read_data (MB   *mb,
-              char *buf,
-              gsize input_len)
+do_read_data (MB     *mb,
+              gchar  *buf,
+              gsize   input_len)
 {
-  char      prev_c;
-  char      c       = 0;
+  gchar     prev_c;
+  gchar     c       = 0;
   gboolean  escaped = FALSE;
   gsize     len     = 0;
   
@@ -535,8 +535,8 @@ ctpl_lexer_read_token_data (MB           *mb,
                             LexerState   *state,
                             GError      **error)
 {
-  gsize start;
-  CtplToken *token = NULL;
+  gsize       start;
+  CtplToken  *token = NULL;
   
   start = mb_tell (mb);
   if (! forward_to_non_data (mb)) {
@@ -545,8 +545,8 @@ ctpl_lexer_read_token_data (MB           *mb,
                  "Unexpected character '%c' inside data block",
                  CTPL_END_CHAR);
   } else {
-    gsize len;
-    char *buf;
+    gsize   len;
+    gchar  *buf;
     
     /* TODO: speed up read of data. For example, we don't have to re-read all
      * character by character to remove escape character if there's no one */

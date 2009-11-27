@@ -44,21 +44,21 @@ struct _CtplEnviron
 CtplEnviron      *ctpl_environ_new            (void);
 void              ctpl_environ_free           (CtplEnviron *env);
 const CtplValue  *ctpl_environ_lookup         (const CtplEnviron *env,
-                                               const char        *symbol);
+                                               const gchar       *symbol);
 void              ctpl_environ_push           (CtplEnviron     *env,
-                                               const char      *symbol,
+                                               const gchar     *symbol,
                                                const CtplValue *value);
 void              ctpl_environ_push_int       (CtplEnviron     *env,
-                                               const char      *symbol,
-                                               int              value);
+                                               const gchar     *symbol,
+                                               glong            value);
 void              ctpl_environ_push_float     (CtplEnviron     *env,
-                                               const char      *symbol,
-                                               float            value);
+                                               const gchar      *symbol,
+                                               gdouble           value);
 void              ctpl_environ_push_string    (CtplEnviron     *env,
-                                               const char      *symbol,
-                                               const char      *value);
+                                               const gchar     *symbol,
+                                               const gchar     *value);
 const CtplValue  *ctpl_environ_pop            (CtplEnviron *env,
-                                               const char  *symbol);
+                                               const gchar *symbol);
 
 
 G_END_DECLS

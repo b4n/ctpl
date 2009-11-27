@@ -68,7 +68,7 @@ static gboolean
 ensure_operands_type (CtplValue     *lvalue,
                       CtplValue     *rvalue,
                       CtplValueType  vtype,
-                      const char    *operator_name,
+                      const gchar   *operator_name,
                       GError       **error)
 {
   gboolean rv = FALSE;
@@ -160,10 +160,10 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
                      ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
       } else {
-        char *tmp = NULL;
+        gchar *tmp = NULL;
         
         if (CTPL_VALUE_HOLDS_FLOAT (rvalue)) {
-          char buf[G_ASCII_DTOSTR_BUF_SIZE];
+          gchar buf[G_ASCII_DTOSTR_BUF_SIZE];
           
           tmp = g_strconcat (ctpl_value_get_string (lvalue),
                              g_ascii_dtostr (buf, sizeof (buf),
@@ -314,7 +314,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
                        ctpl_value_get_held_type_name (rvalue));
           rv = FALSE;
         } else {
-          char *str;
+          gchar *str;
           
           /* hum, may we optimise for 1 and < 1 multiplications? */
           str = do_multiply_string (ctpl_value_get_string (str_val),
@@ -343,8 +343,8 @@ ctpl_eval_operator_div (CtplValue *lvalue,
   
   rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "divide", error);
   if (rv) {
-    double lval;
-    double rval;
+    gdouble lval;
+    gdouble rval;
     
     lval = ctpl_value_get_float (lvalue);
     rval = ctpl_value_get_float (rvalue);
@@ -402,8 +402,8 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
     
     case CTPL_VTYPE_INT:
       if (CTPL_VALUE_HOLDS_INT (rvalue)) {
-        long int lval;
-        long int rval;
+        glong lval;
+        glong rval;
         
         lval = ctpl_value_get_int (lvalue);
         rval = ctpl_value_get_int (rvalue);
@@ -423,8 +423,8 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
     case CTPL_VTYPE_FLOAT:
       rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "superior", error);
       if (rv) {
-        double lval;
-        double rval;
+        gdouble lval;
+        gdouble rval;
         
         lval = ctpl_value_get_float (lvalue);
         rval = ctpl_value_get_float (rvalue);
@@ -448,8 +448,8 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
                      ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
       } else {
-        char *tmp = NULL;
-        int   strcmp_result;
+        gchar  *tmp = NULL;
+        gint    strcmp_result;
         
         tmp = ctpl_value_to_string (rvalue);
         strcmp_result = strcmp (ctpl_value_get_string (lvalue), tmp);
@@ -478,9 +478,10 @@ ctpl_eval_operator_and_or (CtplValue     *lvalue,
                            CtplValue     *value,
                            GError       **error)
 {
-  gboolean success = TRUE;
-  gboolean result = FALSE;
-  gboolean lres, rres;
+  gboolean success  = TRUE;
+  gboolean result   = FALSE;
+  gboolean lres;
+  gboolean rres;
   
   lres = ctpl_eval_bool_value (lvalue);
   rres = ctpl_eval_bool_value (rvalue);
@@ -508,8 +509,8 @@ ctpl_eval_operator_modulo (CtplValue *lvalue,
   
   rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_INT, "modulo", error);
   if (rv) {
-    long int lval = ctpl_value_get_int (lvalue);
-    long int rval = ctpl_value_get_int (rvalue);
+    glong lval = ctpl_value_get_int (lvalue);
+    glong rval = ctpl_value_get_int (rvalue);
     
     if (rval == 0) {
       g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
@@ -655,7 +656,7 @@ ctpl_eval_value_internal (const CtplTokenExpr  *expr,
       break;
   }
   //~ {
-    //~ char *dump;
+    //~ gchar *dump;
     //~ dump = ctpl_value_to_string (value);
     //~ g_debug ("result: %s", dump);
     //~ g_free (dump);

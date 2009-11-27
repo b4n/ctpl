@@ -52,10 +52,10 @@ CtplStack  *ctpl_stack_new      (GCompareFunc compare_func,
 void        ctpl_stack_free     (CtplStack *stack);
 
 void        ctpl_stack_push     (CtplStack *stack,
-                                 void      *data);
+                                 gpointer   data);
 gboolean    ctpl_stack_push_ref (CtplStack *stack);
-void       *ctpl_stack_pop      (CtplStack *stack);
-void       *ctpl_stack_peek     (const CtplStack *stack);
+gpointer    ctpl_stack_pop      (CtplStack *stack);
+gpointer    ctpl_stack_peek     (const CtplStack *stack);
 gboolean    ctpl_stack_is_empty (const CtplStack *stack);
 
 

@@ -230,7 +230,7 @@ ctpl_token_expr_new_operator (CtplOperator    operator,
  *          ctpl_token_expr_free() when no longer needed.
  */
 CtplTokenExpr *
-ctpl_token_expr_new_integer (long int integer)
+ctpl_token_expr_new_integer (glong integer)
 {
   CtplTokenExpr *token;
   
@@ -253,7 +253,7 @@ ctpl_token_expr_new_integer (long int integer)
  *          ctpl_token_expr_free() when no longer needed.
  */
 CtplTokenExpr *
-ctpl_token_expr_new_float (double real)
+ctpl_token_expr_new_float (gdouble real)
 {
   CtplTokenExpr *token;
   
