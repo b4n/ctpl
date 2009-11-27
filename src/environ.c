@@ -160,7 +160,6 @@ ctpl_environ_push (CtplEnviron     *env,
   
   /* FIXME: perhaps warn if overriding an identifier?
    *        or if the overriding value is not of the same type? */
-  
   stack = g_hash_table_lookup (env->symbol_table, symbol);
   if (! stack) {
     stack = ctpl_stack_new (NULL, (GFreeFunc)ctpl_value_free);
@@ -168,7 +167,6 @@ ctpl_environ_push (CtplEnviron     *env,
       g_hash_table_insert (env->symbol_table, g_strdup (symbol), stack);
     }
   }
-  
   if (stack) {
     ctpl_stack_push (stack, ctpl_value_dup (value));
   }

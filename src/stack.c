@@ -65,6 +65,21 @@
  */
 
 
+/*
+ * CtplStackEntry:
+ * @ref_count: Reference count of the entry
+ * @data: Data of the entry
+ * @parent: Parent entry, or %NULL if none
+ * 
+ * A stack entry.
+ */
+struct _CtplStackEntry
+{
+  gint            ref_count;
+  void           *data;
+  CtplStackEntry *parent;
+};
+
 /* initialises a stack entry */
 static void
 ctpl_stack_entry_init (CtplStackEntry  *entry,
@@ -112,6 +127,7 @@ static CtplStackEntry *
 ctpl_stack_entry_ref (CtplStackEntry *entry)
 {
   g_atomic_int_inc (&entry->ref_count);
+  
   return entry;
 }
 
@@ -123,7 +139,7 @@ ctpl_stack_entry_unref (CtplStackEntry *entry)
   
   if (g_atomic_int_dec_and_test (&entry->ref_count)) {
     /*parent = ctpl_stack_entry_free (entry);*/
-    g_warning ("Ref cont reached 0, this shouldn't happend");
+    g_critical ("Ref cont reached 0, this shouldn't happend");
   }
   
   return parent;
@@ -209,7 +225,7 @@ _ctpl_stack_push_ref (CtplStack *stack)
 gboolean
 ctpl_stack_push_ref (CtplStack *stack)
 {
-  gboolean        retv = FALSE;
+  gboolean retv = FALSE;
   
   if (! stack->last) {
     g_critical ("Can't push references on empty stacks");
@@ -306,7 +322,7 @@ ctpl_stack_peek (const CtplStack *stack)
  * Returns: %TRUE if the stack is empty, %FALSE otherwise.
  */
 gboolean
-ctpl_stack_is_empty (CtplStack *stack)
+ctpl_stack_is_empty (const CtplStack *stack)
 {
   return stack->last == NULL;
 }

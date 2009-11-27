@@ -102,11 +102,12 @@ write_buf (MB          *mb,
   gboolean rv;
   gsize    length;
   
-  if (len < 0)
+  if (len < 0) {
     length = strlen (buf);
-  else
+  } else {
     length = (gsize)len;
-  rv = (gboolean)(mb_write (mb, buf, length) == 0);
+  }
+  rv = (mb_write (mb, buf, length) == 0);
   if (! rv) {
     g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_FAILED,
                  "Failed to write to output buffer");
@@ -183,9 +184,7 @@ ctpl_parser_parse_token_if (const CtplTokenIf  *token,
                             MB                 *output,
                             GError            **error)
 {
-  /* FIXME: */
   gboolean  rv = FALSE;
-  #if 1
   gboolean  eval;
   GError   *err = NULL;
   
@@ -197,10 +196,6 @@ ctpl_parser_parse_token_if (const CtplTokenIf  *token,
                                  : token->else_children,
                             env, output, error);
   }
-  #else
-  g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_FAILED,
-               "If statement is not implemented yet");
-  #endif
   return rv;
 }
 
@@ -261,6 +256,7 @@ ctpl_parser_parse_token (const CtplToken *token,
     default:
       /* FIXME: what to do with the error? */
       g_critical ("Invalid/unknown token type %d", ctpl_token_get_type (token));
+      g_assert_not_reached ();
   }
   
   return rv;

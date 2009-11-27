@@ -78,14 +78,12 @@ CtplToken *
 ctpl_token_new_data (const char *data,
                      gssize      len)
 {
-  CtplToken  *token;
-  gsize       length;
+  CtplToken *token;
   
   token = token_new ();
   if (token) {
     token->type = CTPL_TOKEN_TYPE_DATA;
-    length = GET_LEN (data, len);
-    token->token.t_data = g_strndup (data, length);
+    token->token.t_data = g_strndup (data, GET_LEN (data, len));
   }
   
   return token;
@@ -213,7 +211,7 @@ ctpl_token_expr_new_operator (CtplOperator    operator,
   
   token = ctpl_token_expr_new ();
   if (token) {
-    token->type     = CTPL_TOKEN_EXPR_TYPE_OPERATOR;
+    token->type = CTPL_TOKEN_EXPR_TYPE_OPERATOR;
     token->token.t_operator.operator = operator;
     token->token.t_operator.loperand = loperand;
     token->token.t_operator.roperand = roperand;
@@ -361,7 +359,6 @@ ctpl_token_free (CtplToken *token,
         break;
       
       case CTPL_TOKEN_TYPE_IF:
-        /*g_free (token->token.t_if.condition);*/
         ctpl_token_expr_free (token->token.t_if.condition, TRUE);
         
         ctpl_token_free (token->token.t_if.if_children, TRUE);
@@ -503,7 +500,6 @@ ctpl_token_dump_internal (const CtplToken *token,
         break;
       
       case CTPL_TOKEN_TYPE_IF:
-        /*g_print ("if: if (%s)\n", token->token.t_if.condition);*/
         g_print ("if: ");
         ctpl_token_expr_dump_internal (token->token.t_if.condition);
         g_print ("\n");
@@ -520,9 +516,6 @@ ctpl_token_dump_internal (const CtplToken *token,
                                     TRUE, depth + 1);
         }
         break;
-      
-      default:
-        g_print ("???\n");
     }
     if (chain && token->next) {
       ctpl_token_dump_internal (token->next, chain, depth);

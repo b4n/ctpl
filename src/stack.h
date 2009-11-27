@@ -29,21 +29,6 @@ typedef struct _CtplStack       CtplStack;
 typedef struct _CtplStackEntry  CtplStackEntry;
 
 /**
- * CtplStackEntry:
- * @ref_count: Reverence count of the entry
- * @data: Data of the entry
- * @parent: Parent entry, or %NULL if none
- * 
- * A stack entry.
- */
-struct _CtplStackEntry
-{
-  gint            ref_count;
-  void           *data;
-  CtplStackEntry *parent;
-};
-
-/**
  * CtplStack:
  * @compare_func: Function to compare two stack elements
  * @free_func: Function to free a stack element
@@ -71,7 +56,7 @@ void        ctpl_stack_push     (CtplStack *stack,
 gboolean    ctpl_stack_push_ref (CtplStack *stack);
 void       *ctpl_stack_pop      (CtplStack *stack);
 void       *ctpl_stack_peek     (const CtplStack *stack);
-gboolean    ctpl_stack_is_empty (CtplStack *stack);
+gboolean    ctpl_stack_is_empty (const CtplStack *stack);
 
 
 G_END_DECLS

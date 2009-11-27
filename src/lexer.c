@@ -139,7 +139,7 @@ read_word (MB          *mb,
       mb_seek (mb, start, MB_SEEK_SET);
       mb_read (mb, word, len);
       word[len] = 0;
-      /*g_debug ("Next read character will be '%c'", mb_cur_char (mb));*/
+      //~ g_debug ("Next read character will be '%c'", mb_cur_char (mb));
     }
   }
   
@@ -171,8 +171,9 @@ skip_blank (MB *mb)
     c = mb_getc (mb);
     n++;
   } while (! mb_eof (mb) && strchr (CTPL_BLANK_CHARS, c));
-  if (! strchr (CTPL_BLANK_CHARS, c))
+  if (! strchr (CTPL_BLANK_CHARS, c)) {
     mb_seek (mb, -1, MB_SEEK_CUR);
+  }
   
   return n;
 }
@@ -199,8 +200,7 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
     
     skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
-      /* fail */
-      /*g_error ("if: invalid character in condition or missing end character");*/
+      /* there is trash before the end, then fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unexpected character '%c' before end of 'if' statement",
                    c);
@@ -229,7 +229,6 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
             g_set_error (&err, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                          "Unclosed 'if/else' block");
           }
-          /*g_assert (state->block_depth == substate.block_depth);*/
         }
         if (err) {
           g_propagate_error (error, err);
@@ -261,8 +260,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   skip_blank (mb);
   iter_name = read_symbol (mb);
   if (! iter_name) {
-    /* fail */
-    /*g_error ("for: failed to read iter name");*/
+    /* missing iterator symbol, fail */
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "No iterator identifier for 'for' statement");
   } else {
@@ -270,8 +268,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
     skip_blank (mb);
     keyword_in = read_symbol (mb);
     if (! keyword_in || strcmp (keyword_in, "in") != 0) {
-      /* fail */
-      /*g_error ("for: 'in' keyword missing after iter, got '%s'", keyword_in);*/
+      /* missing `in` keyword, fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Missing 'in' keyword after iterator name of 'for' "
                    "statement");
@@ -279,8 +276,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
       skip_blank (mb);
       array_name = read_symbol (mb);
       if (! array_name) {
-        /* fail */
-        /*g_error ("for: failed to read array name");*/
+        /* missing array symbol, fail */
         g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                      "No array identifier for 'for' loop");
       } else {
@@ -288,8 +284,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
         
         skip_blank (mb);
         if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
-          /* fail */
-          /*g_error ("for: no ending character %c", CTPL_END_CHAR);*/
+          /* trash before the end, fail */
           g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                        "Unexpected character '%c' before end of 'for' "
                        "statement",
@@ -339,7 +334,6 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
   skip_blank (mb);
   if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
     /* fail, missing } at the end */
-    /*g_error ("end: missing '%c' at the end", CTPL_END_CHAR);*/
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Unexpected character '%c' before end of 'end' statement",
                  c);
@@ -347,8 +341,7 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
     //~ g_debug ("block end");
     state->block_depth --;
     if (state->block_depth < 0) {
-      /* fail */
-      /*g_error ("found end of non-existing block");*/
+      /* a non-opened block was closed, fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unmatching 'end' statement (needs a 'if' or 'for' before)");
     } else {
@@ -374,15 +367,13 @@ ctpl_lexer_read_token_tpl_else (MB          *mb,
   skip_blank (mb);
   if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
     /* fail, missing } at the end */
-    /*g_error ("else: missing '%c' at the end", CTPL_END_CHAR);*/
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Unexpected character '%c' before end of 'else' statement",
                  c);
   } else {
     //~ g_debug ("else statement");
     if (state->last_statement_type_if != S_IF) {
-      /* fail */
-      /*g_error ("found else statement but no previous if");*/
+      /* else but no opened if, fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unmatching 'else' statement (needs an 'if' before)");
     } else {
@@ -414,7 +405,7 @@ ctpl_lexer_read_token_tpl_expr (MB          *mb,
     
     skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
-      /* fail */
+      /* trash before the end, fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unexpected character '%c' before end of statement",
                    c);
@@ -443,8 +434,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
   
   /* ensure the first character is a start character */
   if ((c = mb_getc (mb)) != CTPL_START_CHAR) {
-    /* fail */
-    /*g_error ("expected '%c' before '%c'", CTPL_START_CHAR, mb_cur_char (mb));*/
+    /* trash before the start, wtf? */
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Unexpected character '%c' before start of statement",
                  c);
@@ -521,7 +511,7 @@ do_read_data (MB   *mb,
               char *buf,
               gsize input_len)
 {
-  int       prev_c;
+  char      prev_c;
   char      c       = 0;
   gboolean  escaped = FALSE;
   gsize     len     = 0;
@@ -529,9 +519,10 @@ do_read_data (MB   *mb,
   for (; input_len > 0; input_len --) {
     prev_c = c;
     c = mb_getc (mb);
-    escaped = (prev_c == CTPL_ESCAPE_CHAR) ? !escaped : FALSE;
-    if (c != CTPL_ESCAPE_CHAR || escaped)
+    escaped = (prev_c == CTPL_ESCAPE_CHAR) ? ! escaped : FALSE;
+    if (c != CTPL_ESCAPE_CHAR || escaped) {
       buf[len ++] = c;
+    }
   }
   
   return len;
@@ -540,17 +531,16 @@ do_read_data (MB   *mb,
 /* reads a data token
  * Returns: A new token on success, %NULL otherwise (syntax error) */
 static CtplToken *
-ctpl_lexer_read_token_data (MB         *mb,
-                            LexerState *state,
-                            GError    **error)
+ctpl_lexer_read_token_data (MB           *mb,
+                            LexerState   *state,
+                            GError      **error)
 {
   gsize start;
   CtplToken *token = NULL;
   
   start = mb_tell (mb);
   if (! forward_to_non_data (mb)) {
-    /* fail */
-    /*g_error ("unexpected '%c'", CTPL_END_CHAR);*/
+    /* found an unescaped }, fail */
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                  "Unexpected character '%c' inside data block",
                  CTPL_END_CHAR);
@@ -593,8 +583,6 @@ ctpl_lexer_read_token (MB          *mb,
       break;
     
     case CTPL_END_CHAR:
-      /* fail here */
-      /*g_error ("syntax error near '%c' token", CTPL_END_CHAR);*/
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unexpected character '%c' at statement start",
                    CTPL_END_CHAR);

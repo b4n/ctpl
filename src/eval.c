@@ -55,10 +55,10 @@ ctpl_eval_error_quark (void)
 }
 
 
-static gboolean   ctpl_eval_value_internal  (CtplTokenExpr      *expr,
-                                             const CtplEnviron  *env,
-                                             CtplValue          *value,
-                                             GError            **error);
+static gboolean   ctpl_eval_value_internal  (const CtplTokenExpr *expr,
+                                             const CtplEnviron   *env,
+                                             CtplValue           *value,
+                                             GError             **error);
 static gboolean   ctpl_eval_bool_value      (const CtplValue *value);
 
 
@@ -88,11 +88,6 @@ ensure_operands_type (CtplValue     *lvalue,
   
   return rv;
 }
-
-#define VALUE_GET_NUMERIC_AS_FLOAT(v) \
-  ((CTPL_VALUE_HOLDS_FLOAT (v)) \
-   ? ctpl_value_get_float (v) \
-   : ctpl_value_get_int (v))
 
 /* Tries to evaluate a subtraction operation */
 static gboolean
@@ -227,7 +222,7 @@ do_multiply_string (const gchar  *str,
     }
     buf[buf_len] = 0;
   }
-  g_debug ("mutiplied string: '%s'", buf);
+  //~ g_debug ("mutiplied string: '%s'", buf);
   
   return buf;
 }
@@ -359,7 +354,7 @@ ctpl_eval_operator_div (CtplValue *lvalue,
       rv = FALSE;
     } else {
       ctpl_value_set_float (value, lval / rval);
-      /*g_debug ("division result: %f", ctpl_value_get_float (value));*/
+      //~ g_debug ("division result: %f", ctpl_value_get_float (value));
     }
   }
   
@@ -393,7 +388,7 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
   switch (ctpl_value_get_held_type (lvalue)) {
     case CTPL_VTYPE_ARRAY:
       if (ctpl_value_get_held_type (rvalue) != CTPL_VTYPE_ARRAY) {
-        /* fail, can't comapre array with other things for superiority */
+        /* fail, can't comapre array with other things */
         rv = FALSE;
       } else {
         const GSList *larray;
@@ -495,7 +490,7 @@ ctpl_eval_operator_and_or (CtplValue     *lvalue,
     default:
       g_critical ("Invalid operator in %s", G_STRLOC);
       success = FALSE;
-      break;
+      g_assert_not_reached ();
   }
   ctpl_value_set_int (value, result ? 1 : 0);
   
@@ -577,6 +572,7 @@ ctpl_eval_operator_internal (CtplOperator operator,
     
     case CTPL_OPERATOR_NONE:
       g_critical ("Unknown operator ID: %d", operator);
+      g_assert_not_reached ();
   }
   
   return rv;
@@ -594,10 +590,10 @@ ctpl_eval_operator_internal (CtplOperator operator,
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 static gboolean
-ctpl_eval_operator (CtplTokenExpr      *operator,
-                    const CtplEnviron  *env,
-                    CtplValue          *value,
-                    GError            **error)
+ctpl_eval_operator (const CtplTokenExpr  *operator,
+                    const CtplEnviron    *env,
+                    CtplValue            *value,
+                    GError              **error)
 {
   gboolean rv = TRUE;
   CtplValue lvalue;
@@ -605,7 +601,6 @@ ctpl_eval_operator (CtplTokenExpr      *operator,
   
   ctpl_value_init (&lvalue);
   ctpl_value_init (&rvalue);
-  
   if (! ctpl_eval_value_internal (operator->token.t_operator.loperand,
                                   env, &lvalue, error)) {
     rv = FALSE;
@@ -616,7 +611,6 @@ ctpl_eval_operator (CtplTokenExpr      *operator,
     rv = ctpl_eval_operator_internal (operator->token.t_operator.operator,
                                       &lvalue, &rvalue, value, error);
   }
-  
   ctpl_value_free_value (&rvalue);
   ctpl_value_free_value (&lvalue);
   
@@ -625,10 +619,10 @@ ctpl_eval_operator (CtplTokenExpr      *operator,
 
 /* Tries to evaluate a value */
 static gboolean
-ctpl_eval_value_internal (CtplTokenExpr      *expr,
-                          const CtplEnviron  *env,
-                          CtplValue          *value,
-                          GError            **error)
+ctpl_eval_value_internal (const CtplTokenExpr  *expr,
+                          const CtplEnviron    *env,
+                          CtplValue            *value,
+                          GError              **error)
 {
   gboolean rv = TRUE;
   
@@ -660,12 +654,12 @@ ctpl_eval_value_internal (CtplTokenExpr      *expr,
       rv = ctpl_eval_operator (expr, env, value, error);
       break;
   }
-  {
-    char *dump;
-    dump = ctpl_value_to_string (value);
-    g_debug ("result: %s", dump);
-    g_free (dump);
-  }
+  //~ {
+    //~ char *dump;
+    //~ dump = ctpl_value_to_string (value);
+    //~ g_debug ("result: %s", dump);
+    //~ g_free (dump);
+  //~ }
   
   return rv;
 }
@@ -681,9 +675,9 @@ ctpl_eval_value_internal (CtplTokenExpr      *expr,
  * Returns: The result of the expression evaluation or %NULL on error.
  */
 CtplValue *
-ctpl_eval_value (CtplTokenExpr     *expr,
-                 const CtplEnviron *env,
-                 GError           **error)
+ctpl_eval_value (const CtplTokenExpr *expr,
+                 const CtplEnviron   *env,
+                 GError             **error)
 {
   CtplValue *value;
   
@@ -720,7 +714,7 @@ ctpl_eval_bool_value (const CtplValue *value)
       const char *string;
       
       string = ctpl_value_get_string (value);
-      eval = (string && (*string != 0));
+      eval = (string && *string != 0);
       break;
     }
   }
@@ -745,13 +739,10 @@ ctpl_eval_bool_value (const CtplValue *value)
  * Returns: The result of the expression evaluation, or %FALSE on error.
  */
 gboolean
-ctpl_eval_bool (CtplTokenExpr      *expr,
-                const CtplEnviron  *env,
-                GError            **error)
+ctpl_eval_bool (const CtplTokenExpr  *expr,
+                const CtplEnviron    *env,
+                GError              **error)
 {
-  /* Should we allow non-existing symbol check if it is alone? e.g.
-   * {if symbol_that_may_be_missing} ... */
-  
   CtplValue value;
   gboolean  eval = FALSE;
   

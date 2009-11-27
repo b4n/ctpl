@@ -166,7 +166,7 @@ read_number (const char  *data,
   
   tmpbuf = g_strndup (data, length);
   value = g_ascii_strtod (tmpbuf, &endptr);
-  //~ g_print ("ep: '%c'\n", *endptr);
+  //~ g_debug ("ep: '%c'\n", *endptr);
   if (tmpbuf != endptr && errno != ERANGE && ! IS_SYMBOLCHAR (*endptr)) {
     if (CTPL_MATH_FLOAT_EQ (value, (double)(long int)value)) {
       token = ctpl_token_expr_new_integer ((long int)value);
@@ -176,7 +176,6 @@ read_number (const char  *data,
   }
   *read_len = (gsize)endptr - (gsize)tmpbuf;
   //~ g_debug ("length of the value: %zd", *read_len);
-  
   g_free (tmpbuf);
   
   return token;
@@ -410,7 +409,6 @@ validate_token_list (GSList  *tokens,
                  "To few operands for operator %s",
                  token_operator_to_string (operators[opt - 1]));
   }
-  
   //~ g_debug ("done.");
   
   return expr;
@@ -428,7 +426,6 @@ lex_operand (const char  *expr,
   gsize           off = 0;
   
   //~ g_debug ("Lexing operand '%.*s'", (int)length, expr);
-  
   token = read_number (expr, length, &off);
   if (! token) {
     token = read_symbol (expr, length, &off);
@@ -517,7 +514,6 @@ ctpl_lexer_expr_lex (const char  *expr,
   
   length = (len < 0) ? strlen (expr) : (gsize)len;
   //~ g_debug ("Hey, I'm gonna lex expression '%.*s'!", length, expr);
-  
   for (i = 0; i < length && ! err; i++) {
     char            c = expr[i];
     gsize           n_skip = 0;
@@ -552,21 +548,9 @@ ctpl_lexer_expr_lex (const char  *expr,
     /* skip blank chars */
     for (; i < length && strchr (CTPL_BLANK_CHARS, expr[i+1]); i++);
   }
-  
   if (! err) {
     /* here check validity of token list, then create the final token. */
-    
-    //~ g_debug ("DUMP BEGINS");
-    //~ g_slist_foreach (tokens, ctpl_token_expr_dump, NULL);
-    //~ g_debug ("DUMP ENDED");
-    
-    //~ g_debug ("VALIDATION BEGINS");
     expr_tok = validate_token_list (tokens, &err);
-    //~ g_debug ("VALIDATION ENDED");
-    
-    //~ g_debug ("DUMP BEGINS");
-    //~ ctpl_token_expr_dump (expr_tok);
-    //~ g_debug ("DUMP ENDED");
   }
   if (err) {
     GSList *tmp;
@@ -576,7 +560,6 @@ ctpl_lexer_expr_lex (const char  *expr,
     }
     g_propagate_error (error, err);
   }
-  
   g_slist_free (tokens);
   
   return expr_tok;

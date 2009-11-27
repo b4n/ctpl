@@ -189,15 +189,15 @@ struct _CtplToken
 };
 
 
-CtplToken    *ctpl_token_new_data (const char *data,
-                                   gssize      len);
-CtplToken    *ctpl_token_new_expr (CtplTokenExpr *expr);
-CtplToken    *ctpl_token_new_for  (const char *array,
-                                   const char *iterator,
-                                   CtplToken  *children);
-CtplToken    *ctpl_token_new_if   (CtplTokenExpr *condition,
-                                   CtplToken     *if_children,
-                                   CtplToken     *else_children);
+CtplToken    *ctpl_token_new_data           (const char *data,
+                                             gssize      len);
+CtplToken    *ctpl_token_new_expr           (CtplTokenExpr *expr);
+CtplToken    *ctpl_token_new_for            (const char *array,
+                                             const char *iterator,
+                                             CtplToken  *children);
+CtplToken    *ctpl_token_new_if             (CtplTokenExpr *condition,
+                                             CtplToken     *if_children,
+                                             CtplToken     *else_children);
 CtplTokenExpr *ctpl_token_expr_new_operator (CtplOperator    operator,
                                              CtplTokenExpr  *loperand,
                                              CtplTokenExpr  *roperand);
@@ -205,17 +205,17 @@ CtplTokenExpr *ctpl_token_expr_new_integer  (long int integer);
 CtplTokenExpr *ctpl_token_expr_new_float    (double real);
 CtplTokenExpr *ctpl_token_expr_new_symbol   (const char *symbol,
                                              gssize      len);
+void          ctpl_token_free               (CtplToken *token,
+                                             gboolean   chain);
 void          ctpl_token_expr_free          (CtplTokenExpr *token,
                                              gboolean       recurse);
-void          ctpl_token_free     (CtplToken *token,
-                                   gboolean   chain);
-void          ctpl_token_append   (CtplToken *token,
-                                   CtplToken *brother);
-void          ctpl_token_prepend  (CtplToken *token,
-                                   CtplToken *brother);
-void          ctpl_token_expr_dump  (const CtplTokenExpr *token);
-void          ctpl_token_dump     (const CtplToken *token,
-                                   gboolean         chain);
+void          ctpl_token_append             (CtplToken *token,
+                                             CtplToken *brother);
+void          ctpl_token_prepend            (CtplToken *token,
+                                             CtplToken *brother);
+void          ctpl_token_dump               (const CtplToken *token,
+                                             gboolean         chain);
+void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
 /**
  * ctpl_token_get_type:
  * @token: A #CtplToken

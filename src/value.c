@@ -204,8 +204,8 @@ ctpl_value_free_value (CtplValue *value)
         }
         g_slist_free (value->value.v_array);
         value->value.v_array = NULL;
-      }
       break;
+    }
   }
 }
 
@@ -847,6 +847,7 @@ long int
 ctpl_value_get_int (const CtplValue *value)
 {
   g_return_val_if_fail (CTPL_VALUE_HOLDS_INT (value), 0);
+  
   return value->value.v_int;
 }
 
@@ -862,6 +863,7 @@ double
 ctpl_value_get_float (const CtplValue *value)
 {
   g_return_val_if_fail (CTPL_VALUE_HOLDS_FLOAT (value), 0.0f);
+  
   return value->value.v_float;
 }
 
@@ -878,6 +880,7 @@ const char *
 ctpl_value_get_string (const CtplValue *value)
 {
   g_return_val_if_fail (CTPL_VALUE_HOLDS_STRING (value), NULL);
+  
   return value->value.v_string;
 }
 
@@ -895,6 +898,7 @@ const GSList *
 ctpl_value_get_array (const CtplValue *value)
 {
   g_return_val_if_fail (CTPL_VALUE_HOLDS_ARRAY (value), NULL);
+  
   return value->value.v_array;
 }
 
@@ -921,8 +925,7 @@ ctpl_value_get_array_int (const CtplValue *value,
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
-  
-  /* cast is because g_slits_length() takes a no-cons pointer, see
+  /* cast is because g_slits_length() takes a non-const pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
   array = g_new0 (long int, len);
@@ -967,8 +970,7 @@ ctpl_value_get_array_float (const CtplValue *value,
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
-  
-  /* cast is because g_slits_length() takes a no-cons pointer, see
+  /* cast is because g_slits_length() takes a non-const pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
   array = g_new0 (double, len);
@@ -1013,8 +1015,7 @@ ctpl_value_get_array_string (const CtplValue *value,
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
-  
-  /* cast is because g_slits_length() takes a no-cons pointer, see
+  /* cast is because g_slits_length() takes a non-const pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
   array = g_new0 (char*, len + 1);
@@ -1098,9 +1099,6 @@ ctpl_value_to_string (const CtplValue *value)
     case CTPL_VTYPE_STRING:
       val = g_strdup (value->value.v_string);
       break;
-    
-    default:
-      g_critical ("WTF???");
   }
   
   return val;
