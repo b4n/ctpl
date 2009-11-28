@@ -98,7 +98,7 @@ ctpl_eval_operator_minus (CtplValue  *lvalue,
 {
   gboolean rv = TRUE;
   
-  rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "subtract", error);
+  rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "-", error);
   if (rv) {
     ctpl_value_set_float (value, ctpl_value_get_float (lvalue) -
                                  ctpl_value_get_float (rvalue));
@@ -144,7 +144,7 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
       /* WARNING: conditional break to fall back to floating conversion if one
        * operand is float */
     case CTPL_VTYPE_FLOAT:
-      rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "plus", error);
+      rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "+", error);
       if (rv) {
         ctpl_value_set_float (value, ctpl_value_get_float (lvalue) +
                                      ctpl_value_get_float (rvalue));
@@ -155,7 +155,7 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
       /* FIXME: should I use ctpl_value_to_string() or ctpl_value_convert()? */
       if (CTPL_VALUE_HOLDS_ARRAY (rvalue)) {
         g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                     "Operator 'plus' cannot be used with '%s' and '%s' types",
+                     "Operator '+' cannot be used with '%s' and '%s' types",
                      ctpl_value_get_held_type_name (lvalue),
                      ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
@@ -245,7 +245,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
   if (L_OR_R_IS (CTPL_VTYPE_ARRAY)) {
     /* cannot multiply arrays */
     g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                 "Invalid operands for operator 'mul' (have '%s' and '%s'): "
+                 "Invalid operands for operator '*' (have '%s' and '%s'): "
                  "cannot multiply arrays.",
                  ctpl_value_get_held_type_name (lvalue),
                  ctpl_value_get_held_type_name (rvalue));
@@ -256,7 +256,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
     } else {
       /* cannot multiply a string with something not a number */
       g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                   "Invalid operands for operator 'mul' (have '%s' and '%s'): "
+                   "Invalid operands for operator '*' (have '%s' and '%s'): "
                    "cannot multiply a string with something not a number.",
                    ctpl_value_get_held_type_name (lvalue),
                    ctpl_value_get_held_type_name (rvalue));
@@ -279,7 +279,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
         break;
       
       case CTPL_VTYPE_INT:
-        rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_INT, "mul", error);
+        rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_INT, "*", error);
         if (rv) {
           ctpl_value_set_int (value, ctpl_value_get_int (lvalue) *
                                      ctpl_value_get_int (rvalue));
@@ -287,7 +287,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
         break;
       
       case CTPL_VTYPE_FLOAT:
-        rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "mul", error);
+        rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "*", error);
         if (rv) {
           ctpl_value_set_float (value, ctpl_value_get_float (lvalue) *
                                        ctpl_value_get_float (rvalue));
@@ -309,7 +309,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
         rv = ctpl_value_convert (num_val, CTPL_VTYPE_INT);
         if (! rv) {
           g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                       "Invalid operands for operator 'mul' (have '%s' and '%s')",
+                       "Invalid operands for operator '*' (have '%s' and '%s')",
                        ctpl_value_get_held_type_name (lvalue),
                        ctpl_value_get_held_type_name (rvalue));
           rv = FALSE;
@@ -341,7 +341,7 @@ ctpl_eval_operator_div (CtplValue *lvalue,
 {
   gboolean rv = TRUE;
   
-  rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "divide", error);
+  rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "/", error);
   if (rv) {
     gdouble lval;
     gdouble rval;
@@ -421,7 +421,8 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
       /* WARNING: conditional break to fall back to floating conversion if one
        * operand is float */
     case CTPL_VTYPE_FLOAT:
-      rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "superior", error);
+      rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT,
+                                 ctpl_operator_to_string (op), error);
       if (rv) {
         gdouble lval;
         gdouble rval;
@@ -443,7 +444,8 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
     case CTPL_VTYPE_STRING:
       if (CTPL_VALUE_HOLDS_ARRAY (rvalue)) {
         g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                     "Invalid operands for operator 'superior' (have '%s' and '%s')",
+                     "Invalid operands for operator '%s' (have '%s' and '%s')",
+                     ctpl_operator_to_string (op),
                      ctpl_value_get_held_type_name (lvalue),
                      ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
@@ -507,7 +509,7 @@ ctpl_eval_operator_modulo (CtplValue *lvalue,
 {
   gboolean rv = TRUE;
   
-  rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_INT, "modulo", error);
+  rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_INT, "%", error);
   if (rv) {
     glong lval = ctpl_value_get_int (lvalue);
     glong rval = ctpl_value_get_int (rvalue);
