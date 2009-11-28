@@ -18,6 +18,7 @@
  */
 
 #include "lexer.h"
+#include "readutils.h"
 #include "lexer-expr.h"
 #include "token.h"
 #include <mb.h>
@@ -108,75 +109,11 @@ ctpl_lexer_error_quark (void)
   return error_quark;
 }
 
-/*
- * read_word:
- * @mb: A #MB
- * @accept: String of acceptable characters for the word
- * 
- * Reads a word composed of @accept characters.
- * 
- * Returns: A newly allocated string containing the read word or %NULL if there
- *          was no word to read (e.g. no characters matching @accept was found
- *          before one not matching it).
- */
-static gchar *
-read_word (MB          *mb,
-           const gchar *accept)
-{
-  gint    c;
-  gsize   start;
-  gsize   len;
-  gchar  *word = NULL;
-  
-  start = mb_tell (mb);
-  do {
-    c = mb_getc (mb);
-  } while (! mb_eof (mb) && strchr (accept, c));
-  len = (mb_tell (mb) - start) - 1;
-  if (len > 0) {
-    word = g_malloc (len + 1);
-    if (word) {
-      mb_seek (mb, start, MB_SEEK_SET);
-      mb_read (mb, word, len);
-      word[len] = 0;
-      //~ g_debug ("Next read character will be '%c'", mb_cur_char (mb));
-    }
-  }
-  
-  return word;
-}
-
 /* reads a symbol (e.g. a variable/constant) */
-static gchar *
-read_symbol (MB *mb)
-{
-  return read_word (mb, CTPL_SYMBOL_CHARS);
-}
+#define read_symbol(mb) (ctpl_read_word ((mb), CTPL_SYMBOL_CHARS))
 
 /* reads an expression (if condition for example) */
-static gchar *
-read_expr (MB *mb)
-{
-  return read_word (mb, CTPL_EXPR_CHARS);
-}
-
-/* skips all blank characters (those from CTPL_BLANK_CHARS) */
-static gsize
-skip_blank (MB *mb)
-{
-  gsize n = 0;
-  gint  c;
-  
-  do {
-    c = mb_getc (mb);
-    n++;
-  } while (! mb_eof (mb) && strchr (CTPL_BLANK_CHARS, c));
-  if (! strchr (CTPL_BLANK_CHARS, c)) {
-    mb_seek (mb, -1, MB_SEEK_CUR);
-  }
-  
-  return n;
-}
+#define read_expr(mb) (ctpl_read_word ((mb), CTPL_EXPR_CHARS))
 
 
 /* reads the data part of a if, aka the expression (e.g. " a > b" in "if a > b")
@@ -190,7 +127,7 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
   CtplToken  *token = NULL;
   
   //~ g_debug ("if?");
-  skip_blank (mb);
+  ctpl_read_skip_blank (mb);
   expr = read_expr (mb);
   if (! expr) {
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -198,7 +135,7 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
   } else {
     gint c;
     
-    skip_blank (mb);
+    ctpl_read_skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
       /* there is trash before the end, then fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -257,7 +194,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   gchar      *array_name;
   
   //~ g_debug ("for?");
-  skip_blank (mb);
+  ctpl_read_skip_blank (mb);
   iter_name = read_symbol (mb);
   if (! iter_name) {
     /* missing iterator symbol, fail */
@@ -265,7 +202,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
                  "No iterator identifier for 'for' statement");
   } else {
     //~ g_debug ("for: iter is '%s'", iter_name);
-    skip_blank (mb);
+    ctpl_read_skip_blank (mb);
     keyword_in = read_symbol (mb);
     if (! keyword_in || strcmp (keyword_in, "in") != 0) {
       /* missing `in` keyword, fail */
@@ -273,7 +210,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
                    "Missing 'in' keyword after iterator name of 'for' "
                    "statement");
     } else {
-      skip_blank (mb);
+      ctpl_read_skip_blank (mb);
       array_name = read_symbol (mb);
       if (! array_name) {
         /* missing array symbol, fail */
@@ -282,7 +219,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
       } else {
         gint c;
         
-        skip_blank (mb);
+        ctpl_read_skip_blank (mb);
         if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
           /* trash before the end, fail */
           g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -331,7 +268,7 @@ ctpl_lexer_read_token_tpl_end (MB          *mb,
   gboolean  rv = FALSE;
   
   //~ g_debug ("end?");
-  skip_blank (mb);
+  ctpl_read_skip_blank (mb);
   if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
     /* fail, missing } at the end */
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -364,7 +301,7 @@ ctpl_lexer_read_token_tpl_else (MB          *mb,
   gboolean  rv = FALSE;
   
   //~ g_debug ("else?");
-  skip_blank (mb);
+  ctpl_read_skip_blank (mb);
   if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
     /* fail, missing } at the end */
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -395,7 +332,7 @@ ctpl_lexer_read_token_tpl_expr (MB          *mb,
   CtplToken  *token = NULL;
   gchar      *expr;
   
-  skip_blank (mb);
+  ctpl_read_skip_blank (mb);
   expr = read_expr (mb);
   if (! expr) {
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -403,7 +340,7 @@ ctpl_lexer_read_token_tpl_expr (MB          *mb,
   } else {
     gint c;
     
-    skip_blank (mb);
+    ctpl_read_skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
       /* trash before the end, fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -442,7 +379,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
     gchar  *first_word;
     gsize   start_off;
     
-    skip_blank (mb);
+    ctpl_read_skip_blank (mb);
     start_off = mb_tell (mb);
     first_word = read_symbol (mb);
     if (g_strcmp0 (first_word, "if") == 0) {

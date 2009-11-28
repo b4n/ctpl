@@ -357,6 +357,7 @@ procede_template (MB           *input,
     <xi:include href="xml/lexer-expr.xml"/>
     <xi:include href="xml/parser.xml"/>
     <xi:include href="xml/eval.xml"/>
+    <xi:include href="xml/readutils.xml"/>
     <xi:include href="xml/mathutils.xml"/>
   </chapter>
   <!--chapter id="object-tree">

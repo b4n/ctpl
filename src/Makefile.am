@@ -8,6 +8,7 @@ libctpl_la_SOURCES = environ.c \
                      lexer-expr.c \
                      mathutils.c \
                      parser.c \
+                     readutils.c \
                      stack.c \
                      token.c \
                      value.c
@@ -19,6 +20,7 @@ ctplinclude_HEADERS = ctpl.h \
                       lexer.h \
                       mathutils.h \
                       parser.h \
+                      readutils.h \
                       stack.h \
                       token.h \
                       value.h

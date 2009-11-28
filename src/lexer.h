@@ -55,12 +55,6 @@ G_BEGIN_DECLS
                           "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
                           "0123456789" \
                           "_"
-/**
- * CTPL_BLANK_CHARS:
- * 
- * Characters treated as blank, commonly used as a separator.
- */
-#define CTPL_BLANK_CHARS  " \t\v\r\n"
 
 /**
  * CTPL_LEXER_ERROR:

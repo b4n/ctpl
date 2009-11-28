@@ -5,7 +5,6 @@ CTPL_START_CHAR
 CTPL_END_CHAR
 CTPL_ESCAPE_CHAR
 CTPL_SYMBOL_CHARS
-CTPL_BLANK_CHARS
 CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex
@@ -168,4 +167,13 @@ ctpl_math_string_to_float
 ctpl_math_string_to_int
 ctpl_math_float_to_string
 ctpl_math_int_to_string
+</SECTION>
+
+<SECTION>
+<TITLE>Read utilities</TITLE>
+<FILE>readutils</FILE>
+CTPL_BLANK_CHARS
+ctpl_read_word
+ctpl_read_skip_chars
+ctpl_read_skip_blank
 </SECTION>

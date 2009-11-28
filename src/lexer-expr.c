@@ -18,6 +18,7 @@
  */
 
 #include "lexer-expr.h"
+#include "readutils.h"  /* for CTPL_BLANK_CHARS */
 #include "lexer.h"
 #include "token.h"
 #include "mathutils.h"
