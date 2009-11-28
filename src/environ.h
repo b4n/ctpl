@@ -22,9 +22,37 @@
 
 #include "value.h"
 #include <glib.h>
+#include <mb.h>
 
 G_BEGIN_DECLS
 
+
+/**
+ * CTPL_ENVIRON_ERROR:
+ * 
+ * Error domain of CtplEnviron.
+ */
+#define CTPL_ENVIRON_ERROR  (ctpl_environ_error_quark ())
+
+/**
+ * CtplEnvironError:
+ * @CTPL_ENVIRON_ERROR_LOADER_MISSING_SYMBOL:     Missing symbol in environment
+ *                                                description
+ * @CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE:      Missing value in environment
+ *                                                description
+ * @CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR:  Missing separator in
+ *                                                environment description
+ * @CTPL_ENVIRON_ERROR_FAILED:                    An error occurred.
+ * 
+ * Error codes that environment functions can throw.
+ */
+typedef enum _CtplEnvironError
+{
+  CTPL_ENVIRON_ERROR_LOADER_MISSING_SYMBOL,
+  CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
+  CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
+  CTPL_ENVIRON_ERROR_FAILED
+} CtplEnvironError;
 
 typedef struct _CtplEnviron CtplEnviron;
 
@@ -41,6 +69,7 @@ struct _CtplEnviron
 };
 
 
+GQuark            ctpl_environ_error_quark    (void) G_GNUC_CONST;
 CtplEnviron      *ctpl_environ_new            (void);
 void              ctpl_environ_free           (CtplEnviron *env);
 const CtplValue  *ctpl_environ_lookup         (const CtplEnviron *env,
@@ -59,6 +88,15 @@ void              ctpl_environ_push_string    (CtplEnviron     *env,
                                                const gchar     *value);
 const CtplValue  *ctpl_environ_pop            (CtplEnviron *env,
                                                const gchar *symbol);
+gboolean          ctpl_environ_add_from_mb    (CtplEnviron *env,
+                                               MB          *mb,
+                                               GError     **error);
+gboolean          ctpl_environ_add_from_string(CtplEnviron  *env,
+                                               const gchar  *string,
+                                               GError      **error);
+gboolean          ctpl_environ_add_from_file  (CtplEnviron *env,
+                                               const gchar *filename,
+                                               GError     **error);
 
 
 G_END_DECLS

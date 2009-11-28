@@ -32,11 +32,28 @@ G_BEGIN_DECLS
  * Characters treated as blank, commonly used as a separator.
  */
 #define CTPL_BLANK_CHARS  " \t\v\r\n"
+/**
+ * CTPL_ESCAPE_CHAR:
+ * 
+ * Character used to escape a special character.
+ */
+#define CTPL_ESCAPE_CHAR  '\\'
+/**
+ * CTPL_STRING_DELIMITER_CHAR:
+ * 
+ * Character surrounding string literals.
+ */
+#define CTPL_STRING_DELIMITER_CHAR '"'
 
 gchar    *ctpl_read_word            (MB          *mb,
                                      const gchar *accept);
 gsize     ctpl_read_skip_chars      (MB           *mb,
                                      const gchar  *reject);
+gchar    *ctpl_read_string_literal  (MB *mb);
+gdouble   ctpl_read_double          (MB    *mb,
+                                     gsize *n_read);
+
+
 /**
  * ctpl_read_skip_blank:
  * @mb: A #MB

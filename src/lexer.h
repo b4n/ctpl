@@ -40,13 +40,6 @@ G_BEGIN_DECLS
  */
 #define CTPL_END_CHAR   '}'
 /**
- * CTPL_ESCAPE_CHAR:
- * 
- * Character used to escape a special character (%CTPL_START_CHAR,
- * %CTPL_END_CHAR or %CTPL_ESCAPE_CHAR).
- */
-#define CTPL_ESCAPE_CHAR  '\\'
-/**
  * CTPL_SYMBOL_CHARS:
  * 
  * Characters that are valid for a symbol.
