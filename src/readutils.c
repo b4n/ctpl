@@ -26,10 +26,10 @@
 
 /**
  * SECTION: readutils
- * @short_description: Common functions used to read from a MB
+ * @short_description: Common functions used to read from a LibMB buffer
  * @include: ctpl/readutils.h
  * 
- * Useful functions tu read data from a libMB's buffer.
+ * Useful functions to read data from a LibMB buffer.
  * 
  * These functions are somewhat generic and are used by different part of CTPL
  * internally.
@@ -76,7 +76,7 @@ ctpl_read_word (MB          *mb,
 
 /**
  * ctpl_read_skip_chars:
- * @mb: a #MB
+ * @mb: A #MB
  * @reject: Characters to skip.
  * 
  * Skips characters in @reject, making the next call to mb_getc() on @mb not
@@ -166,10 +166,7 @@ ctpl_read_string_literal (MB *mb)
  *          the returned value, or %NULL. This value is set to 0 if no valid
  *          number were read.
  * 
- * Reads a number from @mb as a double, similar to what strtod() would do in the
- * C locale.
- * It internally use g_ascii_strtod(), and should behave identically; if not, it
- * is a bug.
+ * Reads a number from @mb as a double, as g_ascii_strtod() would do.
  * 
  * <warning>
  *   <para>
@@ -180,9 +177,9 @@ ctpl_read_string_literal (MB *mb)
  * <note>
  *   <para>
  *     Regardless the above warning, you do not need to check @errno to know if
- *     the conversion succeeded cleanly and completely, since this function does
- *     it already and reports an invalid value if @errno reports any interesting
- *     error.
+ *     the conversion succeeded cleanly and completely, since this function
+ *     already does it and reports an invalid value if @errno reports any
+ *     interesting error (i.e. @ERANGE).
  *   </para>
  * </note>
  * 

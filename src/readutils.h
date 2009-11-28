@@ -29,7 +29,7 @@ G_BEGIN_DECLS
 /**
  * CTPL_BLANK_CHARS:
  * 
- * Characters treated as blank, commonly used as a separator.
+ * Characters treated as blank, commonly used as separator.
  */
 #define CTPL_BLANK_CHARS  " \t\v\r\n"
 /**

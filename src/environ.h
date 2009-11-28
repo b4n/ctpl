@@ -42,9 +42,9 @@ G_BEGIN_DECLS
  *                                                description
  * @CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR:  Missing separator in
  *                                                environment description
- * @CTPL_ENVIRON_ERROR_FAILED:                    An error occurred.
+ * @CTPL_ENVIRON_ERROR_FAILED:                    An error occurred
  * 
- * Error codes that environment functions can throw.
+ * Errors in the CtplEnviron domain.
  */
 typedef enum _CtplEnvironError
 {
@@ -60,7 +60,7 @@ typedef struct _CtplEnviron CtplEnviron;
  * CtplEnviron:
  * @symbol_table: Table containing stacks of symbols
  * 
- * Represents an environment
+ * Represents an environment.
  */
 struct _CtplEnviron
 {

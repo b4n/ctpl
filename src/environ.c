@@ -28,7 +28,7 @@
  * @short_description: Environment
  * @include: ctpl/environ.h
  * 
- * A #CtplEnviron represents a environment of symbols used to lookup, push and
+ * A #CtplEnviron represents an environment of symbols used to lookup, push and
  * pop symbols when computing a template.
  * 
  * <example>
@@ -46,9 +46,9 @@
  *   </programlisting>
  * </example>
  * 
- * Environment can be loaded from #MB, strings or files using
+ * Environments can be loaded from #MB, strings or files using
  * ctpl_environ_add_from_mb(), ctpl_environ_add_from_string() or
- * ctpl_environ_add_from_file(). Environment descriptions are of the for
+ * ctpl_environ_add_from_file(). Environment descriptions are of the form
  * <code>SYMBOL = VALUE;</code>. Some examples below:
  * <example>
  *   <title>An environment description</title>
@@ -540,16 +540,16 @@ ctpl_environ_add_from_string (CtplEnviron  *env,
 /**
  * ctpl_environ_add_from_file:
  * @env: A #CtplEnviron to fill
- * @filename: The filename of the file from which load environment description,
- *            in the GLib filename encoding
+ * @filename: The filename of the file from which load the environment
+ *            description, in the GLib's filename encoding
  * @error: Return location for an error, or %NULL to ignore them
  * 
  * Loads an environment description from a file.
  * See ctpl_environ_add_from_mb().
  * 
- * Errors can come from the domain %G_FILE_ERROR if the file loading failed, or
- * from the %CTPL_ENVIRON_ERROR if the parsing of the environment description
- * failed.
+ * Errors can come from the %G_FILE_ERROR domain if the file loading failed, or
+ * from the %CTPL_ENVIRON_ERROR domain if the parsing of the environment
+ * description failed.
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  */
