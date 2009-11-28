@@ -67,6 +67,7 @@ static CtplEnviron *
 build_env (void)
 {
   CtplEnviron  *env;
+  #if 0
   CtplValue     val;
   
   ctpl_value_init (&val);
@@ -79,6 +80,21 @@ build_env (void)
   ctpl_environ_push (env, "array", &val);
   
   ctpl_value_free_value (&val);
+  #else
+  GError *err = NULL;
+  
+  env = ctpl_environ_new ();
+  if (! ctpl_environ_add_from_string (
+          env,
+          "foo = \"(was foo)\";"
+          "bar = \"(was bar)\";"
+          "num = +42;"
+          "array = [\"first\", \"second\", \"third\"];",
+          &err)) {
+    g_critical ("Failed to load env: %s", err->message);
+    g_error_free (err);
+  }
+  #endif
   
   return env;
 }
