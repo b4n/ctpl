@@ -1,5 +1,5 @@
 
-noinst_PROGRAMS = ctpl
+noinst_PROGRAMS = test
 lib_LTLIBRARIES = libctpl.la
 
 libctpl_la_SOURCES = environ.c \
@@ -25,5 +25,5 @@ ctplinclude_HEADERS = ctpl.h \
                       token.h \
                       value.h
 
-ctpl_SOURCES = ctpl.c
-ctpl_LDADD   = libctpl.la
+test_SOURCES = test.c
+test_LDADD   = libctpl.la
