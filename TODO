@@ -1,6 +1,5 @@
 * Cleanup test application
 
-* Provide an environment loader from a representation
 * Provide a standalone template engine application
 
 ? Use statically allocated values in ctpl_parser_parse_token_expr()
