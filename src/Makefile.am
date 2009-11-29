@@ -1,4 +1,5 @@
 
+bin_PROGRAMS    = ctpl
 noinst_PROGRAMS = test
 lib_LTLIBRARIES = libctpl.la
 
@@ -24,6 +25,9 @@ ctplinclude_HEADERS = ctpl.h \
                       stack.h \
                       token.h \
                       value.h
+
+ctpl_SOURCES = ctpl.c
+ctpl_LDADD   = libctpl.la
 
 test_SOURCES = test.c
 test_LDADD   = libctpl.la
