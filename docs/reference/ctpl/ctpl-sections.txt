@@ -7,6 +7,8 @@ CTPL_SYMBOL_CHARS
 CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex
+ctpl_lexer_lex_string
+ctpl_lexer_lex_file
 ctpl_lexer_free_tree
 ctpl_lexer_dump_tree
 <SUBSECTION Standard>

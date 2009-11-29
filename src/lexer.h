@@ -74,6 +74,10 @@ typedef enum _CtplLexerError
 GQuark      ctpl_lexer_error_quark  (void) G_GNUC_CONST;
 CtplToken  *ctpl_lexer_lex          (MB      *mb,
                                      GError **error);
+CtplToken  *ctpl_lexer_lex_string   (const gchar *template,
+                                     GError     **error);
+CtplToken  *ctpl_lexer_lex_file     (const gchar *filename,
+                                     GError     **error);
 void        ctpl_lexer_free_tree    (CtplToken *root);
 void        ctpl_lexer_dump_tree    (const CtplToken *root);
 

@@ -34,7 +34,8 @@
  * Syntax analyser creating a token tree from an input data in the CTPL
  * language.
  * 
- * To analyse some data, use ctpl_lexer_lex().
+ * To analyse some data, use ctpl_lexer_lex(), ctpl_lexer_lex_string() or
+ * ctpl_lexer_lex_file().
  * To dump a tree, use ctpl_lexer_dump_tree().
  * 
  * <example>
@@ -604,6 +605,64 @@ ctpl_lexer_lex (MB       *mb,
   }
   
   return root;
+}
+
+/**
+ * ctpl_lexer_lex_string:
+ * @template: A string containing the template data
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Lexes a template from a string.
+ * See ctpl_lexer_lex().
+ * 
+ * Returns: A new #CtplToken tree or %NULL on error.
+ */
+CtplToken *
+ctpl_lexer_lex_string (const gchar *template,
+                       GError     **error)
+{
+  CtplToken  *tree = NULL;
+  MB         *mb;
+  
+  mb = mb_new (template, strlen (template), MB_DONTCOPY);
+  tree = ctpl_lexer_lex (mb, error);
+  mb_free (mb);
+  
+  return tree;
+}
+
+/**
+ * ctpl_lexer_lex_file:
+ * @filename: The filename of the file from which read the template, in the
+ *            GLib's filename encoding
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Lexes a template from a file.
+ * See ctpl_lexer_lex().
+ * 
+ * Errors can come from the %G_FILE_ERROR domain if the file loading fails, or
+ * from the %CTPL_LEXER_ERROR domain if the lexing fails.
+ * 
+ * Returns: A new #CtplToken tree or %NULL on error.
+ */
+CtplToken *
+ctpl_lexer_lex_file (const gchar *filename,
+                     GError     **error)
+{
+  CtplToken  *tree = NULL;
+  gchar      *buffer;
+  gsize       length;
+  
+  if (g_file_get_contents (filename, &buffer, &length, error)) {
+    MB *mb;
+    
+    mb = mb_new (buffer, length, MB_DONTCOPY);
+    tree = ctpl_lexer_lex (mb, error);
+    mb_free (mb);
+    g_free (buffer);
+  }
+  
+  return tree;
 }
 
 /**
