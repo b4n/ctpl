@@ -9,11 +9,9 @@
   <bookinfo>
     <title>CTPL Reference Manual</title>
     <releaseinfo>
-      for CTPL &version;.
-<!--
+      for CTPL &version;
       The latest version of this documentation can be found on-line at
-      <ulink role="online-location" url="http://[SERVER]/ctpl/index.html">http://[SERVER]/ctpl/</ulink>.
--->
+      <ulink role="online-location" url="http://ctpl.tuxfamily.org/doc/unstable/index.html">http://ctpl.tuxfamily.org/doc/unstable/</ulink>.
     </releaseinfo>
   </bookinfo>
 
