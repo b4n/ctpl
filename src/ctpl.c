@@ -192,25 +192,6 @@ write_output (MB      *mb,
   return rv;
 }
 
-/* parses a template from an MB source */
-static gboolean
-do_parse_template (MB            *template,
-                   MB            *output,
-                   CtplEnviron   *env,
-                   GError       **error)
-{
-  gboolean    rv = FALSE;
-  CtplToken  *tree;
-  
-  tree = ctpl_lexer_lex (template, error);
-  if (tree) {
-    rv = ctpl_parser_parse (tree, env, output, error);
-  }
-  ctpl_lexer_free_tree (tree);
-  
-  return rv;
-}
-
 /* parses a template from a file */
 static gboolean
 parse_template (const gchar  *filename,
@@ -218,18 +199,14 @@ parse_template (const gchar  *filename,
                 CtplEnviron  *env,
                 GError      **error)
 {
-  gboolean  rv = FALSE;
-  gchar    *buffer;
-  gsize     length;
+  gboolean    rv = FALSE;
+  CtplToken  *tree;
   
-  if (g_file_get_contents (filename, &buffer, &length, error)) {
-    MB *template;
-    
-    template = mb_new (buffer, length, MB_DONTCOPY);
-    rv = do_parse_template (template, output, env, error);
-    mb_free (template);
-    g_free (buffer);
+  tree = ctpl_lexer_lex_file (filename, error);
+  if (tree) {
+    rv = ctpl_parser_parse (tree, env, output, error);
   }
+  ctpl_lexer_free_tree (tree);
   
   return rv;
 }
