@@ -11,7 +11,9 @@ AC_CONFIG_HEADERS([config.h])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+pkgconfigdir="${libdir}/pkgconfig"
 ctplincludedir="${includedir}/ctpl"
+AC_SUBST(pkgconfigdir)
 AC_SUBST(ctplincludedir)
 
 # Checks for programs.
@@ -73,5 +75,6 @@ AC_CONFIG_FILES([Makefile
                  docs/Makefile
                  docs/reference/Makefile
                  docs/reference/ctpl/Makefile
-                 docs/reference/ctpl/version.xml])
+                 docs/reference/ctpl/version.xml
+                 ctpl.pc])
 AC_OUTPUT
