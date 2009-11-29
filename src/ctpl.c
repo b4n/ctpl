@@ -17,6 +17,10 @@
  * 
  */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+#include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
@@ -29,11 +33,12 @@
 
 
 /* options */
-static gchar      **OPT_env_files   = NULL;
-static gchar      **OPT_env_chunks  = NULL;
-static gchar      **OPT_input_files = NULL;
-static gchar       *OPT_output_file = NULL;
-static gboolean     OPT_verbose     = FALSE;
+static gchar      **OPT_env_files     = NULL;
+static gchar      **OPT_env_chunks    = NULL;
+static gchar      **OPT_input_files   = NULL;
+static gchar       *OPT_output_file   = NULL;
+static gboolean     OPT_verbose       = FALSE;
+static gboolean     OPT_print_version = FALSE;
 
 static GOptionEntry option_entries[] = {
   { "output", 'o', 0, G_OPTION_ARG_FILENAME, &OPT_output_file,
@@ -46,6 +51,8 @@ static GOptionEntry option_entries[] = {
     "CHUNK" },
   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &OPT_verbose,
     "Be verbose.", NULL },
+  { "version", 0, 0, G_OPTION_ARG_NONE, &OPT_print_version,
+    "Print the version information and exit.", NULL },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &OPT_input_files,
     "Input files", "INPUTFILE[...]" },
   { NULL }
@@ -63,7 +70,10 @@ parse_options (gint    *argc,
   context = g_option_context_new ("- CTPL template parser");
   g_option_context_add_main_entries (context, option_entries, GETTEXT_PACKAGE);
   if (g_option_context_parse (context, argc, argv, error)) {
-    if (OPT_input_files == NULL) {
+    if (OPT_print_version) {
+      printf ("CTPL %s\n", VERSION);
+      exit (0);
+    } else if (OPT_input_files == NULL) {
       g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE,
                    "Missing input file(s)");
     } else {
