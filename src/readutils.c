@@ -60,7 +60,7 @@ ctpl_read_word (MB          *mb,
   do {
     c = mb_getc (mb);
   } while (! mb_eof (mb) && strchr (accept, c));
-  len = (mb_tell (mb) - start) - 1;
+  len = (mb_tell (mb) - start) - (mb_eof (mb) ? 0 : 1);
   if (len > 0) {
     word = g_malloc (len + 1);
     if (word) {
