@@ -51,16 +51,15 @@ gchar *
 ctpl_read_word (MB          *mb,
                 const gchar *accept)
 {
-  gint    c;
   gsize   start;
   gsize   len;
   gchar  *word = NULL;
   
   start = mb_tell (mb);
-  do {
-    c = mb_getc (mb);
-  } while (! mb_eof (mb) && strchr (accept, c));
-  len = (mb_tell (mb) - start) - (mb_eof (mb) ? 0 : 1);
+  while (! mb_eof (mb) && strchr (accept, mb_cur_char (mb))) {
+    mb_getc (mb);
+  }
+  len = (mb_tell (mb) - start);
   if (len > 0) {
     word = g_malloc (len + 1);
     if (word) {
@@ -89,14 +88,10 @@ ctpl_read_skip_chars (MB           *mb,
                       const gchar  *reject)
 {
   gsize n = 0;
-  gint  c;
   
-  do {
-    c = mb_getc (mb);
+  while (! mb_eof (mb) && strchr (reject, mb_cur_char (mb))) {
+    mb_getc (mb);
     n++;
-  } while (! mb_eof (mb) && strchr (reject, c));
-  if (! strchr (reject, c)) {
-    mb_seek (mb, -1, MB_SEEK_CUR);
   }
   
   return n;
