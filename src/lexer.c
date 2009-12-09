@@ -110,12 +110,6 @@ ctpl_lexer_error_quark (void)
   return error_quark;
 }
 
-/* reads a symbol (e.g. a variable/constant) */
-#define read_symbol(mb) (ctpl_read_word ((mb), CTPL_SYMBOL_CHARS))
-
-/* reads an expression (if condition for example) */
-#define read_expr(mb) (ctpl_read_word ((mb), CTPL_EXPR_CHARS))
-
 
 /* reads the data part of a if, aka the expression (e.g. " a > b" in "if a > b")
  * Return a new token or %NULL on error */
@@ -124,60 +118,53 @@ ctpl_lexer_read_token_tpl_if (MB          *mb,
                               LexerState  *state,
                               GError     **error)
 {
-  gchar      *expr;
-  CtplToken  *token = NULL;
+  CtplToken      *token = NULL;
+  CtplTokenExpr  *expr;
+  GError         *err = NULL;
   
   //~ g_debug ("if?");
   ctpl_read_skip_blank (mb);
-  expr = read_expr (mb);
-  if (! expr) {
-    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                 "Missing expression after 'if' token");
-  } else {
+  expr = ctpl_lexer_expr_lex_full (mb, FALSE, &err);
+  if (expr) {
     gint c;
     
-    ctpl_read_skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
       /* there is trash before the end, then fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unexpected character '%c' before end of 'if' statement",
                    c);
     } else {
-      CtplTokenExpr *texpr;
+      CtplToken  *if_token;
+      CtplToken  *else_token = NULL;
+      LexerState  substate = *state;
       
-      texpr = ctpl_lexer_expr_lex (expr, -1, error);
-      if (texpr) {
-        CtplToken  *if_token;
-        CtplToken  *else_token = NULL;
-        LexerState  substate = *state;
-        GError     *err = NULL;
-        
-        //~ g_debug ("if token: `if %s`", expr);
-        substate.block_depth ++;
-        substate.last_statement_type_if = S_IF;
-        if_token = ctpl_lexer_lex_internal (mb, &substate, &err);
-        if (! err) {
-          if (substate.last_statement_type_if == S_ELSE) {
-            //~ g_debug ("have else");
-            else_token = ctpl_lexer_lex_internal (mb, &substate, &err);
-          }
-          if (! err /* don't override errors */ &&
-              state->block_depth != substate.block_depth) {
-            /* if a block was not closed, fail */
-            g_set_error (&err, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                         "Unclosed 'if/else' block");
-          }
+      //~ g_debug ("if token: `if %s`", expr);
+      substate.block_depth ++;
+      substate.last_statement_type_if = S_IF;
+      if_token = ctpl_lexer_lex_internal (mb, &substate, &err);
+      if (! err) {
+        if (substate.last_statement_type_if == S_ELSE) {
+          //~ g_debug ("have else");
+          else_token = ctpl_lexer_lex_internal (mb, &substate, &err);
         }
-        if (err) {
-          g_propagate_error (error, err);
-          ctpl_token_expr_free (texpr, TRUE);
-        } else {
-          token = ctpl_token_new_if (texpr, if_token, else_token);
+        if (! err /* don't override errors */ &&
+            state->block_depth != substate.block_depth) {
+          /* if a block was not closed, fail */
+          g_set_error (&err, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                       "Unclosed 'if/else' block");
+        }
+        if (! err) {
+          token = ctpl_token_new_if (expr, if_token, else_token);
+          /* set expr to NULL not to free it since it is now used */
+          expr = NULL;
         }
       }
     }
   }
-  g_free (expr);
+  ctpl_token_expr_free (expr, TRUE);
+  if (err) {
+    g_propagate_error (error, err);
+  }
   
   return token;
 }
@@ -196,7 +183,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   
   //~ g_debug ("for?");
   ctpl_read_skip_blank (mb);
-  iter_name = read_symbol (mb);
+  iter_name = ctpl_read_symbol (mb);
   if (! iter_name) {
     /* missing iterator symbol, fail */
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -204,7 +191,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
   } else {
     //~ g_debug ("for: iter is '%s'", iter_name);
     ctpl_read_skip_blank (mb);
-    keyword_in = read_symbol (mb);
+    keyword_in = ctpl_read_symbol (mb);
     if (! keyword_in || strcmp (keyword_in, "in") != 0) {
       /* missing `in` keyword, fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -212,7 +199,7 @@ ctpl_lexer_read_token_tpl_for (MB          *mb,
                    "statement");
     } else {
       ctpl_read_skip_blank (mb);
-      array_name = read_symbol (mb);
+      array_name = ctpl_read_symbol (mb);
       if (! array_name) {
         /* missing array symbol, fail */
         g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
@@ -330,33 +317,24 @@ ctpl_lexer_read_token_tpl_expr (MB          *mb,
                                 LexerState  *state,
                                 GError     **error)
 {
-  CtplToken  *token = NULL;
-  gchar      *expr;
+  CtplToken      *token = NULL;
+  CtplTokenExpr  *expr;
   
   ctpl_read_skip_blank (mb);
-  expr = read_expr (mb);
-  if (! expr) {
-    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                 "No valid expression in statement");
-  } else {
+  expr = ctpl_lexer_expr_lex_full (mb, FALSE, error);
+  if (expr) {
     gint c;
     
-    ctpl_read_skip_blank (mb);
     if ((c = mb_getc (mb)) != CTPL_END_CHAR) {
       /* trash before the end, fail */
       g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
                    "Unexpected character '%c' before end of statement",
                    c);
+      ctpl_token_expr_free (expr, TRUE);
     } else {
-      CtplTokenExpr *texpr;
-      
-      texpr = ctpl_lexer_expr_lex (expr, -1, error);
-      if (texpr) {
-        token = ctpl_token_new_expr (texpr);
-      }
+      token = ctpl_token_new_expr (expr);
     }
   }
-  g_free (expr);
   
   return token;
 }
@@ -382,7 +360,7 @@ ctpl_lexer_read_token_tpl (MB          *mb,
     
     ctpl_read_skip_blank (mb);
     start_off = mb_tell (mb);
-    first_word = read_symbol (mb);
+    first_word = ctpl_read_symbol (mb);
     if (g_strcmp0 (first_word, "if") == 0) {
       /* an if condition:
        * if expr */

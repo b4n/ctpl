@@ -144,7 +144,7 @@ main (int    argc,
       root = ctpl_lexer_lex (mb, &err);
       if (! root) {
         fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
-        g_error_free (err);
+        g_clear_error (&err);
       } else {
         MB *output;
         CtplEnviron *env;
@@ -155,7 +155,7 @@ main (int    argc,
         output = mb_new (NULL, 0, MB_FREEABLE | MB_GROWABLE);
         if (! ctpl_parser_parse (root, env, output, &err)) {
           fprintf (stderr, "Parser failed: %s\n", err ? err->message : "???");
-          g_error_free (err);
+          g_clear_error (&err);
         } else {
           fputs ("===== output =====\n", stdout);
           dump_mb (output, stdout);
@@ -166,6 +166,21 @@ main (int    argc,
         ctpl_environ_free (env);
       }
       ctpl_lexer_free_tree (root);
+      
+      {
+        CtplTokenExpr *expr;
+        
+        mb_rewind (mb);
+        expr = ctpl_lexer_expr_lex_full (mb, TRUE, &err);
+        if (! expr) {
+          fprintf (stderr, "Wrong expression: %s\n", err ? err->message : "???");
+          g_clear_error (&err);
+        } else {
+          ctpl_token_expr_dump (expr);
+          ctpl_token_expr_free (expr, TRUE);
+        }
+      }
+      
       mb_free (mb);
     }
     g_free (buf);

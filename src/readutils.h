@@ -33,6 +33,15 @@ G_BEGIN_DECLS
  */
 #define CTPL_BLANK_CHARS  " \t\v\r\n"
 /**
+ * CTPL_SYMBOL_CHARS:
+ * 
+ * Characters that are valid for a symbol.
+ */
+#define CTPL_SYMBOL_CHARS "abcdefghijklmnopqrstuvwxyz" \
+                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
+                          "0123456789" \
+                          "_"
+/**
  * CTPL_ESCAPE_CHAR:
  * 
  * Character used to escape a special character.
@@ -64,6 +73,17 @@ gdouble   ctpl_read_double          (MB    *mb,
  * Returns: The number of skipped characters.
  */
 #define ctpl_read_skip_blank(mb) (ctpl_read_skip_chars ((mb), CTPL_BLANK_CHARS))
+/**
+ * ctpl_read_symbol:
+ * @mb: A #MB
+ * 
+ * Reads a symbol (a word composed of the characters from %CTPL_SYMBOL_CHARS).
+ * See ctpl_read_word()
+ * 
+ * Returns: A newly allocated string containing the read symbol, or %NULL if no
+ *          symbol was read.
+ */
+#define ctpl_read_symbol(mb) (ctpl_read_word ((mb), CTPL_SYMBOL_CHARS))
 
 
 G_END_DECLS

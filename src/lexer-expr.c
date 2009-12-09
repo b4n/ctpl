@@ -18,8 +18,7 @@
  */
 
 #include "lexer-expr.h"
-#include "readutils.h"  /* for CTPL_BLANK_CHARS */
-#include "lexer.h"
+#include "readutils.h"
 #include "token.h"
 #include "mathutils.h"
 #include <mb.h>
@@ -128,8 +127,48 @@ typedef struct _LexerExprState LexerExprState;
 
 struct _LexerExprState
 {
-  /* ... */
+  gboolean  lex_all;  /* character ending the stream to lex, or 0 for none */
+  gint      depth;    /* current parenthesis depth */
 };
+
+/* the maximum length of the expression to display in error messages */
+#define ERRMSG_EXPR_LEN           5
+/*
+ * @ERRMSG_EXPR_BUF_MAX_LEN:
+ * 
+ * The maximum size needed for the buffer given to errmsg_expr_display().
+ * ERRMSG_EXPR_LEN + 3 (...) + 1 (EOS)
+ */
+#define ERRMSG_EXPR_BUF_MAX_LEN   (ERRMSG_EXPR_LEN + 3 + 1)
+/*
+ * errmsg_expr_display:
+ * @buf: A character buffer where put the expression summary. This buffer should
+ *       be greater or equal to @ERRMSG_EXPR_BUF_MAX_LEN.
+ * @len: The size of @buf
+ * @mb: The #MB from where get the current expression
+ * 
+ * Puts the current expression of @mb in @buf. This is used to display the
+ * current expression, for example in error messages.
+ * 
+ * Typical use of this is as the following:
+ * |[
+ * gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
+ * 
+ * printf ("Current expression is '%s'\n",
+ *         errmsg_expr_display (buf, sizeof buf, mb));
+ * |]
+ * 
+ * Note that this might be implemented as a macro, then might computes its
+ * arguments more than once.
+ * 
+ * Returns: @buf
+ */
+#define errmsg_expr_display(buf, len, mb) \
+  (g_snprintf ((buf), (len), "%.*s%s", \
+               (int)MIN (mb_get_remaining_length (mb), ERRMSG_EXPR_LEN), \
+               mb_get_current_pointer (mb), \
+               (mb_get_remaining_length (mb) > ERRMSG_EXPR_LEN) ? "..." : ""), \
+   buf)
 
 
 /*<standard>*/
@@ -146,61 +185,51 @@ ctpl_lexer_expr_error_quark (void)
 }
 
 
-/* Checks whether @c is a valid character for a symbol */
-#define IS_SYMBOLCHAR(c) ((c) != 0 && strchr (CTPL_SYMBOL_CHARS, (c)))
-
-/* @data: String to convert to number token. String must be @length+1 long or
- *        more, but the number is read in the first @length bytes.
- * @length: the number of bytes to read in @data
+/* @mb: #MB holding the number.
+ * @state: Lexer state
+ * See ctpl_read_double()
  * Returns: A new #CtplTokenExpr or %NULL if the input doesn't contain any valid
  *          number.
  */
 static CtplTokenExpr *
-read_number (const gchar *data,
-             gsize        length,
-             gsize       *read_len)
+read_number (MB              *mb,
+             LexerExprState  *state)
 {
   CtplTokenExpr  *token = NULL;
-  gchar          *endptr = NULL;
   gdouble         value;
-  gchar          *tmpbuf;
+  gsize           n_read = 0;
   
-  tmpbuf = g_strndup (data, length);
-  value = g_ascii_strtod (tmpbuf, &endptr);
-  //~ g_debug ("ep: '%c'\n", *endptr);
-  if (tmpbuf != endptr && errno != ERANGE && ! IS_SYMBOLCHAR (*endptr)) {
+  value = ctpl_read_double (mb, &n_read);
+  //~ g_debug ("%*s: %zu\n", mb->length - mb->offset, &mb->buffer[mb->offset], n_read);
+  if (n_read > 0) {
     if (CTPL_MATH_FLOAT_EQ (value, (gdouble)(glong)value)) {
       token = ctpl_token_expr_new_integer ((glong)value);
     } else {
       token = ctpl_token_expr_new_float (value);
     }
   }
-  *read_len = (gsize)endptr - (gsize)tmpbuf;
-  //~ g_debug ("length of the value: %zd", *read_len);
-  g_free (tmpbuf);
   
   return token;
 }
 
-/* Reads a symbol from @data[0:@length]
- * Returns: A nex #CtplTokenExpr holding the symbol, or %NULL if no symbol was
+/* Reads a symbol from @mb
+ * See ctpl_read_symbol()
+ * Returns: A new #CtplTokenExpr holding the symbol, or %NULL if no symbol was
  *          read. */
 static CtplTokenExpr *
-read_symbol (const gchar *data,
-             gsize        length,
-             gsize       *read_len)
+read_symbol (MB              *mb,
+             LexerExprState  *state)
 {
-  CtplTokenExpr *symbol = NULL;
-  gsize i;
+  CtplTokenExpr *token = NULL;
+  gchar         *symbol;
   
-  for (i = 0; i < length && IS_SYMBOLCHAR (data[i]); i++);
-  *read_len = i;
-  if (i > 0) {
-    symbol = ctpl_token_expr_new_symbol (data, i);
+  symbol = ctpl_read_symbol (mb);
+  if (symbol) {
+    token = ctpl_token_expr_new_symbol (symbol, -1);
   }
-  //~ g_debug ("length of the symbol: %zd", *read_len);
+  g_free (symbol);
   
-  return symbol;
+  return token;
 }
 
 /* Gets whether op1 has priority over po2.
@@ -418,26 +447,24 @@ validate_token_list (GSList  *tokens,
 /* Reads an operand.
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
-lex_operand (const gchar *expr,
-             gsize        length,
-             gsize       *n_skiped,
-             GError     **error)
+lex_operand (MB              *mb,
+             LexerExprState  *state,
+             GError         **error)
 {
   CtplTokenExpr  *token;
-  gsize           off = 0;
   
-  //~ g_debug ("Lexing operand '%.*s'", (int)length, expr);
-  token = read_number (expr, length, &off);
+  /*g_debug ("Lexing operand '%.*s'", (int)mb_get_remaining_length (mb),
+                                    mb_get_current_pointer (mb));*/
+  token = read_number (mb, state);
   if (! token) {
-    token = read_symbol (expr, length, &off);
+    token = read_symbol (mb, state);
     if (! token) {
+      gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
+      
       g_set_error (error, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                   "No valid operand at strat of expression '%.*s'",
-                   (int)length, expr);
+                   "No valid operand at strat of expression '%s'",
+                   errmsg_expr_display (buf, sizeof buf, mb));
     }
-  }
-  if (token) {
-    *n_skiped = off;
   }
   
   return token;
@@ -446,112 +473,109 @@ lex_operand (const gchar *expr,
 /* Reads an operator.
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
-lex_operator (const gchar *expr,
-              gsize        length,
-              gsize       *n_skiped,
-              GError     **error)
+lex_operator (MB             *mb,
+              LexerExprState *state,
+              GError        **error)
 {
-  CtplTokenExpr  *token = NULL;
-  gsize           off   = 0;
-  CtplOperator    op    = CTPL_OPERATOR_NONE;
+  CtplTokenExpr  *token   = NULL;
+  gsize           off     = 0;
+  CtplOperator    op      = CTPL_OPERATOR_NONE;
+  const gchar    *expr    = mb_get_current_pointer (mb);
+  gsize           length  = mb_get_remaining_length (mb);
   
   //~ g_debug ("Lexing operator '%.*s'", (int)length, expr);
   op = ctpl_operator_from_string (expr, length, &off);
   if (op == CTPL_OPERATOR_NONE) {
+    gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
+    
     g_set_error (error, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERATOR,
-                 "No valid operator at start of expression '%.*s'",
-                 (int)length, expr);
+                 "No valid operator at start of expression '%s'",
+                 errmsg_expr_display (buf, sizeof buf, mb));
   } else {
-    *n_skiped = off;
+    mb_seek (mb, off, MB_SEEK_CUR);
     token = ctpl_token_expr_new_operator (op, NULL, NULL);
   }
   
   return token;
 }
 
-/* skips characters until the matching closing parenthesis.
- * It means that it attempts to skip characters until the ')' while taking into
- * account that if an opening parenthesis is found, it must be closed before
- * matching the currently opened one.
- * e.g., with "a(b)c)", this function will return a pointer to the last
- * parenthesis and not the first as a call to strchr() might do. */
-static const gchar *
-skip_to_closing_parenthesis (const gchar *str)
+/* Recursive part of the lexer (does all but doesn't validates some parts). */
+static CtplTokenExpr *
+ctpl_lexer_expr_lex_internal (MB               *mb,
+                              LexerExprState   *state,
+                              GError          **error)
 {
-  const gchar  *s = str;
-  gsize         n = 1;
-  
-  for (s = str; *s; s++) {
-    if      (*s == '(') n++;
-    else if (*s == ')') n--;
-    /* can't use the for condition as we don't want the final skip (s++) */
-    if (n <= 0) break;
-  }
-  
-  return (n == 0) ? s : NULL;
-}
-
-/**
- * ctpl_lexer_expr_lex:
- * @expr: An expression to lex
- * @len: The length to read from @expr, or -1 to read the whole string
- * @error: Return location for errors, or %NULL to ignore them.
- * 
- * Tries to lex @expr.
- * 
- * Returns: A new #CtplTokenExpr or %NULL on error.
- */
-CtplTokenExpr *
-ctpl_lexer_expr_lex (const gchar *expr,
-                     gssize       len,
-                     GError     **error)
-{
-  gsize           length;
-  gsize           i;
   CtplTokenExpr  *expr_tok = NULL;
   GSList         *tokens = NULL;
   GError         *err = NULL;
   gboolean        expect_operand = TRUE;
   
-  length = (len < 0) ? strlen (expr) : (gsize)len;
-  //~ g_debug ("Hey, I'm gonna lex expression '%.*s'!", length, expr);
-  for (i = 0; i < length && ! err; i++) {
-    gchar           c = expr[i];
-    gsize           n_skip = 0;
+  ctpl_read_skip_blank (mb);
+  while (! mb_eof (mb) && ! err) {
     CtplTokenExpr  *token = NULL;
+    gchar           c = mb_cur_char (mb);
     
-    if (expect_operand) {
-      /* try to read an operand */
-      if (c == '(') {
-        const gchar  *end;
-        const gchar  *start = &expr[i+1];
-        
-        end = skip_to_closing_parenthesis (start);
-        if (! end) {
+    if (c == ')') {
+      if (state->depth == 0) {
+        if (state->lex_all) {
+          /* if we validate all, throw an error */
           g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                       "Missing closing parenthesis");
+                       "Too much closing parenthesis");
+        }
+        /* else, just stop lexing */
+      } else {
+        state->depth --;
+        mb_getc (mb); /* skip parenthesis */
+      }
+      /* stop lexing */
+      break;
+    } else {
+      if (expect_operand) {
+        /* try to read an operand */
+        if (c == '(') {
+          LexerExprState substate;
+          
+          mb_getc (mb); /* skip parenthesis */
+          substate = *state;
+          substate.depth ++;
+          token = ctpl_lexer_expr_lex_internal (mb, &substate, &err);
+          if (token &&
+              substate.depth != state->depth) {
+            g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                         "Missing closing parenthesis");
+          }
         } else {
-          token = ctpl_lexer_expr_lex (start, end - start, &err);
-          n_skip = ((gsize)end - (gsize)start) + 2;
+          token = lex_operand (mb, state, &err);
         }
       } else {
-        token = lex_operand (&expr[i], length - i, &n_skip, &err);
+        /* try to read an operator */
+        token = lex_operator (mb, state, &err);
       }
-    } else {
-      /* try to read an operator */
-      token = lex_operator (&expr[i], length - i, &n_skip, &err);
     }
     if (token) {
-      i += (n_skip > 1) ? n_skip - 1 : 0;
       expect_operand = ! expect_operand;
       tokens = g_slist_append (tokens, token);
+    } else if (! state->lex_all) {
+      /* if we don't validate all, we don't want to throw an error when no token
+       * was read, just stop lexing. */
+      g_clear_error (&err);
+      break;
     }
     /* skip blank chars */
-    for (; i < length && strchr (CTPL_BLANK_CHARS, expr[i+1]); i++);
+    ctpl_read_skip_blank (mb);
   }
   if (! err) {
-    /* here check validity of token list, then create the final token. */
-    expr_tok = validate_token_list (tokens, &err);
+    if (! tokens) {
+      /* if no tokens were read, complain */
+      gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
+      
+      g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_FAILED,
+                   "No valid operand at start of expression '%s'",
+                   errmsg_expr_display (buf, sizeof buf, mb));
+    } else {
+      /* here check validity of token list, then create the final token. */
+      expr_tok = validate_token_list (tokens, &err);
+    }
   }
   if (err) {
     GSList *tmp;
@@ -564,4 +588,88 @@ ctpl_lexer_expr_lex (const gchar *expr,
   g_slist_free (tokens);
   
   return expr_tok;
+}
+
+
+/**
+ * ctpl_lexer_expr_lex:
+ * @mb: A #MB holding an expression
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Tries to lex the expression in @mb.
+ * If you want to lex a #MB that (may) hold other data after the expression,
+ * see ctpl_lexer_expr_lex_full().
+ * 
+ * Returns: A new #CtplTokenExpr or %NULL on error.
+ */
+CtplTokenExpr *
+ctpl_lexer_expr_lex (MB      *mb,
+                     GError **error)
+{
+  return ctpl_lexer_expr_lex_full (mb, TRUE, error);
+}
+
+/**
+ * ctpl_lexer_expr_lex_full:
+ * @mb: A #MB
+ * @lex_all: Whether to lex @mb until EOF or until the end of a valid
+ *           expression. This is useful for expressions inside other data.
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Tries to lex the expression in @mb.
+ * 
+ * Returns: A new #CtplTokenExpr or %NULL on error.
+ */
+CtplTokenExpr *
+ctpl_lexer_expr_lex_full (MB       *mb,
+                          gboolean  lex_all,
+                          GError  **error)
+{
+  LexerExprState  state = {0, TRUE};
+  CtplTokenExpr  *expr_tok;
+  GError         *err = NULL;
+  
+  state.lex_all = lex_all;
+  expr_tok = ctpl_lexer_expr_lex_internal (mb, &state, &err);
+  if (! err) {
+    /* don't report an error if one already set */
+    if (state.lex_all && ! mb_eof (mb)) {
+      /* if we lex all and we don't have reached EOF here, complain */
+      g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                   "Trash data at end of expression");
+    }
+  }
+  if (err) {
+    ctpl_token_expr_free (expr_tok, TRUE);
+    expr_tok = NULL;
+    g_propagate_error (error, err);
+  }
+  
+  return expr_tok;
+}
+
+/**
+ * ctpl_lexer_expr_lex_string:
+ * @expr: An expression
+ * @len: Length of @expr or -1 to read the whole string
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Tries to lex the expression in @expr.
+ * See ctpl_lexer_expr_lex().
+ * 
+ * Returns: A new #CtplTokenExpr or %NULL on error.
+ */
+CtplTokenExpr *
+ctpl_lexer_expr_lex_string (const gchar *expr,
+                            gssize       len,
+                            GError     **error)
+{
+  CtplTokenExpr  *token = NULL;
+  MB             *mb;
+  
+  mb = mb_new (expr, (len < 0) ? strlen (expr) : (gsize)len, MB_DONTCOPY);
+  token = ctpl_lexer_expr_lex (mb, error);
+  mb_free (mb);
+  
+  return token;
 }

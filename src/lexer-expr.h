@@ -78,7 +78,12 @@ typedef enum _CtplLexerExprError
 
 
 GQuark          ctpl_lexer_expr_error_quark (void) G_GNUC_CONST;
-CtplTokenExpr  *ctpl_lexer_expr_lex         (const gchar *expr,
+CtplTokenExpr  *ctpl_lexer_expr_lex         (MB      *mb,
+                                             GError **error);
+CtplTokenExpr  *ctpl_lexer_expr_lex_full    (MB       *mb,
+                                             gboolean  lex_all,
+                                             GError  **error);
+CtplTokenExpr  *ctpl_lexer_expr_lex_string  (const gchar *expr,
                                              gssize       len,
                                              GError     **error);
 const gchar    *ctpl_operator_to_string     (CtplOperator op);

@@ -3,7 +3,6 @@
 <FILE>lexer</FILE>
 CTPL_START_CHAR
 CTPL_END_CHAR
-CTPL_SYMBOL_CHARS
 CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex
@@ -24,6 +23,8 @@ CTPL_OPERATOR_CHARS
 CTPL_LEXER_EXPR_ERROR
 CtplLexerExprError
 ctpl_lexer_expr_lex
+ctpl_lexer_expr_lex_full
+ctpl_lexer_expr_lex_string
 ctpl_operator_to_string
 ctpl_operator_from_string
 <SUBSECTION Standard>
@@ -181,9 +182,11 @@ ctpl_math_int_to_string
 <TITLE>Read utilities</TITLE>
 <FILE>readutils</FILE>
 CTPL_BLANK_CHARS
+CTPL_SYMBOL_CHARS
 CTPL_ESCAPE_CHAR
 CTPL_STRING_DELIMITER_CHAR
 ctpl_read_word
+ctpl_read_symbol
 ctpl_read_skip_chars
 ctpl_read_skip_blank
 ctpl_read_string_literal

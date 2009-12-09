@@ -39,15 +39,6 @@ G_BEGIN_DECLS
  * Character delimiting end of language tokens from raw data.
  */
 #define CTPL_END_CHAR   '}'
-/**
- * CTPL_SYMBOL_CHARS:
- * 
- * Characters that are valid for a symbol.
- */
-#define CTPL_SYMBOL_CHARS "abcdefghijklmnopqrstuvwxyz" \
-                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-                          "0123456789" \
-                          "_"
 
 /**
  * CTPL_LEXER_ERROR:
