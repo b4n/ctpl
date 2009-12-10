@@ -415,88 +415,40 @@ ctpl_lexer_read_token_tpl (MB          *mb,
   return token;
 }
 
-
-/* skips data characters
- * Returns: %TRUE on success, %FALSE otherwise (syntax error) */
-static gboolean
-forward_to_non_data (MB *mb)
-{
-  gint      prev_c;
-  gint      c       = 0;
-  gboolean  rv      = TRUE;
-  gboolean  escaped = FALSE;
-  
-  do {
-    prev_c = c;
-    c = mb_getc (mb);
-    escaped = (prev_c == CTPL_ESCAPE_CHAR) ? !escaped : FALSE;
-  } while (! mb_eof (mb) &&
-           ((c != CTPL_START_CHAR && c != CTPL_END_CHAR) || escaped));
-  
-  if (! mb_eof (mb)) {
-    mb_seek (mb, -1, MB_SEEK_CUR);
-    /* if we reached an unescaped end character ('}'), fail */
-    rv = (c == CTPL_START_CHAR);
-  }
-  
-  return rv;
-}
-
-/* stores read data in @buf by removing unescaped CTPL_ESCAPE_CHAR.
- * Returns the length filled in @buf */
-static gsize
-do_read_data (MB     *mb,
-              gchar  *buf,
-              gsize   input_len)
-{
-  gchar     prev_c;
-  gchar     c       = 0;
-  gboolean  escaped = FALSE;
-  gsize     len     = 0;
-  
-  for (; input_len > 0; input_len --) {
-    prev_c = c;
-    c = mb_getc (mb);
-    escaped = (prev_c == CTPL_ESCAPE_CHAR) ? ! escaped : FALSE;
-    if (c != CTPL_ESCAPE_CHAR || escaped) {
-      buf[len ++] = c;
-    }
-  }
-  
-  return len;
-}
-
 /* reads a data token
- * Returns: A new token on success, %NULL otherwise (syntax error) */
+ * Returns: A new token on full success, %NULL otherwise (syntax error or empty
+ *          read) */
 static CtplToken *
 ctpl_lexer_read_token_data (MB           *mb,
                             LexerState   *state,
                             GError      **error)
 {
-  gsize       start;
-  CtplToken  *token = NULL;
+  CtplToken  *token   = NULL;
+  gint        prev_c;
+  gboolean    escaped = FALSE;
+  GString    *gstring;
   
-  start = mb_tell (mb);
-  if (! forward_to_non_data (mb)) {
-    /* found an unescaped }, fail */
-    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                 "Unexpected character '%c' inside data block",
-                 CTPL_END_CHAR);
-  } else {
-    gsize   len;
-    gchar  *buf;
-    
-    /* TODO: speed up read of data. For example, we don't have to re-read all
-     * character by character to remove escape character if there's no one */
-    len = mb_tell (mb) - start;
-    buf = g_malloc (len);
-    if (buf) {
-      mb_seek (mb, start, MB_SEEK_SET);
-      len = do_read_data (mb, buf, len);
-      token = ctpl_token_new_data (buf, len);
+  gstring = g_string_new ("");
+  while (! mb_eof (mb) &&
+         ((mb_cur_char (mb) != CTPL_START_CHAR &&
+           mb_cur_char (mb) != CTPL_END_CHAR) || escaped)) {
+    if (mb_cur_char (mb) != CTPL_ESCAPE_CHAR || escaped) {
+      g_string_append_c (gstring, mb_cur_char (mb));
     }
-    g_free (buf);
+    prev_c = mb_getc (mb);
+    escaped = (prev_c == CTPL_ESCAPE_CHAR) ? ! escaped : FALSE;
   }
+  if (! (mb_eof (mb) || mb_cur_char (mb) == CTPL_START_CHAR)) {
+    /* we reached an unescaped character that needed escaping and that was not
+     * CTPL_START_CHAR: fail */
+    g_set_error (error, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                 "Unexpected character '%c' inside data block",
+                 mb_cur_char (mb));
+  } else if (gstring->len > 0) {
+    /* only create non-empty tokens */
+    token = ctpl_token_new_data (gstring->str, gstring->len);
+  }
+  g_string_free (gstring, TRUE);
   
   return token;
 }
@@ -518,12 +470,6 @@ ctpl_lexer_read_token (MB          *mb,
     case CTPL_START_CHAR:
       //~ g_debug ("start of a template recognised syntax");
       token = ctpl_lexer_read_token_tpl (mb, state, error);
-      break;
-    
-    case CTPL_END_CHAR:
-      g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                   "Unexpected character '%c' at statement start",
-                   CTPL_END_CHAR);
       break;
     
     default:
