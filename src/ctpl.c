@@ -42,7 +42,7 @@ static gboolean     OPT_print_version = FALSE;
 
 static GOptionEntry option_entries[] = {
   { "output", 'o', 0, G_OPTION_ARG_FILENAME, &OPT_output_file,
-    "Write ourput to FILE. If not provided, defaults to stdout.", "FILE" },
+    "Write output to FILE. If not provided, defaults to stdout.", "FILE" },
   { "env-file", 'e', 0, G_OPTION_ARG_FILENAME_ARRAY, &OPT_env_files,
     "Add environment from ENVFILE. This option may appear more than once.",
     "ENVFILE" },
