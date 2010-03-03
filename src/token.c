@@ -341,7 +341,10 @@ void
 ctpl_token_free (CtplToken *token,
                  gboolean   chain)
 {
-  if (token) {
+  while (token) {
+    CtplToken *next;
+    CtplToken *prev;
+    
     switch (token->type) {
       case CTPL_TOKEN_TYPE_DATA:
         g_free (token->token.t_data);
@@ -365,17 +368,18 @@ ctpl_token_free (CtplToken *token,
         ctpl_token_free (token->token.t_if.else_children, TRUE);
         break;
     }
+    next = token->next;
+    prev = token->prev;
+    g_slice_free1 (sizeof *token, token);
+    token = NULL;
     if (chain) {
       /* free next token */
-      ctpl_token_free (token->next, chain);
+      token = next;
     } else {
       /* detach current token */
-      if (token->prev)
-        token->prev->next = token->next;
-      if (token->next)
-        token->next->prev = token->prev;
+      if (prev) prev->next = next;
+      if (next) next->prev = prev;
     }
-    g_slice_free1 (sizeof *token, token);
   }
 }
 
