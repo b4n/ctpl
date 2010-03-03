@@ -186,6 +186,8 @@ struct _CtplToken
   } token;
   CtplToken    *prev;
   CtplToken    *next;
+  CtplToken    *first;
+  CtplToken    *last;
 };
 
 

@@ -59,6 +59,8 @@ token_new (void)
   if (token) {
     token->prev = NULL;
     token->next = NULL;
+    token->first = NULL;
+    token->last = NULL;
   }
   
   return token;
@@ -394,11 +396,21 @@ void
 ctpl_token_append (CtplToken *token,
                    CtplToken *brother)
 {
+  if (token->last) {
+    token = token->last;
+  }
   while (token->next) {
     token = token->next;
   }
   token->next = brother;
   brother->prev = token;
+  token->last = brother->last ? brother->last : brother;
+  if (! token->first) {
+    brother->first = token;
+  } else {
+    token->first->last = token->last;
+    brother->first = token->first;
+  }
 }
 
 /**
@@ -412,11 +424,21 @@ void
 ctpl_token_prepend (CtplToken *token,
                     CtplToken *brother)
 {
+  if (token->first) {
+    token = token->first;
+  }
   while (token->prev) {
     token = token->prev;
   }
   token->prev = brother;
   brother->next = token;
+  token->first = brother->first ? brother->first : brother;
+  if (! token->last) {
+    brother->last = token;
+  } else {
+    token->last->first = token->first;
+    brother->last = token->last;
+  }
 }
 
 /* prints indentation for @depth */
