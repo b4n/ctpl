@@ -17,8 +17,9 @@ AC_SUBST(pkgconfigdir)
 AC_SUBST(ctplincludedir)
 
 # Checks for programs.
+LT_PREREQ([2.2.0])
+LT_INIT
 AC_PROG_CC
-AC_PROG_LIBTOOL
 
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
@@ -35,7 +36,8 @@ LIBS="$LIBS $LIBMB_LIBS $GLIB_LIBS"
 
 # paranoiac compilation
 AC_ARG_ENABLE([paranoia],
-              AC_HELP_STRING([--enable-paranoia], [enable paranioac compiler options [[default=no]]]),
+              AS_HELP_STRING([--enable-paranoia],
+                             [enable paranioac compiler options [[default=no]]]),
               [enable_paranoia="$enableval"],
               [enable_paranoia="no"])
 AC_MSG_CHECKING([[whether to enable paranoiac compiler options]])
