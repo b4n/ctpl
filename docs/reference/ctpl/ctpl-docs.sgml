@@ -181,16 +181,16 @@ procede_template (MB           *input,
         CTPL supports 2 kind of data:
         <variablelist>
           <varlistentry>
-            <term>Raw data</term>
+            <term><link linkend="raw-data">Raw data</link></term>
             <listitem>
               <para>
                 The actual content of your template, or at least most of it:
-                unparsed data that will remain unchanged.
+                unparsed data that will remain (almost) unchanged.
               </para>
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term>Template blocks</term>
+            <term><link linkend="template-blocks">Template blocks</link></term>
             <listitem>
               <para>
                 The instructions that makes the template engine useful.
@@ -199,17 +199,27 @@ procede_template (MB           *input,
           </varlistentry>
         </variablelist>
       </para>
-      <section>
+      <section id="raw-data">
         <title>Raw data</title>
         <para>
           There is no syntax for the raw data: everything that is not a
           template block is raw data. The only exception to this rule is that
           the template-blocks-delimiters <code>{</code> and <code>}</code>
-          must be escaped using a backslash (<code>\</code>). For example, to
-          produce a opening bracket, you need to write <code>\{</code>.
+          must be escaped using a backslash (<code>\</code>), as well as
+          backslashes themselves. For example, to produce an opening bracket,
+          you need to write <code>\{</code>, and to produce a backslash you need
+          to write it twice: <code>\\</code> (the first one escapes the second).
         </para>
+        <note>
+          <para>
+            Even if escaping a character that doesn't need to be escaped works
+            perfectly (thought the escaping backslash doesn't appear), it is
+            recommended not to do so in order to allow future addition of new
+            escaping sequences without changes on your template's output.
+          </para>
+        </note>
       </section>
-      <section>
+      <section id="template-blocks">
         <title>Template blocks</title>
         <para>
           Template blocks are delimited with brackets: they are opened with an
