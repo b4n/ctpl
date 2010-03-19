@@ -26,6 +26,7 @@
 #include "lexer.h"
 #include "mathutils.h"
 #include "parser.h"
+#include "readutils.h"
 #include "stack.h"
 #include "token.h"
 #include "value.h"
