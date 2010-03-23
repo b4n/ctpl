@@ -293,6 +293,110 @@ ctpl_environ_pop (CtplEnviron *env,
   return value;
 }
 
+/* data for ctpl_environ_foreach() */
+struct _CtplEnvironForeachData
+{
+  CtplEnviron            *env;
+  CtplEnvironForeachFunc  func;
+  gpointer                user_data;
+  gboolean                run;
+};
+
+/* callback for ctpl_environ_foreach() */
+static void
+ctpl_environ_foreach_hfunc (gpointer  symbol,
+                            gpointer  stack,
+                            gpointer  user_data)
+{
+  struct _CtplEnvironForeachData *data = user_data;
+  
+  if (data->run) {
+    CtplValue *value;
+    
+    value = ctpl_stack_peek (stack);
+    if (value) {
+      data->run = data->func (data->env, symbol, value, data->user_data);
+    }
+  }
+}
+
+/**
+ * ctpl_environ_foreach:
+ * @env: A #CtplEnviron
+ * @func: A #CtplEnvironForeachFunc
+ * @user_data: user data to pass to @func
+ * 
+ * Calls @func on each symbol on the environment.
+ */
+void
+ctpl_environ_foreach (CtplEnviron            *env,
+                      CtplEnvironForeachFunc  func,
+                      gpointer                user_data)
+{
+  struct _CtplEnvironForeachData data;
+  
+  data.env = env;
+  data.func = func;
+  data.user_data = user_data;
+  data.run = TRUE;
+  g_hash_table_foreach (env->symbol_table, ctpl_environ_foreach_hfunc, &data);
+}
+
+/* data for ctpl_environ_merge() */
+struct _CtplEnvironMergeData
+{
+  CtplEnviron  *env;
+  gboolean      merge_symbols;
+};
+
+/* callback for ctpl_environ_merge() */
+static void
+ctpl_environ_merge_hfunc (gpointer  symbol,
+                          gpointer  stack,
+                          gpointer  user_data)
+{
+  struct _CtplEnvironMergeData *data = user_data;
+  CtplStack                    *local_stack;
+  
+  local_stack = ctpl_environ_lookup_stack (data->env, symbol);
+  if (! local_stack || data->merge_symbols) {
+    CtplValue *value;
+    
+    /* FIXME: merge the whole stack and not its top value */
+    value = ctpl_stack_peek (stack);
+    if (value) {
+      ctpl_environ_push (data->env, symbol, value);
+    }
+  }
+}
+
+/**
+ * ctpl_environ_merge:
+ * @env: A #CtplEnviron
+ * @source: Source environ to merge with @env
+ * @merge_symbols: Whether to merge symbols that exists in both environs
+ * 
+ * Merges an environment into another. If a symbol of the source environ already
+ * exists in the destination one, its value is either pushed if @merge_symbols
+ * is true or ignored if %FALSE.
+ * 
+ * <warning>
+ *   Currently, symbol merging only pushes the topmost value for the source
+ *   environ rather than pushing it entirely.
+ * </warning>
+ */
+void
+ctpl_environ_merge (CtplEnviron        *env,
+                    const CtplEnviron  *source,
+                    gboolean            merge_symbols)
+{
+  struct _CtplEnvironMergeData data;
+  
+  data.env = env;
+  data.merge_symbols = merge_symbols;
+  g_hash_table_foreach (source->symbol_table, ctpl_environ_merge_hfunc, &data);
+}
+
 
 /*============================ environment loader ============================*/
 

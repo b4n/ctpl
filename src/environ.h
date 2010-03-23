@@ -55,6 +55,21 @@ typedef enum _CtplEnvironError
 } CtplEnvironError;
 
 typedef struct _CtplEnviron CtplEnviron;
+/**
+ * CtplEnvironForeachFunc:
+ * @environ: The #CtplEnviron on which the function was called
+ * @cymbol: The current symbol
+ * @value: The symbol's value
+ * @user_data: User data passed to ctpl_environ_foreach()
+ * 
+ * User function for ctpl_environ_foreach().
+ * 
+ * Returns: %TRUE to continue enumerating environ, %FALSE to stop.
+ */
+typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
+                                             const gchar     *symbol,
+                                             const CtplValue *value,
+                                             gpointer         user_data);
 
 /**
  * CtplEnviron:
@@ -88,6 +103,12 @@ void              ctpl_environ_push_string    (CtplEnviron     *env,
                                                const gchar     *value);
 const CtplValue  *ctpl_environ_pop            (CtplEnviron *env,
                                                const gchar *symbol);
+void              ctpl_environ_foreach        (CtplEnviron           *env,
+                                               CtplEnvironForeachFunc func,
+                                               gpointer               user_data);
+void              ctpl_environ_merge          (CtplEnviron        *env,
+                                               const CtplEnviron  *source,
+                                               gboolean            merge_symbols);
 gboolean          ctpl_environ_add_from_mb    (CtplEnviron *env,
                                                MB          *mb,
                                                GError     **error);

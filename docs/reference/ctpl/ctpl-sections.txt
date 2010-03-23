@@ -85,6 +85,7 @@ ctpl_eval_error_quark
 CTPL_ENVIRON_ERROR
 CtplEnvironError
 CtplEnviron
+CtplEnvironForeachFunc
 ctpl_environ_new
 ctpl_environ_free
 ctpl_environ_lookup
@@ -93,6 +94,8 @@ ctpl_environ_push_int
 ctpl_environ_push_float
 ctpl_environ_push_string
 ctpl_environ_pop
+ctpl_environ_foreach
+ctpl_environ_merge
 ctpl_environ_add_from_file
 ctpl_environ_add_from_mb
 ctpl_environ_add_from_string
