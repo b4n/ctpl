@@ -17,20 +17,34 @@
  * 
  */
 
-#ifndef H_CTPL_H
-#define H_CTPL_H
+#ifndef H_CTPL_IO_H
+#define H_CTPL_IO_H
 
-#include "environ.h"
-#include "eval.h"
-#include "lexer-expr.h"
-#include "lexer.h"
-#include "mathutils.h"
-#include "parser.h"
-#include "io.h"
+#include <glib.h>
+#include <gio/gio.h>
+/* allow include of this file to get the full I/O layer */
 #include "input-stream.h"
 #include "output-stream.h"
-#include "stack.h"
-#include "token.h"
-#include "value.h"
+
+G_BEGIN_DECLS
+
+
+enum _CtplIOError
+{
+  CTPL_IO_ERROR_EOF,
+  CTPL_IO_ERROR_INVALID_NUMBER,
+  CTPL_IO_ERROR_INVALID_STRING,
+  CTPL_IO_ERROR_RANGE,
+  CTPL_IO_ERROR_NOMEM,
+  CTPL_IO_ERROR_FAILED
+};
+
+#define CTPL_IO_ERROR   (ctpl_io_error_quark ())
+
+
+GQuark            ctpl_io_error_quark                   (void) G_GNUC_CONST;
+
+
+G_END_DECLS
 
 #endif /* guard */

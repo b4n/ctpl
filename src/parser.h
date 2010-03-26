@@ -22,7 +22,7 @@
 
 #include "token.h"
 #include "environ.h"
-#include <mb.h>
+#include "output-stream.h"
 #include <glib.h>
 
 G_BEGIN_DECLS
@@ -55,10 +55,10 @@ typedef enum _CtplParserError
 
 
 GQuark    ctpl_parser_error_quark   (void) G_GNUC_CONST;
-gboolean  ctpl_parser_parse         (const CtplToken *tree,
-                                     CtplEnviron     *env,
-                                     MB              *output,
-                                     GError         **error);
+gboolean  ctpl_parser_parse         (const CtplToken   *tree,
+                                     CtplEnviron       *env,
+                                     CtplOutputStream  *output,
+                                     GError           **error);
 
 
 G_END_DECLS

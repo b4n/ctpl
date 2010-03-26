@@ -18,10 +18,10 @@
  */
 
 #include "ctpl.h"
-#include <mb.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 
 static void
@@ -100,90 +100,110 @@ build_env (void)
 }
 
 static void
-dump_mb (MB    *mb,
-         FILE  *fp)
+dump_g_memory_output_stream (GMemoryOutputStream *stream,
+                             FILE  *fp)
 {
-  mb_seek (mb, 0, MB_SEEK_SET);
-  while (! mb_eof (mb)) {
-    fputc (mb_getc (mb), fp);
+  gchar  *buf;
+  gsize   buf_size;
+  gsize   i;
+  
+  buf = g_memory_output_stream_get_data (stream);
+  buf_size = g_memory_output_stream_get_data_size (stream);
+  if (fwrite (buf, 1, buf_size, fp) < buf_size) {
+    fprintf (stderr, "Failed to dump some data: %s\n", g_strerror (errno));
+  } else {
+    fputc ('\n', fp);
   }
-  fputc ('\n', fp);
+}
+
+static gboolean
+rewind_ctpl_input_stream (CtplInputStream **stream)
+{
+  gboolean success = FALSE;
+  GError  *err = NULL;
+  
+  if (G_IS_SEEKABLE ((*stream)->stream) && 
+      g_seekable_seek (G_SEEKABLE ((*stream)->stream), 0, G_SEEK_SET,
+                       NULL, &err)) {
+    CtplInputStream *new;
+    
+    new = ctpl_input_stream_new ((*stream)->stream, (*stream)->name);
+    ctpl_input_stream_unref (*stream);
+    *stream = new;
+    success = TRUE;
+  }
+  if (err) {
+    fprintf (stderr, "Cannot rewind stream: %s\n", err->message);
+  }
+  
+  return success;
 }
 
 int
 main (int    argc,
       char **argv)
 {
-  int rv = 1;
-  MB *mb;
+  int               rv = 1;
+  CtplInputStream  *stream;
+  
+  g_type_init ();
   
   # if 1
-  if (argc >= 2)
-  {
-    gchar *buf = NULL;
-    gsize  len = 0;
+  if (argc >= 2) {
+    CtplToken  *root;
+    GError     *err = NULL;
+    GFile      *file;
     
-    if (g_file_test (argv[1], G_FILE_TEST_EXISTS)) {
-      GError *err = NULL;
-      
-      if (! g_file_get_contents (argv[1], &buf, &len, &err)) {
-        g_error ("Failed to open file '%s': %s", argv[1], err->message);
-        g_error_free (err);
-      }
-    } else {
-      buf = g_strdup (argv[1]);
-      len = strlen (buf);
+    file = g_file_new_for_commandline_arg (argv[1]);
+    stream = ctpl_input_stream_new_for_gfile (file, NULL);
+    g_object_unref (file);
+    if (! stream) {
+      stream = ctpl_input_stream_new_for_memory (argv[1], -1, NULL, "first arg");
     }
     
-    mb = mb_new (buf, len, MB_DONTCOPY);
-    if (mb)
-    {
-      CtplToken *root;
-      GError *err = NULL;
+    root = ctpl_lexer_lex (stream, &err);
+    if (! root) {
+      fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
+      g_clear_error (&err);
+    } else {
+      CtplOutputStream *output;
+      GOutputStream    *gostream;
+      CtplEnviron      *env;
       
-      root = ctpl_lexer_lex (mb, &err);
-      if (! root) {
-        fprintf (stderr, "Wrong data: %s\n", err ? err->message : "???");
+      ctpl_lexer_dump_tree (root);
+      
+      env = build_env ();
+      gostream = g_memory_output_stream_new (NULL, 0, realloc, free);
+      output = ctpl_output_stream_new (gostream);
+      if (! ctpl_parser_parse (root, env, output, &err)) {
+        fprintf (stderr, "Parser failed: %s\n", err ? err->message : "???");
         g_clear_error (&err);
       } else {
-        MB *output;
-        CtplEnviron *env;
-        
-        ctpl_lexer_dump_tree (root);
-        
-        env = build_env ();
-        output = mb_new (NULL, 0, MB_FREEABLE | MB_GROWABLE);
-        if (! ctpl_parser_parse (root, env, output, &err)) {
-          fprintf (stderr, "Parser failed: %s\n", err ? err->message : "???");
-          g_clear_error (&err);
-        } else {
-          fputs ("===== output =====\n", stdout);
-          dump_mb (output, stdout);
-          fputs ("=== end output ===\n", stdout);
-          rv = 0;
-        }
-        mb_free (output);
-        ctpl_environ_free (env);
+        fputs ("===== output =====\n", stdout);
+        dump_g_memory_output_stream (G_MEMORY_OUTPUT_STREAM (gostream), stdout);
+        fputs ("=== end output ===\n", stdout);
+        rv = 0;
       }
-      ctpl_lexer_free_tree (root);
-      
-      {
-        CtplTokenExpr *expr;
-        
-        mb_rewind (mb);
-        expr = ctpl_lexer_expr_lex_full (mb, TRUE, &err);
-        if (! expr) {
-          fprintf (stderr, "Wrong expression: %s\n", err ? err->message : "???");
-          g_clear_error (&err);
-        } else {
-          ctpl_token_expr_dump (expr);
-          ctpl_token_expr_free (expr, TRUE);
-        }
-      }
-      
-      mb_free (mb);
+      g_object_unref (gostream);
+      ctpl_output_stream_unref (output);
+      ctpl_environ_free (env);
     }
-    g_free (buf);
+    ctpl_lexer_free_tree (root);
+    
+    if (rewind_ctpl_input_stream (&stream)) {
+      CtplTokenExpr *expr;
+      
+      expr = ctpl_lexer_expr_lex_full (stream, TRUE, &err);
+      if (! expr) {
+        fprintf (stderr, "Wrong expression: %s\n", err ? err->message : "???");
+        g_clear_error (&err);
+      } else {
+        ctpl_token_expr_dump (expr);
+        ctpl_token_expr_free (expr, TRUE);
+      }
+    }
+    
+    ctpl_input_stream_unref (stream);
   }
   #else
   if (argc < 2)

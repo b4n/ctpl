@@ -46,9 +46,9 @@
  *   </programlisting>
  * </example>
  * 
- * Environments can be loaded from #MB, strings or files using
- * ctpl_environ_add_from_mb(), ctpl_environ_add_from_string() or
- * ctpl_environ_add_from_file(). Environment descriptions are of the form
+ * Environments can be loaded from #CtplInputStream, strings or files using
+ * ctpl_environ_add_from_stream(), ctpl_environ_add_from_string() or
+ * ctpl_environ_add_from_path(). Environment descriptions are of the form
  * <code>SYMBOL = VALUE;</code>. Some examples below:
  * <example>
  *   <title>An environment description</title>
@@ -401,8 +401,7 @@ ctpl_environ_merge (CtplEnviron        *env,
 /*============================ environment loader ============================*/
 
 #include <string.h>
-#include <mb.h>
-#include "readutils.h"
+#include "input-stream.h"
 #include "mathutils.h"
 #include "lexer.h"      /* for CTPL_SYMBOL_CHARS */
 
@@ -415,23 +414,24 @@ ctpl_environ_merge (CtplEnviron        *env,
 #define VALUE_END_CHAR        ';'
 
 
-static gboolean   read_value              (MB         *mb,
-                                           CtplValue  *value,
-                                           GError    **error);
+static gboolean   read_value              (CtplInputStream *stream,
+                                           CtplValue       *value,
+                                           GError         **error);
 
 
 /* reads a symbol (e.g. a variable/constant) */
-#define read_symbol(mb) (ctpl_read_word ((mb), CTPL_SYMBOL_CHARS))
+#define read_symbol(stream, error) (ctpl_input_stream_read_symbol ((stream), (error)))
 
 /* tries to read a string literal */
 static gboolean
-read_string (MB        *mb,
-             CtplValue *value)
+read_string (CtplInputStream *stream,
+             CtplValue       *value,
+             GError         **error)
 {
   gchar    *str;
   gboolean  rv = FALSE;
   
-  str = ctpl_read_string_literal (mb);
+  str = ctpl_input_stream_read_string_literal (stream, error);
   if (str) {
     ctpl_value_set_string (value, str);
     rv = TRUE;
@@ -443,15 +443,18 @@ read_string (MB        *mb,
 
 /* tries to read a number to a CtplValue */
 static gboolean
-read_number (MB        *mb,
-             CtplValue *value)
+read_number (CtplInputStream *stream,
+             CtplValue       *value,
+             GError         **error)
 {
   gboolean  rv = FALSE;
   gdouble   val;
-  gsize     n_read = 0;
+  GError   *err = NULL;
   
-  val = ctpl_read_double (mb, &n_read);
-  if (n_read > 0) {
+  val = ctpl_input_stream_read_double (stream, &err);
+  if (err) {
+    g_propagate_error (error, err);
+  } else {
     if (CTPL_MATH_FLOAT_EQ (val, (gdouble)(glong)val)) {
       ctpl_value_set_int (value, (glong)val);
     } else {
@@ -467,126 +470,153 @@ read_number (MB        *mb,
  * tries to read an array.
  * 
  * Returns: %TRUE on full success, %FALSE otherwise.
- * 
- * WARNING: error is NOT set if the read data did not contain an array at all.
  */
 static gboolean
-read_array (MB        *mb,
-            CtplValue *value,
-            GError   **error)
+read_array (CtplInputStream *stream,
+            CtplValue       *value,
+            GError         **error)
 {
-  gsize     start;
-  gboolean  rv = FALSE;
+  GError *err = NULL;
+  gchar   c;
   
-  start = mb_tell (mb);
-  if (mb_getc (mb) == ARRAY_START_CHAR) {
+  c = ctpl_input_stream_get_c (stream, &err);
+  if (err) {
+    /* I/O error */
+  } else if (c != ARRAY_START_CHAR) {
+    ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
+                                 CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
+                                 "Not an array");
+  } else {
     CtplValue item;
     gboolean  in_array = TRUE;
     
     ctpl_value_set_array (value, CTPL_VTYPE_INT, 0, NULL);
     ctpl_value_init (&item);
-    rv = TRUE;
-    while (rv && in_array && ! mb_eof (mb)) {
-      rv = read_value (mb, &item, error);
-      if (rv) {
-        int c;
-        
+    while (! err && in_array) {
+      if (read_value (stream, &item, &err)) {
         ctpl_value_array_append (value, &item);
-        ctpl_read_skip_blank (mb);
-        c = mb_getc (mb);
-        if (c == ARRAY_END_CHAR) {
-          in_array = FALSE;
-        } else if (c == ARRAY_SEPARATOR_CHAR) {
-          ctpl_read_skip_blank (mb);
-        } else {
-          g_set_error (error, CTPL_ENVIRON_ERROR, CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
-                       "Missing `%c` separator between array values",
-                       ARRAY_SEPARATOR_CHAR);
-          rv = FALSE;
+        if (ctpl_input_stream_skip_blank (stream, &err) >= 0) {
+          c = ctpl_input_stream_get_c (stream, &err);
+          if (err) {
+            /* I/O error */
+          } else if (c == ARRAY_END_CHAR) {
+            in_array = FALSE;
+          } else if (c == ARRAY_SEPARATOR_CHAR) {
+            ctpl_input_stream_skip_blank (stream, &err);
+          } else {
+            ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
+                                         CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
+                                         "Missing `%c` separator between array "
+                                         "values", ARRAY_SEPARATOR_CHAR);
+          }
         }
       }
     }
     ctpl_value_free_value (&item);
-  } /*else {
-    g_set_error (error, CTPL_ENVIRON_ERROR, CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
-                 "Not an array");
-  }*/
-  if (! rv) {
-    mb_seek (mb, start, MB_SEEK_SET);
+  }
+  if (err) {
+    g_propagate_error (error, err);
   }
   
-  return rv;
+  return ! err;
 }
 
 /* tries to read a symbol's value */
 static gboolean
-read_value (MB         *mb,
-            CtplValue  *value,
-            GError    **error)
+read_value (CtplInputStream *stream,
+            CtplValue       *value,
+            GError         **error)
 {
-  gboolean  rv = TRUE;
+  GError *err = NULL;
+  gchar   c;
   
-  if (! read_string (mb, value)) {
-    if (! read_number (mb, value)) {
-      GError *err = NULL;
-      
-      rv = read_array (mb, value, &err);
-      if (! rv) {
-        if (err) {
-          g_propagate_error (error, err);
-        } else {
-          g_set_error (error, CTPL_ENVIRON_ERROR, CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
-                       "No valid value can be read");
-        }
-      }
-    }
+  c = ctpl_input_stream_peek_c (stream, &err);
+  if (err) {
+    /* I/O error */
+  } else if (c == CTPL_STRING_DELIMITER_CHAR) {
+    read_string (stream, value, &err);
+  } else if (c == ARRAY_START_CHAR) {
+    read_array (stream, value, &err);
+  } else if (c == '.' ||
+             (c >= '0' && c <= '9') ||
+             c == '+' || c == '-') {
+    read_number (stream, value, &err);
+  } else {
+    ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
+                                 CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
+                                 "No valid value can be read");
+  }
+  if (err) {
+    g_propagate_error (error, err);
   }
   
-  return rv;
+  return ! err;
 }
 
 /* tries to load the next symbol from the environment description */
 static gboolean
-load_next (CtplEnviron *env,
-           MB          *mb,
-           GError     **error)
+load_next (CtplEnviron     *env,
+           CtplInputStream *stream,
+           GError         **error)
 {
-  gchar    *symbol;
   gboolean  rv = FALSE;
   
-  ctpl_read_skip_blank (mb);
-  symbol = read_symbol (mb);
-  if (! symbol) {
-    g_set_error (error, CTPL_ENVIRON_ERROR, CTPL_ENVIRON_ERROR_LOADER_MISSING_SYMBOL,
-                 "Missing symbol");
-  } else {
-    ctpl_read_skip_blank (mb);
-    if (mb_getc (mb) != VALUE_SEPARATOR_CHAR) {
-      g_set_error (error, CTPL_ENVIRON_ERROR, CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
-                   "Missing `%c` separator between symbol and value",
-                   VALUE_SEPARATOR_CHAR);
+  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+    gchar *symbol;
+    
+    symbol = read_symbol (stream, error);
+    if (! symbol) {
+      /* I/O error */
+    } else if (! *symbol) {
+      ctpl_input_stream_set_error (stream, error, CTPL_ENVIRON_ERROR,
+                                   CTPL_ENVIRON_ERROR_LOADER_MISSING_SYMBOL,
+                                   "Missing symbol");
     } else {
-      CtplValue value;
-      
-      ctpl_value_init (&value);
-      ctpl_read_skip_blank (mb);
-      if (read_value (mb, &value, error)) {
-        ctpl_read_skip_blank (mb);
-        if (mb_getc (mb) != VALUE_END_CHAR) {
-          g_set_error (error, CTPL_ENVIRON_ERROR, CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
-                       "Missing `%c` separator after end of symbol's value",
-                       VALUE_END_CHAR);
+      if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+        GError *err = NULL;
+        gchar   c;
+        
+        c = ctpl_input_stream_get_c (stream, &err);
+        if (err) {
+          /* I/O error */
+          g_propagate_error (error, err);
+        } else if (c != VALUE_SEPARATOR_CHAR) {
+          ctpl_input_stream_set_error (stream, error, CTPL_ENVIRON_ERROR,
+                                       CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
+                                       "Missing `%c` separator between symbol "
+                                       "and value", VALUE_SEPARATOR_CHAR);
         } else {
-          ctpl_environ_push (env, symbol, &value);
-          /* skip blanks again to try to reach end before next call */
-          ctpl_read_skip_blank (mb);
-          rv = TRUE;
+          if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+            CtplValue value;
+            
+            ctpl_value_init (&value);
+            if (read_value (stream, &value, error) &&
+                ctpl_input_stream_skip_blank (stream, error) >= 0) {
+              c = ctpl_input_stream_get_c (stream, &err);
+              if (err) {
+                /* I/O error */
+                g_propagate_error (error, err);
+              } else if (c != VALUE_END_CHAR) {
+                ctpl_input_stream_set_error (stream, error, CTPL_ENVIRON_ERROR,
+                                             CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
+                                             "Missing `%c` separator after end "
+                                             "of symbol's value",
+                                             VALUE_END_CHAR);
+              } else {
+                /* skip blanks again to try to reach end before next call */
+                if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+                  ctpl_environ_push (env, symbol, &value);
+                  rv = TRUE;
+                }
+              }
+            }
+            ctpl_value_free_value (&value);
+          }
         }
       }
-      ctpl_value_free_value (&value);
     }
+    g_free (symbol);
   }
-  g_free (symbol);
   
   return rv;
 }
@@ -594,25 +624,28 @@ load_next (CtplEnviron *env,
 /**
  * ctpl_environ_add_from_mb:
  * @env: A #CtplEnviron to fill
- * @mb: A #MB from where read the environment description.
+ * @stream: A #CtplInputStream from where read the environment description.
  * @error: Return location for an error, or %NULL to ignore them
  * 
- * Loads an environment description from a #MB.
+ * Loads an environment description from a #CtplInputStream.
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 gboolean
-ctpl_environ_add_from_mb (CtplEnviron  *env,
-                          MB           *mb,
-                          GError      **error)
+ctpl_environ_add_from_stream (CtplEnviron      *env,
+                              CtplInputStream  *stream,
+                              GError          **error)
 {
-  gboolean rv = TRUE;
+  GError   *err = NULL;
   
-  while (rv && ! mb_eof (mb)) {
-    rv = load_next (env, mb, error);
+  while (! err && ! ctpl_input_stream_eof (stream, &err)) {
+    load_next (env, stream, &err);
+  }
+  if (err) {
+    g_propagate_error (error, err);
   }
   
-  return rv;
+  return ! err;
 }
 
 /**
@@ -622,7 +655,7 @@ ctpl_environ_add_from_mb (CtplEnviron  *env,
  * @error: Return location for an error, or %NULL to ignore them
  * 
  * Loads an environment description from a string.
- * See ctpl_environ_add_from_mb().
+ * See ctpl_environ_add_from_stream().
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  */
@@ -631,49 +664,44 @@ ctpl_environ_add_from_string (CtplEnviron  *env,
                               const gchar  *string,
                               GError      **error)
 {
-  gboolean  rv;
-  MB       *mb;
+  gboolean          rv;
+  CtplInputStream  *stream;
   
-  mb = mb_new (string, strlen (string), MB_DONTCOPY);
-  rv = ctpl_environ_add_from_mb (env, mb, error);
-  mb_free (mb);
+  stream = ctpl_input_stream_new_for_memory (string, -1, NULL,
+                                             "environment description");
+  rv = ctpl_environ_add_from_stream (env, stream, error);
+  ctpl_input_stream_unref (stream);
   
   return rv;
 }
 
 /**
- * ctpl_environ_add_from_file:
+ * ctpl_environ_add_from_path:
  * @env: A #CtplEnviron to fill
- * @filename: The filename of the file from which load the environment
- *            description, in the GLib's filename encoding
+ * @path: The path of the file from which load the environment description, in
+ *        the GLib's filename encoding
  * @error: Return location for an error, or %NULL to ignore them
  * 
- * Loads an environment description from a file.
- * See ctpl_environ_add_from_mb().
+ * Loads an environment description from a path.
+ * See ctpl_environ_add_from_stream().
  * 
- * Errors can come from the %G_FILE_ERROR domain if the file loading failed, or
+ * Errors can come from the %G_IO_ERROR domain if the file loading failed, or
  * from the %CTPL_ENVIRON_ERROR domain if the parsing of the environment
  * description failed.
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  */
 gboolean
-ctpl_environ_add_from_file (CtplEnviron *env,
-                            const gchar *filename,
+ctpl_environ_add_from_path (CtplEnviron *env,
+                            const gchar *path,
                             GError     **error)
 {
   gboolean  rv = FALSE;
-  gchar    *buffer;
-  gsize     length;
+  CtplInputStream *stream;
   
-  rv = g_file_get_contents (filename, &buffer, &length, error);
-  if (rv) {
-    MB *mb;
-    
-    mb = mb_new (buffer, length, MB_DONTCOPY);
-    rv = ctpl_environ_add_from_mb (env, mb, error);
-    mb_free (mb);
-    g_free (buffer);
+  stream = ctpl_input_stream_new_for_path (path, error);
+  if (stream) {
+    rv = ctpl_environ_add_from_stream (env, stream, error);
   }
   
   return rv;

@@ -5,11 +5,13 @@ lib_LTLIBRARIES = libctpl.la
 
 libctpl_la_SOURCES = environ.c \
                      eval.c \
+                     io.c \
+                     input-stream.c \
                      lexer.c \
                      lexer-expr.c \
                      mathutils.c \
+                     output-stream.c \
                      parser.c \
-                     readutils.c \
                      stack.c \
                      token.c \
                      value.c
@@ -17,11 +19,13 @@ libctpl_la_SOURCES = environ.c \
 ctplinclude_HEADERS = ctpl.h \
                       environ.h \
                       eval.h \
-                      lexer-expr.h \
+                      io.h \
+                      input-stream.h \
                       lexer.h \
+                      lexer-expr.h \
                       mathutils.h \
+                      output-stream.h \
                       parser.h \
-                      readutils.h \
                       stack.h \
                       token.h \
                       value.h

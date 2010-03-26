@@ -25,14 +25,16 @@ AC_PROG_CC
 GTK_DOC_CHECK(1.9)
 
 # Checks for libraries.
-PKG_CHECK_MODULES([LIBMB],  [libmb])
-PKG_CHECK_MODULES([GLIB],   [glib-2.0])
+PKG_CHECK_MODULES([GLIB],     [glib-2.0])
+PKG_CHECK_MODULES([GIO],      [gio-2.0])
+# FIXME: needed by the ctpl utility to write to stdout
+PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0])
 
 # FIXME: hack!
 LIBS="$LIBS -lm"
 
-CFLAGS="$CFLAGS $LIBMB_CFLAGS $GLIB_CFLAGS"
-LIBS="$LIBS $LIBMB_LIBS $GLIB_LIBS"
+CFLAGS="${CFLAGS} ${GLIB_CFLAGS} ${GIO_CFLAGS} ${GIO_UNIX_CFLAGS}"
+LIBS="${LIBS} ${GLIB_LIBS} ${GIO_LIBS} ${GIO_UNIX_LIBS}"
 
 # paranoiac compilation
 AC_ARG_ENABLE([paranoia],
