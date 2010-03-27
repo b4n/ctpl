@@ -1,4 +1,5 @@
 * Cleanup test application
+* improve `inline` support and usage.
 
 ? Use statically allocated values in ctpl_parser_parse_token_expr()
 ? Add support for string literals in expressions (started in string-literals

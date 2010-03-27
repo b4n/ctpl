@@ -108,7 +108,15 @@ dump_g_memory_output_stream (GMemoryOutputStream *stream,
   gsize   i;
   
   buf = g_memory_output_stream_get_data (stream);
+#if GLIB_CHECK_VERSION(2,18,0)
+  /* FIXME: this function is new in GIO 2.18, how to read GMemoryOutputStream
+   * without it!? */
   buf_size = g_memory_output_stream_get_data_size (stream);
+#else
+  /* hope the allocated size is correct, or the memory is 0-filled (though we
+   * know it is not the case...) */
+  buf_size = g_memory_output_stream_get_size (stream);
+#endif
   if (fwrite (buf, 1, buf_size, fp) < buf_size) {
     fprintf (stderr, "Failed to dump some data: %s\n", g_strerror (errno));
   } else {
