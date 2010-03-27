@@ -292,35 +292,6 @@ ctpl_input_stream_eof (CtplInputStream *stream,
   return eof;
 }
 
-/**
- * ctpl_input_stream_eof_fast:
- * @stream: A #CtplInputStream
- * 
- * <warning>
- *   This function is reliable only to know if the stream already reached EOF,
- *   not if next read will do so. To reliably check whether the stream have data
- *   to be read, first call a function that will do a read if necessary, and
- *   then reach the end of the stream. For example, use
- *   ctpl_input_stream_peek_c():
- *   <code>
- *     ctpl_input_stream_peek_c (stream, &error);
- *     // deal with the possible error
- *     if (ctpl_input_stream_eof (stream)) {
- *       // here EOF is reliable
- *     }
- *   </code>
- *   There is also a reliable version, but that can fail:
- *   ctpl_input_stream_eof().
- * </warning>
- * 
- * Returns: %TRUE if at end of stream, %FALSE otherwise.
- */
-inline gboolean
-ctpl_input_stream_eof_fast (CtplInputStream *stream)
-{
-  return stream->buf_size <= 0;
-}
-
 gssize
 ctpl_input_stream_read (CtplInputStream *stream,
                         void            *buffer,
@@ -385,32 +356,6 @@ ctpl_input_stream_peek (CtplInputStream *stream,
   }
   
   return read_size;
-}
-
-inline gchar
-ctpl_input_stream_get_c (CtplInputStream *stream,
-                         GError         **error)
-{
-  gchar   c;
-  
-  if (ctpl_input_stream_read (stream, &c, 1, error) < 1) {
-    c = CTPL_EOF;
-  }
-  
-  return c;
-}
-
-inline gchar
-ctpl_input_stream_peek_c (CtplInputStream *stream,
-                          GError         **error)
-{
-  gchar c = CTPL_EOF;
-  
-  if (! ctpl_input_stream_eof (stream, error)) {
-    c = stream->buffer[stream->buf_pos];
-  }
-  
-  return c;
 }
 
 gchar *
@@ -694,4 +639,67 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
   g_string_free (gstring, TRUE);
   
   return value;
+}
+
+
+/* below the functions that may be overwritten by another implementation in
+ * header file. This comes at the end to allow save undef while using the
+ * preferred implementation in the rest of the file */
+
+#undef ctpl_input_stream_get_c
+gchar
+ctpl_input_stream_get_c (CtplInputStream *stream,
+                         GError         **error)
+{
+  gchar   c;
+  
+  if (ctpl_input_stream_read (stream, &c, 1, error) < 1) {
+    c = CTPL_EOF;
+  }
+  
+  return c;
+}
+
+#undef ctpl_input_stream_peek_c
+gchar
+ctpl_input_stream_peek_c (CtplInputStream *stream,
+                          GError         **error)
+{
+  gchar c = CTPL_EOF;
+  
+  if (! ctpl_input_stream_eof (stream, error)) {
+    c = stream->buffer[stream->buf_pos];
+  }
+  
+  return c;
+}
+
+/**
+ * ctpl_input_stream_eof_fast:
+ * @stream: A #CtplInputStream
+ * 
+ * <warning>
+ *   This function is reliable only to know if the stream already reached EOF,
+ *   not if next read will do so. To reliably check whether the stream have data
+ *   to be read, first call a function that will do a read if necessary, and
+ *   then reach the end of the stream. For example, use
+ *   ctpl_input_stream_peek_c():
+ *   <code>
+ *     ctpl_input_stream_peek_c (stream, &error);
+ *     // deal with the possible error
+ *     if (ctpl_input_stream_eof (stream)) {
+ *       // here EOF is reliable
+ *     }
+ *   </code>
+ *   There is also a reliable version, but that can fail:
+ *   ctpl_input_stream_eof().
+ * </warning>
+ * 
+ * Returns: %TRUE if at end of stream, %FALSE otherwise.
+ */
+#undef ctpl_input_stream_eof_fast
+gboolean
+ctpl_input_stream_eof_fast (CtplInputStream *stream)
+{
+  return stream->buf_size <= 0;
 }

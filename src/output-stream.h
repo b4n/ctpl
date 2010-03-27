@@ -38,9 +38,20 @@ gboolean          ctpl_output_stream_write          (CtplOutputStream  *stream,
                                                      const gchar       *data,
                                                      gssize             length,
                                                      GError           **error);
-inline gboolean   ctpl_output_stream_put_c          (CtplOutputStream  *stream,
+gboolean          ctpl_output_stream_put_c          (CtplOutputStream  *stream,
                                                      gchar              c,
                                                      GError           **error);
+
+#if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+static inline gboolean
+ctpl_output_stream_put_c_inline (CtplOutputStream  *stream,
+                                 gchar              c,
+                                 GError           **error)
+{
+  return ctpl_output_stream_write (stream, &c, 1, error);
+}
+#define ctpl_output_stream_put_c ctpl_output_stream_put_c_inline
+#endif
 
 
 G_END_DECLS

@@ -44,7 +44,8 @@ ctpl_output_stream_write (CtplOutputStream  *stream,
   return g_output_stream_write (stream, data, len, NULL, error) == len;
 }
 
-inline gboolean
+#undef ctpl_output_stream_put_c
+gboolean
 ctpl_output_stream_put_c (CtplOutputStream  *stream,
                           gchar              c,
                           GError           **error)

@@ -109,7 +109,7 @@ void              ctpl_input_stream_set_error           (CtplInputStream  *strea
                                                          ...);
 gboolean          ctpl_input_stream_eof                 (CtplInputStream *stream,
                                                          GError         **error);
-inline gboolean   ctpl_input_stream_eof_fast            (CtplInputStream *stream);
+gboolean          ctpl_input_stream_eof_fast            (CtplInputStream *stream);
 gssize            ctpl_input_stream_read                (CtplInputStream *stream,
                                                          void            *buffer,
                                                          gsize            count,
@@ -118,9 +118,9 @@ gssize            ctpl_input_stream_peek                (CtplInputStream *stream
                                                          void            *buffer,
                                                          gsize            count,
                                                          GError         **error);
-inline gchar      ctpl_input_stream_get_c               (CtplInputStream *stream,
+gchar             ctpl_input_stream_get_c               (CtplInputStream *stream,
                                                          GError         **error);
-inline gchar      ctpl_input_stream_peek_c              (CtplInputStream *stream,
+gchar             ctpl_input_stream_peek_c              (CtplInputStream *stream,
                                                          GError         **error);
 gchar            *ctpl_input_stream_read_word           (CtplInputStream *stream,
                                                          const gchar     *accept,
@@ -140,6 +140,30 @@ gchar            *ctpl_input_stream_read_string_literal (CtplInputStream *stream
                                                          GError         **error);
 gdouble           ctpl_input_stream_read_double         (CtplInputStream *stream,
                                                          GError         **error);
+
+
+#define ctpl_input_stream_eof_fast(stream) (stream->buf_size <= 0)
+
+#if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+static inline gchar
+ctpl_input_stream_get_c_inline (CtplInputStream *stream,
+                                GError         **error)
+{
+  gchar   c;
+  
+  if (ctpl_input_stream_read (stream, &c, 1, error) < 1) {
+    c = CTPL_EOF;
+  }
+  
+  return c;
+}
+#define ctpl_input_stream_get_c ctpl_input_stream_get_c_inline
+#endif
+
+#define ctpl_input_stream_peek_c(stream, error)     \
+  ((! ctpl_input_stream_eof ((stream), (error)))    \
+   ? (stream)->buffer[(stream)->buf_pos]            \
+   : CTPL_EOF)
 
 /**
  * ctpl_input_stream_skip_blank:
