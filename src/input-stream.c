@@ -31,7 +31,7 @@
  *  * A generic number-reading function somewhere to avoid bad approximation
  *    with floating values as source. The value would then be put to a
  *    #CtplValue.
- *    This would allow support for other bases (8, 16 and maybe even 2).
+ *    This would allow support for other bases (8, and even 2 maybe).
  */
 
 
@@ -534,8 +534,6 @@ ctpl_input_stream_read_string_literal (CtplInputStream *stream,
   return str;
 }
 
-/* FIXME: support hexa (strtod() do so, then it is only a matter of reading the
- * characters */
 gdouble
 ctpl_input_stream_read_double (CtplInputStream *stream,
                                GError         **error)
@@ -547,6 +545,7 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
   GString  *gstring;
   GError   *err = NULL;
   gboolean  in_number = TRUE;
+  gint      base = 10;
   
   gstring = g_string_new ("");
   while (in_number && ! err) {
@@ -555,7 +554,6 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
     c = ctpl_input_stream_peek_c (stream, &err);
     if (! err) {
       /*g_debug ("c = %c", c);*/
-      
       switch (c) {
         case '.':
           if (have_dot || have_exponent) {
@@ -570,13 +568,51 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
         case '-':
           if (have_mantissa &&
               ! (have_exponent && gstring->len > 0 &&
-                 gstring->str[gstring->len - 1] == 'e')) {
+                 (gstring->str[gstring->len - 1] == 'e' ||
+                  gstring->str[gstring->len - 1] == 'p'))) {
             in_number = FALSE;
           } else {
             g_string_append_c (gstring, c);
           }
           break;
         
+        case 'p':
+        case 'P':
+          if (have_exponent || base != 16) {
+            in_number = FALSE;
+          } else {
+            have_exponent = TRUE;
+            g_string_append_c (gstring, 'p');
+          }
+          break;
+        
+        case 'e':
+        case 'E':
+          if (base < 15) {
+            if (have_exponent || base != 10) {
+              in_number = FALSE;
+            } else {
+              have_exponent = TRUE;
+              g_string_append_c (gstring, 'e');
+            }
+            break;
+          }
+          /* Fallthrough */
+        case 'a':
+        case 'A':
+        case 'b':
+        case 'B':
+        case 'c':
+        case 'C':
+        case 'd':
+        case 'D':
+        case 'f':
+        case 'F':
+          if (base < 16) {
+            in_number = FALSE;
+            break;
+          }
+          /* Fallthrough */
         case '0':
         case '1':
         case '2':
@@ -593,13 +629,17 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
           }
           break;
         
-        case 'e':
-        case 'E':
-          if (have_exponent) {
-            in_number = FALSE;
+        case 'x':
+        case 'X':
+          if ((gstring->len == 1 ||
+               (gstring->len == 2 && (gstring->str[0] == '+' ||
+                                      gstring->str[0] == '-')))
+              && gstring->str[gstring->len - 1] == '0') {
+            g_string_append_c (gstring, c);
+            have_mantissa = FALSE; /* the previous 0 wasn't mantissa finally */
+            base = 16;
           } else {
-            have_exponent = TRUE;
-            g_string_append_c (gstring, 'e');
+            in_number = FALSE;
           }
           break;
         
@@ -623,9 +663,10 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
       /*g_debug ("trying to convert fp '%s'", nptr);*/
       value = g_ascii_strtod (nptr, &endptr);
       if (! endptr || *endptr != 0) {
-        g_critical ("This code shouldn't be reached. This means there is an "
-                    "error in the code, please report this together with the "
-                    "data that generated this error.");
+        ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
+                                     CTPL_IO_ERROR_INVALID_NUMBER,
+                                     "Invalid floating constant \"%s\"",
+                                     nptr);
       } else if (errno == ERANGE) {
         ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
                                      CTPL_IO_ERROR_RANGE,
