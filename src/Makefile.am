@@ -26,12 +26,13 @@ ctplinclude_HEADERS = ctpl.h \
                       input-stream.h \
                       lexer.h \
                       lexer-expr.h \
-                      mathutils.h \
                       output-stream.h \
                       parser.h \
-                      stack.h \
                       token.h \
                       value.h
+
+EXTRA_DIST          = mathutils.h \
+                      stack.h
 
 if BUILD_CTPL
 bin_PROGRAMS += ctpl

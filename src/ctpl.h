@@ -24,12 +24,10 @@
 #include "eval.h"
 #include "lexer-expr.h"
 #include "lexer.h"
-#include "mathutils.h"
 #include "parser.h"
 #include "io.h"
 #include "input-stream.h"
 #include "output-stream.h"
-#include "stack.h"
 #include "token.h"
 #include "value.h"
 
