@@ -212,6 +212,22 @@ main (int    argc,
       }
     }
     
+    if (rewind_ctpl_input_stream (&stream)) {
+      CtplValue value;
+      
+      ctpl_value_init (&value);
+      if (! ctpl_input_stream_read_number (stream, &value, &err)) {
+        fprintf (stderr, "No valid number: %s\n", err->message);
+        g_clear_error (&err);
+      } else {
+        if (CTPL_VALUE_HOLDS_FLOAT (&value)) {
+          printf ("%g\n", ctpl_value_get_float (&value));
+        } else {
+          printf ("%ld\n", ctpl_value_get_int (&value));
+        }
+      }
+    }
+    
     ctpl_input_stream_unref (stream);
   }
   #else
