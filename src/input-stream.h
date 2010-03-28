@@ -24,6 +24,7 @@
 #include <string.h>
 #include <glib.h>
 #include <gio/gio.h>
+#include "value.h"
 
 G_BEGIN_DECLS
 
@@ -138,7 +139,12 @@ gssize            ctpl_input_stream_skip_word           (CtplInputStream *stream
                                                          GError         **error);
 gchar            *ctpl_input_stream_read_string_literal (CtplInputStream *stream,
                                                          GError         **error);
+gboolean          ctpl_input_stream_read_number         (CtplInputStream *stream,
+                                                         CtplValue       *value,
+                                                         GError         **error);
 gdouble           ctpl_input_stream_read_double         (CtplInputStream *stream,
+                                                         GError         **error);
+glong             ctpl_input_stream_read_long           (CtplInputStream *stream,
                                                          GError         **error);
 
 
