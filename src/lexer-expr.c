@@ -25,6 +25,7 @@
 #include <glib.h>
 #include <string.h>
 #include <errno.h>
+#include "value.h"
 
 
 /**
@@ -159,19 +160,17 @@ read_number (CtplInputStream *stream,
              GError         **error)
 {
   CtplTokenExpr  *token = NULL;
-  GError         *err = NULL;
-  gdouble         value;
+  CtplValue       value;
   
-  value = ctpl_input_stream_read_double (stream, &err);
-  if (err) {
-    g_propagate_error (error, err);
-  } else {
-    if (CTPL_MATH_FLOAT_EQ (value, (gdouble)(glong)value)) {
-      token = ctpl_token_expr_new_integer ((glong)value);
+  ctpl_value_init (&value);
+  if (ctpl_input_stream_read_number (stream, &value, error)) {
+    if (CTPL_VALUE_HOLDS_INT (&value)) {
+      token = ctpl_token_expr_new_integer (ctpl_value_get_int (&value));
     } else {
-      token = ctpl_token_expr_new_float (value);
+      token = ctpl_token_expr_new_float (ctpl_value_get_float (&value));
     }
   }
+  ctpl_value_free_value (&value);
   
   return token;
 }
