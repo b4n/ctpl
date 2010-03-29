@@ -728,10 +728,13 @@ ctpl_input_stream_skip_word (CtplInputStream  *stream,
  * 
  * Reads a string quoted with %CTPL_STRING_DELIMITER_CHAR, containing possible
  * escaping sequences escaped by %CTPL_ESCAPE_CHAR.
+ * A plain %CTPL_ESCAPE_CHAR need to be escaped too, otherwise it will simply
+ * escape the next character.
  * 
  * For instance, a string might look like this, assuming the escape character is
  * <code>\</code> (backslash) and the quoting character is <code>"</code>
- * (double quote): <code>"a valid string with \"special\" characters"</code>
+ * (double quote): <code>"a valid string with \"special\" characters such as
+ * \\ backslashes"</code>
  * 
  * Returns: The read string, or %NULL on error
  * 
