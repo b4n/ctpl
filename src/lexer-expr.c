@@ -90,8 +90,8 @@
  *     <term>Operands</term>
  *     <listitem>
  *       <para>
- *         Any numeric constant written in C notation (period (<code>.</code>)
- *         as the fraction separator, if any), or any reference to any
+ *         Any numeric constant that ctpl_input_stream_read_number() supports,
+ *         or any reference to any 
  *         <link linkend="ctpl-CtplEnviron">environment</link> variable.
  *       </para>
  *     </listitem>
