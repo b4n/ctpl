@@ -594,7 +594,7 @@ load_next (CtplEnviron     *env,
 }
 
 /**
- * ctpl_environ_add_from_mb:
+ * ctpl_environ_add_from_stream:
  * @env: A #CtplEnviron to fill
  * @stream: A #CtplInputStream from where read the environment description.
  * @error: Return location for an error, or %NULL to ignore them
