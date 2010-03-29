@@ -28,7 +28,11 @@
  * @short_description: CTPL's data output stream
  * @include: ctpl/output-stream.h
  * 
+ * The data output stream used by CTPL; built on top of #GOutputStream.
  * 
+ * A #CtplOutputStream is created with ctpl_output_stream_new(). It uses a
+ * #GObject<!-- -->-like refcounting, through ctpl_output_stream_ref() and
+ * ctpl_output_stream_unref().
  */
 
 /**
