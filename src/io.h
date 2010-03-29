@@ -29,7 +29,21 @@
 G_BEGIN_DECLS
 
 
-enum _CtplIOError
+/**
+ * CtplIOError:
+ * @CTPL_IO_ERROR_EOF:            End of the stream unexpectedly reached
+ * @CTPL_IO_ERROR_INVALID_NUMBER: The stream doesn't contain a valid number
+ *                                recognized by the function that threw it
+ * @CTPL_IO_ERROR_INVALID_STRING: The stream doesn't contain a valid string
+ *                                literal
+ * @CTPL_IO_ERROR_RANGE:          A numeric conversion would overflow
+ * @CTPL_IO_ERROR_NOMEM:          Not enough memory to complete the operation
+ * @CTPL_IO_ERROR_FAILED:         Something went wrong
+ * 
+ * Errors that can be thrown by I/O functions (#CtplInputStream and
+ * #CtplOutputStream methods).
+ */
+typedef enum _CtplIOError
 {
   CTPL_IO_ERROR_EOF,
   CTPL_IO_ERROR_INVALID_NUMBER,
@@ -37,10 +51,14 @@ enum _CtplIOError
   CTPL_IO_ERROR_RANGE,
   CTPL_IO_ERROR_NOMEM,
   CTPL_IO_ERROR_FAILED
-};
+} CtplIOError;
 
+/**
+ * CTPL_IO_ERROR:
+ * 
+ * Error domain for #CtplIOError<!-- -->s.
+ */
 #define CTPL_IO_ERROR   (ctpl_io_error_quark ())
-
 
 GQuark            ctpl_io_error_quark                   (void) G_GNUC_CONST;
 

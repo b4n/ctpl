@@ -366,6 +366,9 @@ procede_template (MB           *input,
     <xi:include href="xml/parser.xml"/>
     <xi:include href="xml/eval.xml"/>
     <xi:include href="xml/readutils.xml"/>
+    <xi:include href="xml/io.xml"/>
+    <xi:include href="xml/input-stream.xml"/>
+    <xi:include href="xml/output-stream.xml"/>
     <xi:include href="xml/mathutils.xml"/>
   </chapter>
   <!--chapter id="object-tree">

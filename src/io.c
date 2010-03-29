@@ -26,7 +26,7 @@
  * @short_description: CTPL's IO layer
  * @include: ctpl/io.h
  * 
- * 
+ * See the two sub-modules #CtplInputStream and #CtplOutputStream.
  */
 
 GQuark

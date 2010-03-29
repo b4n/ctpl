@@ -31,6 +31,48 @@
  * 
  */
 
+/**
+ * ctpl_output_stream_new:
+ * @stream: A #GOutputStream
+ * 
+ * Creates a new #CtplOutputStream for a given #GOutputStream.
+ * This function adds a reference to the #GOutputStream.
+ * 
+ * Returns: A new #CtplOutputStream.
+ * 
+ * Since: 0.2
+ */
+
+/**
+ * ctpl_output_stream_ref:
+ * @stream: A #CtplOutputStream
+ * 
+ * Adds a reference to a #CtplOutputStream.
+ * 
+ * Returns: The stream
+ */
+
+/**
+ * ctpl_output_stream_unref:
+ * @stream: A #CtplOutputStream
+ * 
+ * Removes a reference from a #CtplOutputStream. When its reference count
+ * reaches 0, the stream is destroyed.
+ */
+
+/**
+ * ctpl_output_stream_write:
+ * @stream: A #CtplOutputStream
+ * @data: Data to write
+ * @length: Length of the data in bytes, or -1 if it is a null-terminated string
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Writes a buffer to a #CtplOutputStream.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ * 
+ * Since: 0.2
+ */
 gboolean
 ctpl_output_stream_write (CtplOutputStream  *stream,
                           const gchar       *data,
@@ -45,6 +87,18 @@ ctpl_output_stream_write (CtplOutputStream  *stream,
 }
 
 #undef ctpl_output_stream_put_c
+/**
+ * ctpl_output_stream_put_c:
+ * @stream: A #CtplOutputStream
+ * @c: A character
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Writes a character to a #CtplOutputStream.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ * 
+ * Since: 0.2
+ */
 gboolean
 ctpl_output_stream_put_c (CtplOutputStream  *stream,
                           gchar              c,

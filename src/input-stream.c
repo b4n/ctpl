@@ -53,7 +53,7 @@
  * (ctpl_input_stream_new_for_gfile()), path
  * (ctpl_input_stream_new_for_path()) and URIs
  * (ctpl_input_stream_new_for_uri()).
- * #CtplInputStream object uses a #GObject-like refcounting, via
+ * #CtplInputStream object uses a #GObject<!-- -->-like refcounting, via
  * ctpl_input_stream_ref() and ctpl_input_stream_unref().
  */
 
@@ -61,6 +61,19 @@
 #define INPUT_STREAM_GROW_SIZE  64U
 #define SKIP_BUF_SIZE           64U
 
+/**
+ * ctpl_input_stream_new:
+ * @stream: A #GInputStream
+ * @name: The name of the stream, or %NULL for none. This is used to identify
+ *        the stream in error messages
+ * 
+ * Creates a new #CtplInputStream for a #GInputStream.
+ * This function adds a reference to the #GInputStream.
+ * 
+ * Returns: A new #CtplInputStream
+ * 
+ * Since: 0.2
+ */
 CtplInputStream *
 ctpl_input_stream_new (GInputStream *stream,
                        const gchar  *name)
@@ -80,6 +93,20 @@ ctpl_input_stream_new (GInputStream *stream,
   return self;
 }
 
+/**
+ * ctpl_input_stream_new_for_memory:
+ * @data: Data for which create the stream
+ * @length: length of @data
+ * @destroy: #GDestroyNotify to call on @data when finished, or %NULL
+ * @name: The name of the stream to identify it in error messages
+ * 
+ * Creates a new #CtplInputStream for in-memory data. This is a wrapper around
+ * #GMemoryInputStream; see ctpl_input_stream_new().
+ * 
+ * Returns: A new #CtplInputStream for the given data
+ * 
+ * Since: 0.2
+ */
 CtplInputStream *
 ctpl_input_stream_new_for_memory (const gchar    *data,
                                   gssize          length,
@@ -96,6 +123,20 @@ ctpl_input_stream_new_for_memory (const gchar    *data,
   return stream;
 }
 
+/**
+ * ctpl_input_stream_new_for_gfile:
+ * @file: A #GFile to read
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Creates a new #CtplInputStream for a #GFile. This is a wrapper around
+ * g_file_read() that also sets the name of the stream to the file's name.
+ * The errors this function can throw are those from the %G_IO_ERROR domain.
+ * See ctpl_input_stream_new().
+ * 
+ * Returns: A new #CtplInputStream on success, %NULL on error.
+ * 
+ * Since: 0.2
+ */
 CtplInputStream *
 ctpl_input_stream_new_for_gfile (GFile    *file,
                                  GError  **error)
@@ -116,9 +157,22 @@ ctpl_input_stream_new_for_gfile (GFile    *file,
   return stream;
 }
 
+/**
+ * ctpl_input_stream_new_for_path:
+ * @path: A path
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Creates a new #CtplInputStream for a path. This is a wrapper for
+ * ctpl_input_stream_new_for_gfile() that simply creates a #GFile for the given
+ * path and call ctpl_input_stream_new_for_gfile() on it.
+ * 
+ * Returns: A new #CtplInputStream on success, %NULL on error.
+ * 
+ * Since: 0.2
+ */
 CtplInputStream *
 ctpl_input_stream_new_for_path (const gchar *path,
-                                 GError     **error)
+                                GError     **error)
 {
   GFile            *file;
   CtplInputStream  *stream = NULL;
@@ -130,6 +184,19 @@ ctpl_input_stream_new_for_path (const gchar *path,
   return stream;
 }
 
+/**
+ * ctpl_input_stream_new_for_uri:
+ * @uri: An URI
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Creates a new #CtplInputStream for an URI. This is a wrapper for
+ * ctpl_input_stream_new_for_gfile() that simply creates a #GFile for the given
+ * URI and call ctpl_input_stream_new_for_gfile() on it.
+ * 
+ * Returns: A new #CtplInputStream on success, %NULL on error.
+ * 
+ * Since: 0.2
+ */
 CtplInputStream *
 ctpl_input_stream_new_for_uri (const gchar *uri,
                                GError     **error)
@@ -144,6 +211,16 @@ ctpl_input_stream_new_for_uri (const gchar *uri,
   return stream;
 }
 
+/**
+ * ctpl_input_stream_ref:
+ * @stream: A #CtplInputStream
+ * 
+ * Adds a reference to a #CtplInputStream
+ * 
+ * Returns: The stream
+ * 
+ * Since: 0.2
+ */
 CtplInputStream *
 ctpl_input_stream_ref (CtplInputStream *stream)
 {
@@ -152,6 +229,15 @@ ctpl_input_stream_ref (CtplInputStream *stream)
   return stream;
 }
 
+/**
+ * ctpl_input_stream_unref:
+ * @stream: A #CtplInputStream
+ * 
+ * Removes a reference from a #CtplInputStream. if the reference count drops to
+ * 0, frees the stream.
+ * 
+ * Since: 0.2
+ */
 void
 ctpl_input_stream_unref (CtplInputStream *stream)
 {
@@ -165,6 +251,20 @@ ctpl_input_stream_unref (CtplInputStream *stream)
   }
 }
 
+/**
+ * ctpl_input_stream_set_error:
+ * @stream: A #CtplInputStream
+ * @error: A #GError to fill, may be %NULL
+ * @domain: The domain of the error to report
+ * @code: The code of the error
+ * @format: printf-like format string
+ * @...: printf-like arguments for @format
+ * 
+ * This is a wrapper around g_set_error() that adds stream's position
+ * information to the reported error.
+ * 
+ * Since: 0.2
+ */
 void
 ctpl_input_stream_set_error (CtplInputStream  *stream,
                              GError          **error,
@@ -187,6 +287,16 @@ ctpl_input_stream_set_error (CtplInputStream  *stream,
   }
 }
 
+/*
+ * ensure_cache_filled:
+ * @stream: A #CtplInputStream
+ * @error: return location for errors, or %NULL to ignore them
+ * 
+ * Ensures the @stream's cache is not at the end, and fills it with data read
+ * from the underlying stream if needed.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise
+ */
 static gboolean
 ensure_cache_filled (CtplInputStream *stream,
                      GError         **error)
@@ -212,6 +322,21 @@ ensure_cache_filled (CtplInputStream *stream,
   return success;
 }
 
+/*
+ * resize_cache:
+ * @stream: A #CtplInputStream
+ * @new_size: the requested new size of the stream's cache
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Tries to resize the cache of a #CtplInputStream to @new_size. This may grow
+ * or shrink the cache; but it will never loose unread content.
+ * Note that the new cache size might not be the requested one even on success:
+ * there can be too much still useful cached data or the underlying stream can
+ * be too close to the end to fill the full size. In both cases, the cache will
+ * be resized to the closest size possible to the request.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise
+ */
 static gboolean
 resize_cache (CtplInputStream *stream,
               gsize            new_size,
@@ -280,6 +405,8 @@ resize_cache (CtplInputStream *stream,
  * 
  * Returns: %FALSE if not at EOF, %TRUE otherwise (note that this includes I/O
  *          error).
+ * 
+ * Since: 0.2
  */
 gboolean
 ctpl_input_stream_eof (CtplInputStream *stream,
@@ -294,6 +421,19 @@ ctpl_input_stream_eof (CtplInputStream *stream,
   return eof;
 }
 
+/**
+ * ctpl_input_stream_read:
+ * @stream: A #CtplInputStream
+ * @buffer: buffer to fill with the read data
+ * @count: number of bytes to read
+ * @error: return location for errors, or %NULL to ignore them
+ * 
+ * Reads data from a #CtplInputStream.
+ * 
+ * Returns: The number of bytes read, or -1 on error.
+ * 
+ * Since: 0.2
+ */
 gssize
 ctpl_input_stream_read (CtplInputStream *stream,
                         void            *buffer,
@@ -333,6 +473,26 @@ ctpl_input_stream_read (CtplInputStream *stream,
   return read_size;
 }
 
+/**
+ * ctpl_input_stream_peek:
+ * @stream: A #CtplInputStream
+ * @buffer: buffer to fill with the peeked data
+ * @count: number of bytes to peek
+ * @error: return location for errors, or %NULL to ignore them
+ * 
+ * Peeks data from a #CtplInputStream. Peeking data is like reading, but it
+ * doesn't removes the data from the stream.
+ * 
+ * <warning>
+ *   Note a peek might resize the internal stream's cache to fit at least
+ *   @count. Therefore, peeking too much data at once should be done with some
+ *   care.
+ * </warning>
+ * 
+ * Returns: the number of bytes peeked, or -1 on error
+ * 
+ * Since: 0.2
+ */
 gssize
 ctpl_input_stream_peek (CtplInputStream *stream,
                         void            *buffer,
@@ -360,6 +520,38 @@ ctpl_input_stream_peek (CtplInputStream *stream,
   return read_size;
 }
 
+/**
+ * ctpl_input_stream_read_word:
+ * @stream: A #CtplInputStream
+ * @accept: string of the character acceptable for the word
+ * @length: return location for the length of the read word, or %NULL
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Reads a word from a #CtplInputStream. A word is a sequence of characters
+ * referenced by @accept. Note that the word might be empty if no characters
+ * matching @accept are found before one that doesn't match.
+ * 
+ * For example, reading a word composed of any ASCII lowercase characters may be
+ * as the following:
+ * |[
+ * gchar  *word;
+ * GError *error = NULL;
+ * 
+ * word = ctpl_input_stream_read_word (stream, "abcdefghijklmnopqrstuvwxyz",
+ *                                     NULL, &error);
+ * if (! word) {
+ *   /<!-- -->* deal with the error *<!-- -->/
+ * } else {
+ *   printf ("Read the word \"%s\"\n", word);
+ *   g_free (word);
+ * }
+ * ]|
+ * 
+ * Returns: A newly allocated string containing the read word that should be
+ *          freed with g_free() when no longer needed; or %NULL on error.
+ * 
+ * Since: 0.2
+ */
 gchar *
 ctpl_input_stream_read_word (CtplInputStream *stream,
                              const gchar     *accept,
@@ -398,6 +590,21 @@ ctpl_input_stream_read_word (CtplInputStream *stream,
   return g_string_free (word, err != NULL);
 }
 
+/**
+ * ctpl_input_stream_peek_word:
+ * @stream: A #CtplInputStream
+ * @accept: string of the character acceptable for the word
+ * @length: return location for the length of the read word, or %NULL
+ * @error: return location for errors, or %NULL to ignore them
+ * 
+ * Peeks a word from a #CtplInputStream. See ctpl_input_stream_peek() and
+ * ctpl_input_stream_read_word().
+ * 
+ * Returns: A newly allocated string containing the peeked word that should be
+ *          freed with g_free() when no longer needed; or %NULL on error.
+ * 
+ * Since: 0.2
+ */
 gchar *
 ctpl_input_stream_peek_word (CtplInputStream *stream,
                              const gchar     *accept,
@@ -434,6 +641,18 @@ ctpl_input_stream_peek_word (CtplInputStream *stream,
   return g_string_free (word, ! success);
 }
 
+/**
+ * ctpl_input_stream_skip:
+ * @stream: A #CtplInputStream
+ * @count: Number of bytes to skip
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Skips @count bytes from a #CtplInputStream.
+ * 
+ * Returns: The number of skipped bytes, or -1 on error.
+ * 
+ * Since: 
+ */
 gssize
 ctpl_input_stream_skip (CtplInputStream *stream,
                         gsize            count,
@@ -458,6 +677,19 @@ ctpl_input_stream_skip (CtplInputStream *stream,
   return n;
 }
 
+/**
+ * ctpl_input_stream_skip_word:
+ * @stream: A #CtplInputStream
+ * @reject: A string of the characters to skip
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Skips all the characters matching @reject from a #CtplInputStream until the
+ * first that doesn't match.
+ * 
+ * Returns: The number of skipped bytes, or -1 on error.
+ * 
+ * Since: 0.2
+ */
 gssize
 ctpl_input_stream_skip_word (CtplInputStream  *stream,
                              const gchar      *reject,
@@ -485,6 +717,22 @@ ctpl_input_stream_skip_word (CtplInputStream  *stream,
   return n;
 }
 
+/**
+ * ctpl_input_stream_read_string_literal:
+ * @stream: A #CtplInputStream
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Reads a string quoted with %CTPL_STRING_DELIMITER_CHAR, containing possible
+ * escaping sequences escaped by %CTPL_ESCAPE_CHAR.
+ * 
+ * For instance, a string might look like this, assuming the escape character is
+ * <code>\</code> (backslash) and the quoting character is <code>"</code>
+ * (double quote): <code>"a valid string with \"special\" characters"</code>
+ * 
+ * Returns: The read string, or %NULL on error
+ * 
+ * Since: 0.2
+ */
 gchar *
 ctpl_input_stream_read_string_literal (CtplInputStream *stream,
                                        GError         **error)
@@ -540,6 +788,12 @@ ctpl_input_stream_read_string_literal (CtplInputStream *stream,
 #define READ_INT    (1 << 1)
 #define READ_BOTH   (READ_FLOAT | READ_INT)
 
+/*
+ * ctpl_input_stream_read_number_internal:
+ * @type: which kind of number match (float, int or both)
+ * 
+ * see ctpl_input_stream_read_number()
+ */
 static gboolean
 ctpl_input_stream_read_number_internal (CtplInputStream *stream,
                                         gint             type,
@@ -754,6 +1008,24 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
   return ! err;
 }
 
+/**
+ * ctpl_input_stream_read_number:
+ * @stream: A #CtplInputStream
+ * @value: A #CtplValue to fill with the read number, either %CTPL_VTYPE_INT
+ *         or %CTPL_VTYPE_FLOAT
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Reads a number from a #CtplInputStream. A number can be a plain decimal
+ * integer, a binary integer prefixed with <code>0b</code>, an octal integer
+ * prefixed with <code>0o</code>, a hexadecimal integer prefixed with
+ * <code>0x</code>, a decimal real with possible decimal exponent separated by a
+ * <code>e</code> or a hexadecimal real with possible decimal power separated by
+ * a <code>p</code>.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ * 
+ * Since: 0.2
+ */
 gboolean
 ctpl_input_stream_read_number (CtplInputStream *stream,
                                CtplValue       *value,
@@ -763,6 +1035,18 @@ ctpl_input_stream_read_number (CtplInputStream *stream,
                                                  error);
 }
 
+/**
+ * ctpl_input_stream_read_double:
+ * @stream: A #CtplInputStream
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Reads a real form a #CtplInputStream. See ctpl_input_stream_read_number() for
+ * details.
+ * 
+ * Returns: The read value, or 0 on error.
+ * 
+ * Since: 0.2
+ */
 gdouble
 ctpl_input_stream_read_double (CtplInputStream *stream,
                                GError         **error)
@@ -925,6 +1209,18 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
 #endif
 }
 
+/**
+ * ctpl_input_stream_read_long:
+ * @stream: A #CtplInputStream
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Reads an integer from a #CtplInputStream. See ctpl_input_stream_read_number()
+ * for details.
+ * 
+ * Returns: The read integer, ot 0 on error.
+ * 
+ * Since: 0.2
+ */
 glong
 ctpl_input_stream_read_long (CtplInputStream *stream,
                              GError         **error)
@@ -947,12 +1243,23 @@ ctpl_input_stream_read_long (CtplInputStream *stream,
  * header file. This comes at the end to allow save undef while using the
  * preferred implementation in the rest of the file */
 
+/**
+ * ctpl_input_stream_get_c:
+ * @stream: A #CtplInputStream
+ * @error: Return location for errors, to %NULL to ignore them
+ * 
+ * Reads a character from a #CtplInputStream.
+ * 
+ * Returns: The read character, or %CTPL_EOF at stream's end or on error
+ * 
+ * Since: 
+ */
 #undef ctpl_input_stream_get_c
 gchar
 ctpl_input_stream_get_c (CtplInputStream *stream,
                          GError         **error)
 {
-  gchar   c;
+  gchar c;
   
   if (ctpl_input_stream_read (stream, &c, 1, error) < 1) {
     c = CTPL_EOF;
@@ -961,6 +1268,18 @@ ctpl_input_stream_get_c (CtplInputStream *stream,
   return c;
 }
 
+/**
+ * ctpl_input_stream_peek_c:
+ * @stream: A #CtplInputStream
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Peeks a character from a #CtplInputStream.
+ * This may be implemented as a macro.
+ * 
+ * Returns: The peeked character, or %CTPL_EOF at end of the stream or on error
+ * 
+ * Since: 0.2
+ */
 #undef ctpl_input_stream_peek_c
 gchar
 ctpl_input_stream_peek_c (CtplInputStream *stream,
@@ -979,19 +1298,22 @@ ctpl_input_stream_peek_c (CtplInputStream *stream,
  * ctpl_input_stream_eof_fast:
  * @stream: A #CtplInputStream
  * 
+ * Checks if a #CtplInputStream reached its end. See also
+ * ctpl_input_stream_eof().
+ * 
  * <warning>
  *   This function is reliable only to know if the stream already reached EOF,
  *   not if next read will do so. To reliably check whether the stream have data
  *   to be read, first call a function that will do a read if necessary, and
  *   then reach the end of the stream. For example, use
  *   ctpl_input_stream_peek_c():
- *   <code>
+ *   |[
  *     ctpl_input_stream_peek_c (stream, &error);
- *     // deal with the possible error
- *     if (ctpl_input_stream_eof (stream)) {
- *       // here EOF is reliable
+ *     /<!-- -->* deal with the possible error *<!-- -->/
+ *     if (ctpl_input_stream_eof_fast (stream)) {
+ *       /<!-- -->* here EOF is reliable *<!-- -->/
  *     }
- *   </code>
+ *   ]|
  *   There is also a reliable version, but that can fail:
  *   ctpl_input_stream_eof().
  * </warning>
