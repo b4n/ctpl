@@ -419,9 +419,6 @@ static gboolean   read_value              (CtplInputStream *stream,
                                            GError         **error);
 
 
-/* reads a symbol (e.g. a variable/constant) */
-#define read_symbol(stream, error) (ctpl_input_stream_read_symbol ((stream), (error)))
-
 /* tries to read a string literal */
 static gboolean
 read_string (CtplInputStream *stream,
@@ -437,31 +434,6 @@ read_string (CtplInputStream *stream,
     rv = TRUE;
   }
   g_free (str);
-  
-  return rv;
-}
-
-/* tries to read a number to a CtplValue */
-static gboolean
-read_number (CtplInputStream *stream,
-             CtplValue       *value,
-             GError         **error)
-{
-  gboolean  rv = FALSE;
-  gdouble   val;
-  GError   *err = NULL;
-  
-  val = ctpl_input_stream_read_double (stream, &err);
-  if (err) {
-    g_propagate_error (error, err);
-  } else {
-    if (CTPL_MATH_FLOAT_EQ (val, (gdouble)(glong)val)) {
-      ctpl_value_set_int (value, (glong)val);
-    } else {
-      ctpl_value_set_float (value, val);
-    }
-    rv = TRUE;
-  }
   
   return rv;
 }
@@ -540,7 +512,7 @@ read_value (CtplInputStream *stream,
   } else if (c == '.' ||
              (c >= '0' && c <= '9') ||
              c == '+' || c == '-') {
-    read_number (stream, value, &err);
+    ctpl_input_stream_read_number (stream, value, &err);
   } else {
     ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
                                  CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
@@ -564,7 +536,7 @@ load_next (CtplEnviron     *env,
   if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
     gchar *symbol;
     
-    symbol = read_symbol (stream, error);
+    symbol = ctpl_input_stream_read_symbol (stream, error);
     if (! symbol) {
       /* I/O error */
     } else if (! *symbol) {
