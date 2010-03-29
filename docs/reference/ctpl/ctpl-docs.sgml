@@ -29,7 +29,7 @@
         CTPL depends on the following libraries:
         <variablelist>
           <varlistentry>
-            <term><ulink url="http://www.gtk.org">GLib</ulink></term>
+            <term><ulink url="http://library.gnome.org/devel/glib/">GLib</ulink></term>
             <listitem>
               <para>
                 General purpose C utility library
@@ -37,10 +37,10 @@
             </listitem>
           </varlistentry>
           <varlistentry>
-            <term><ulink url="http://ban.free-h.net/libmb/">LibMB</ulink></term>
+            <term><ulink url="http://library.gnome.org/devel/gio/">GIO</ulink></term>
             <listitem>
               <para>
-                FILE-like API for memory buffer read/write
+                GLib's I/O abstraction library
               </para>
             </listitem>
           </varlistentry>
@@ -55,30 +55,35 @@
           <itemizedlist>
             <listitem>
               <para>
-                It is a library, then it can be easily used from programs
+                It is a library, then it can be easily used from programs;
               </para>
             </listitem>
             <listitem>
               <para>
-                It is written in standard C, which gives portability, speed and
-                easy portage to other languages (as most of languages supports
-                additions written in C).
+                <link linkend="working-design">Separated lexer and parser</link>;
               </para>
             </listitem>
             <listitem>
               <para>
-                Simple syntax
+                It is written in portable C;
               </para>
             </listitem>
             <listitem>
               <para>
-                Fast and strict parsing
+                Simple syntax;
               </para>
             </listitem>
             <listitem>
               <para>
-                In-memory parsing, allowing non-file data parsing and
-                avoiding I/O-latencies.
+                Fast and strict parsing;
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Possible in-memory parsing, allowing non-file data parsing and
+                avoiding I/O-latencies, through GIO's
+                <link linkend="GMemoryInputStream">GMemoryInputStream</link> and
+                <link linkend="GMemoryOutputStream">GMemoryOutputStream</link>.
               </para>
             </listitem>
           </itemizedlist>
@@ -89,14 +94,9 @@
           <itemizedlist>
             <listitem>
               <para>
-                Full in-memory parsing requires to load the whole template in
-                memory, which may lead to huge memory consumption with large
-                templates. The memory usage is about 2 times the input template
-                size.
-              </para>
-              <para>
-                Note that the memory consumption may be reduced if we or LibMB
-                start supporting file-stream read/write.
+                Since the input is first completely load as a token tree in
+                memory, it consumes a little more memory than the input
+                template.
               </para>
             </listitem>
           </itemizedlist>
@@ -105,7 +105,7 @@
     </section>
     
     <section>
-      <title>Working design</title>
+      <title id="working-design">Working design</title>
       <para>
         The CTPL engine is split, as most parsers, in two distinct parts:
         the lexer and the parser.
@@ -142,9 +142,9 @@
 
 /**
  * procede_template:
- * @input:  The input template, needs to be readable.
+ * @input:  The input stream
  * @env:    The environment against which parse the input.
- * @output: The output buffer, needs to be writeable.
+ * @output: The output stream
  * @error:  Return location for an error, or %NULL to ignore them.
  * 
  * Parses and lexes a template.
@@ -152,10 +152,10 @@
  * Returns: %TRUE on success, %FALSE on error.
  */
 gboolean
-procede_template (MB           *input,
-                  CtplEnviron  *env,
-                  MB           *output,
-                  GError      **error)
+procede_template (CtplInputStream  *input,
+                  CtplEnviron      *env,
+                  CtplOutputStream *output,
+                  GError          **error)
 {
   gboolean    success = FALSE;
   CtplToken  *tree;
@@ -365,7 +365,6 @@ procede_template (MB           *input,
     <xi:include href="xml/lexer-expr.xml"/>
     <xi:include href="xml/parser.xml"/>
     <xi:include href="xml/eval.xml"/>
-    <xi:include href="xml/readutils.xml"/>
     <xi:include href="xml/io.xml"/>
     <xi:include href="xml/input-stream.xml"/>
     <xi:include href="xml/output-stream.xml"/>
