@@ -980,6 +980,7 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
         glong   longval;
         
         /*g_debug ("trying to convert '%s'", nptr);*/
+        errno = 0;
         if (read_type & READ_INT) {
           longval = strtol (nptr, &endptr, base);
         } else {
@@ -1048,6 +1049,12 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
  * -0x88fe.2p8
  *   </programlisting>
  * </example>
+ * 
+ * <warning>
+ *   <para>
+ *     This function may modify @errno.
+ *   </para>
+ * </warning>
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  * 
