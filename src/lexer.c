@@ -421,8 +421,10 @@ ctpl_lexer_read_token_tpl (CtplInputStream *stream,
       gchar  *first_word;
       gsize   first_word_len;
       
-      first_word = ctpl_input_stream_peek_symbol_full (stream, &first_word_len,
-                                                       error);
+      /* the maximum length of an interesting word is 4 (else), plus one to be
+       * sure we get the end of the word */
+      first_word = ctpl_input_stream_peek_symbol_full (stream, 5,
+                                                       &first_word_len, error);
       if (first_word) {
         if (strcmp (first_word, "if") == 0) {
           /* an if condition:

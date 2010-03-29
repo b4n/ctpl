@@ -528,6 +528,8 @@ ctpl_input_stream_peek (CtplInputStream *stream,
  * ctpl_input_stream_read_word:
  * @stream: A #CtplInputStream
  * @accept: string of the character acceptable for the word
+ * @accept_len: length of @accept, can be -1 if @accept is null-terminated
+ * @max_len: maximum number of bytes to read, or -1 for no limit
  * @length: return location for the length of the read word, or %NULL
  * @error: Return location for errors, or %NULL to ignore them
  * 
@@ -541,8 +543,8 @@ ctpl_input_stream_peek (CtplInputStream *stream,
  * gchar  *word;
  * GError *error = NULL;
  * 
- * word = ctpl_input_stream_read_word (stream, "abcdefghijklmnopqrstuvwxyz",
- *                                     NULL, &error);
+ * word = ctpl_input_stream_read_word (stream, "abcdefghijklmnopqrstuvwxyz", -1,
+ *                                     -1, NULL, &error);
  * if (! word) {
  *   /<!-- -->* deal with the error *<!-- -->/
  * } else {
@@ -559,14 +561,20 @@ ctpl_input_stream_peek (CtplInputStream *stream,
 gchar *
 ctpl_input_stream_read_word (CtplInputStream *stream,
                              const gchar     *accept,
+                             gssize           accept_len,
+                             gssize           max_len,
                              gsize           *length,
                              GError         **error)
 {
   GError   *err = NULL;
   GString  *word;
+  gsize     accept_length;
+  gsize     max_length;
   
+  accept_length = (accept_len < 0) ? strlen (accept) : (gsize)accept_len;
+  max_length = (max_len < 0) ? G_MAXSIZE : (gsize)max_len;
   word = g_string_new (NULL);
-  while (! err) {
+  while (! err && word->len <= max_length) {
     gchar c;
     
     c = ctpl_input_stream_peek_c (stream, &err);
@@ -575,7 +583,7 @@ ctpl_input_stream_read_word (CtplInputStream *stream,
     } else if (ctpl_input_stream_eof_fast (stream)) {
       break;
     } else {
-      if (strchr (accept, c)) {
+      if (memchr (accept, c, accept_length)) {
         g_string_append_c (word, c);
         ctpl_input_stream_get_c (stream, &err);
       } else {
@@ -598,6 +606,8 @@ ctpl_input_stream_read_word (CtplInputStream *stream,
  * ctpl_input_stream_peek_word:
  * @stream: A #CtplInputStream
  * @accept: string of the character acceptable for the word
+ * @accept_len: length of @accept, can be -1 if @accept is null-terminated
+ * @max_len: maximum number of bytes to peek, or -1 for no limit
  * @length: return location for the length of the read word, or %NULL
  * @error: return location for errors, or %NULL to ignore them
  * 
@@ -612,12 +622,18 @@ ctpl_input_stream_read_word (CtplInputStream *stream,
 gchar *
 ctpl_input_stream_peek_word (CtplInputStream *stream,
                              const gchar     *accept,
+                             gssize           accept_len,
+                             gssize           max_len,
                              gsize           *length,
                              GError         **error)
 {
   gboolean  success = FALSE;
   GString  *word;
+  gsize     accept_length;
+  gsize     max_length;
   
+  accept_length = (accept_len < 0) ? strlen (accept) : (gsize)accept_len;
+  max_length = (max_len < 0) ? G_MAXSIZE : (gsize)max_len;
   word = g_string_new (NULL);
   if (ensure_cache_filled (stream, error)) {
     gsize pos = stream->buf_pos;
@@ -626,7 +642,7 @@ ctpl_input_stream_peek_word (CtplInputStream *stream,
     do {
       gchar c = stream->buffer[pos++];
       
-      if (strchr (accept, c)) {
+      if (memchr (accept, c, accept_length)) {
         g_string_append_c (word, c);
       } else {
         break;
@@ -636,7 +652,7 @@ ctpl_input_stream_peek_word (CtplInputStream *stream,
                                 stream->buf_size + INPUT_STREAM_GROW_SIZE,
                                 error);
       }
-    } while (success && pos < stream->buf_size);
+    } while (success && pos < stream->buf_size && word->len <= max_length);
   }
   if (success && length) {
     *length = word->len;
@@ -685,6 +701,7 @@ ctpl_input_stream_skip (CtplInputStream *stream,
  * ctpl_input_stream_skip_word:
  * @stream: A #CtplInputStream
  * @reject: A string of the characters to skip
+ * @reject_len: Length of @reject, can be -1 if null-terminated
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Skips all the characters matching @reject from a #CtplInputStream until the
@@ -697,16 +714,20 @@ ctpl_input_stream_skip (CtplInputStream *stream,
 gssize
 ctpl_input_stream_skip_word (CtplInputStream  *stream,
                              const gchar      *reject,
+                             gssize            reject_len,
                              GError          **error)
 {
   gssize  n = 0;
   GError *err = NULL;
+  gsize   reject_length;
   
+  reject_length = reject_len < 0 ? strlen (reject) : (gsize) reject_len;
   while (! err) {
     gchar c;
     
     c = ctpl_input_stream_peek_c (stream, &err);
-    if (err || ctpl_input_stream_eof_fast (stream) || ! strchr (reject, c)) {
+    if (err || ctpl_input_stream_eof_fast (stream) ||
+        ! memchr (reject, c, reject_length)) {
       break;
     } else {
       ctpl_input_stream_get_c (stream, &err);

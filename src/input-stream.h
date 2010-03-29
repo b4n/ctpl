@@ -64,6 +64,8 @@ struct _CtplInputStream
  * Characters treated as blank, commonly used as separator.
  */
 #define CTPL_BLANK_CHARS  " \t\v\r\n"
+/* number of bytes in %CTPL_BLANK_CHARS */
+#define CTPL_BLANK_CHARS_LEN ((sizeof CTPL_BLANK_CHARS) - 1)
 /**
  * ctpl_is_blank:
  * @c: A character
@@ -88,6 +90,8 @@ struct _CtplInputStream
                           "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
                           "0123456789" \
                           "_"
+/* number of bytes in %CTPL_SYMBOL_CHARS */
+#define CTPL_SYMBOL_CHARS_LEN ((sizeof CTPL_SYMBOL_CHARS) - 1)
 /**
  * ctpl_is_symbol:
  * @c: A character
@@ -153,10 +157,14 @@ gchar             ctpl_input_stream_peek_c              (CtplInputStream *stream
                                                          GError         **error);
 gchar            *ctpl_input_stream_read_word           (CtplInputStream *stream,
                                                          const gchar     *accept,
+                                                         gssize           accept_len,
+                                                         gssize           max_len,
                                                          gsize           *length,
                                                          GError         **error);
 gchar            *ctpl_input_stream_peek_word           (CtplInputStream *stream,
                                                          const gchar     *accept,
+                                                         gssize           accept_len,
+                                                         gssize           max_len,
                                                          gsize           *length,
                                                          GError         **error);
 gssize            ctpl_input_stream_skip                (CtplInputStream *stream,
@@ -164,6 +172,7 @@ gssize            ctpl_input_stream_skip                (CtplInputStream *stream
                                                          GError         **error);
 gssize            ctpl_input_stream_skip_word           (CtplInputStream *stream,
                                                          const gchar     *reject,
+                                                         gssize           reject_len,
                                                          GError         **error);
 gchar            *ctpl_input_stream_read_string_literal (CtplInputStream *stream,
                                                          GError         **error);
@@ -210,8 +219,9 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
  * 
  * Since: 0.2
  */
-#define ctpl_input_stream_skip_blank(stream, error) \
-  (ctpl_input_stream_skip_word ((stream), CTPL_BLANK_CHARS, (error)))
+#define ctpl_input_stream_skip_blank(stream, error)                            \
+  (ctpl_input_stream_skip_word ((stream), CTPL_BLANK_CHARS,                    \
+                                CTPL_BLANK_CHARS_LEN, (error)))
 /**
  * ctpl_input_stream_read_symbol:
  * @stream: A #CtplInputStream
@@ -225,12 +235,14 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
  * 
  * Since: 0.2
  */
-#define ctpl_input_stream_read_symbol(stream, error) \
-  (ctpl_input_stream_read_word ((stream), CTPL_SYMBOL_CHARS, NULL, (error)))
+#define ctpl_input_stream_read_symbol(stream, error)                           \
+  (ctpl_input_stream_read_word ((stream), CTPL_SYMBOL_CHARS,                   \
+                                CTPL_SYMBOL_CHARS_LEN, -1, NULL, (error)))
 
 /**
  * ctpl_input_stream_read_symbol_full:
  * @stream: A #CtplInputStream
+ * @max_len: The maximum number of bytes to read, or -1 for no limit
  * @length: Return location for the read symbol length, or %NULL
  * @error: return location for errors, or %NULL to ignore them
  * 
@@ -242,12 +254,16 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
  * 
  * Since: 0.2
  */
-#define ctpl_input_stream_read_symbol_full(stream, length, error) \
-  (ctpl_input_stream_read_word ((stream), CTPL_SYMBOL_CHARS, (length), (error)))
+#define ctpl_input_stream_read_symbol_full(stream, max_len, length, error)     \
+  (ctpl_input_stream_read_word ((stream), CTPL_SYMBOL_CHARS,                   \
+                                CTPL_SYMBOL_CHARS_LEN, (max_len), (length),    \
+                                (error)))
 
 /**
  * ctpl_input_stream_peek_symbol:
  * @stream: A #CtplInputStream
+ * @max_len: The maximum number of bytes to peek, even if they still matches,
+ *           or -1 for no limit
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Peeks a word from a #CtplInputStream. See ctpl_input_stream_peek_word() and
@@ -258,12 +274,15 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
  * 
  * Since: 0.2
  */
-#define ctpl_input_stream_peek_symbol(stream, error) \
-  (ctpl_input_stream_peek_word ((stream), CTPL_SYMBOL_CHARS, NULL, (error)))
+#define ctpl_input_stream_peek_symbol(stream, max_len, error)                  \
+  (ctpl_input_stream_peek_word ((stream), CTPL_SYMBOL_CHARS,                   \
+                                CTPL_SYMBOL_CHARS_LEN, max_len, NULL, (error)))
 
 /**
  * ctpl_input_stream_peek_symbol_full:
  * @stream: A #CtplInputStream
+ * @max_len: The maximum number of bytes to peek, even if they still matches,
+ *           or -1 for no limit
  * @length: Return location for the peeked length, or %NULL
  * @error: Return location for errors, or %NULL to ignore them
  * 
@@ -275,8 +294,10 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
  * 
  * Since: 0.2
  */
-#define ctpl_input_stream_peek_symbol_full(stream, length, error) \
-  (ctpl_input_stream_peek_word ((stream), CTPL_SYMBOL_CHARS, (length), (error)))
+#define ctpl_input_stream_peek_symbol_full(stream, max_len, length, error)     \
+  (ctpl_input_stream_peek_word ((stream), CTPL_SYMBOL_CHARS,                   \
+                                CTPL_SYMBOL_CHARS_LEN, max_len, (length),      \
+                                (error)))
 
 
 G_END_DECLS
