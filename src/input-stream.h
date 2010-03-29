@@ -202,10 +202,10 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
 #define ctpl_input_stream_get_c ctpl_input_stream_get_c_inline
 #endif
 
-#define ctpl_input_stream_peek_c(stream, error)     \
-  ((! ctpl_input_stream_eof ((stream), (error)))    \
-   ? (stream)->buffer[(stream)->buf_pos]            \
-   : CTPL_EOF)
+#define ctpl_input_stream_peek_c(stream, error)            \
+  ((gchar)((! ctpl_input_stream_eof ((stream), (error)))   \
+           ? (stream)->buffer[(stream)->buf_pos]           \
+           : CTPL_EOF))
 
 /**
  * ctpl_input_stream_skip_blank:

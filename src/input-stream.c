@@ -28,15 +28,6 @@
 #include "value.h"
 
 
-/* TODO:
- *  * ctpl_input_stream_read_long()
- *  * A generic number-reading function somewhere to avoid bad approximation
- *    with floating values as source. The value would then be put to a
- *    #CtplValue.
- *    This would allow support for other bases (8, and even 2 maybe).
- */
-
-
 /**
  * SECTION: input-stream
  * @short_description: CTPL's data input stream
@@ -359,7 +350,7 @@ resize_cache (CtplInputStream *stream,
     if (read_size < 0) {
       success = FALSE;
     } else {
-      stream->buf_size += read_size;
+      stream->buf_size += (gsize)read_size;
     }
   } else if (new_size < stream->buf_size) {
     if (stream->buf_pos >= stream->buf_size) {
@@ -515,10 +506,10 @@ ctpl_input_stream_peek (CtplInputStream *stream,
   if (read_size >= 0) {
     /* if the buffer is smaller that the request it is at EOF */
     read_size = stream->buf_size - stream->buf_pos;
-    if (count < read_size) {
-      read_size = count;
+    if ((gssize)count < read_size) {
+      read_size = (gssize)count;
     }
-    memcpy (buffer, &stream->buffer[stream->buf_pos], read_size);
+    memcpy (buffer, &stream->buffer[stream->buf_pos], (gsize)read_size);
   }
   
   return read_size;
@@ -690,7 +681,7 @@ ctpl_input_stream_skip (CtplInputStream *stream,
       n = -1;
     } else {
       n += n_read;
-      count -= n_read;
+      count -= (gsize)n_read;
     }
   }
   
@@ -1000,8 +991,8 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
       } else {
         gchar  *nptr = gstring->str;
         gchar  *endptr;
-        gdouble dblval;
-        glong   longval;
+        gdouble dblval = 0.0;
+        glong   longval = 0;
         
         /*g_debug ("trying to convert '%s'", nptr);*/
         errno = 0;
