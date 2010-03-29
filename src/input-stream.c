@@ -396,11 +396,13 @@ resize_cache (CtplInputStream *stream,
  * The error this function can throw are from the %G_IO_ERROR domain.
  * 
  * <warning>
- *   The return value of this function is quite uncommon: it returns %TRUE if at
- *   stream's end, but also on error.
- *   This is to be more convenient since this function is mainly used to ensure
- *   the stream does NOT have reached its end. To differentiate an error from
- *   EOF, check if the error was set.
+ *   <para>
+ *     The return value of this function is quite uncommon: it returns %TRUE if
+ *     at stream's end, but also on error.
+ *     This is to be more convenient since this function is mainly used to
+ *     ensure the stream does NOT have reached its end. To differentiate an
+ *     error from EOF, check if the error was set.
+ *   </para>
  * </warning>
  * 
  * Returns: %FALSE if not at EOF, %TRUE otherwise (note that this includes I/O
@@ -484,9 +486,11 @@ ctpl_input_stream_read (CtplInputStream *stream,
  * doesn't removes the data from the stream.
  * 
  * <warning>
- *   Note a peek might resize the internal stream's cache to fit at least
- *   @count. Therefore, peeking too much data at once should be done with some
- *   care.
+ *   <para>
+ *     Note a peek might resize the internal stream's cache to fit at least
+ *     @count. Therefore, peeking too much data at once should be done with some
+ *     care.
+ *   </para>
  * </warning>
  * 
  * Returns: the number of bytes peeked, or -1 on error
@@ -1020,7 +1024,30 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
  * prefixed with <code>0o</code>, a hexadecimal integer prefixed with
  * <code>0x</code>, a decimal real with possible decimal exponent separated by a
  * <code>e</code> or a hexadecimal real with possible decimal power separated by
- * a <code>p</code>.
+ * a <code>p</code>; each possibly preceded by a plus or minus sign.
+ * The decimal point of real numbers is always a period (<code>.</code>).
+ * 
+ * <example>
+ *   <title>Some numeric constants</title>
+ *   <programlisting>
+ * /<!-- -->* Decimal integers *<!-- -->/
+ * 42
+ * +512
+ * /<!-- -->* Binary integers *<!-- -->/
+ * 0b11
+ * /<!-- -->* Octal integers *<!-- -->/
+ * 0o755
+ * /<!-- -->* Hexadecimal integers *<!-- -->/
+ * -0x7FFBE
+ * 0x8ff
+ * /<!-- -->* Decimal reals *<!-- -->/
+ * +2.1
+ * 1.024e3
+ * /<!-- -->* Hexadecimal reals *<!-- -->/
+ * 0x71F.A0
+ * -0x88fe.2p8
+ *   </programlisting>
+ * </example>
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  * 
@@ -1302,20 +1329,22 @@ ctpl_input_stream_peek_c (CtplInputStream *stream,
  * ctpl_input_stream_eof().
  * 
  * <warning>
- *   This function is reliable only to know if the stream already reached EOF,
- *   not if next read will do so. To reliably check whether the stream have data
- *   to be read, first call a function that will do a read if necessary, and
- *   then reach the end of the stream. For example, use
- *   ctpl_input_stream_peek_c():
- *   |[
- *     ctpl_input_stream_peek_c (stream, &error);
- *     /<!-- -->* deal with the possible error *<!-- -->/
- *     if (ctpl_input_stream_eof_fast (stream)) {
- *       /<!-- -->* here EOF is reliable *<!-- -->/
- *     }
- *   ]|
- *   There is also a reliable version, but that can fail:
- *   ctpl_input_stream_eof().
+ *   <para>
+ *     This function is reliable only to know if the stream already reached EOF,
+ *     not if next read will do so. To reliably check whether the stream have
+ *     data to be read, first call a function that will do a read if necessary,
+ *     and then reach the end of the stream. For example, use
+ *     ctpl_input_stream_peek_c():
+ *     |[
+ *       ctpl_input_stream_peek_c (stream, &error);
+ *       /<!-- -->* deal with the possible error *<!-- -->/
+ *       if (ctpl_input_stream_eof_fast (stream)) {
+ *         /<!-- -->* here EOF is reliable *<!-- -->/
+ *       }
+ *     ]|
+ *     There is also a reliable version, but that can fail:
+ *     ctpl_input_stream_eof().
+ *   </para>
  * </warning>
  * 
  * Returns: %TRUE if at end of stream, %FALSE otherwise.
