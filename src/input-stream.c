@@ -433,7 +433,7 @@ ctpl_input_stream_read (CtplInputStream *stream,
                         gsize            count,
                         GError         **error)
 {
-  gssize read_size = -1;
+  gssize read_size;
   
   g_return_val_if_fail (count <= G_MAXSSIZE, -1);
   
@@ -458,7 +458,7 @@ ctpl_input_stream_read (CtplInputStream *stream,
           stream->pos ++;
       }
       /*g_debug ("read character %d (%c)", c, c);*/
-      *(gchar *)buffer = c;
+      ((gchar *)buffer)[read_size] = c;
       count --;
     }
   }
@@ -494,16 +494,14 @@ ctpl_input_stream_peek (CtplInputStream *stream,
                         gsize            count,
                         GError         **error)
 {
-  gssize read_size = 0;
+  gssize read_size;
   
   g_return_val_if_fail (count <= G_MAXSSIZE, -1);
   
-  if ((stream->buf_size - stream->buf_pos) < count) {
-    if (! resize_cache (stream, stream->buf_pos + count, error)) {
-      read_size = -1;
-    }
-  }
-  if (read_size >= 0) {
+  if ((stream->buf_size - stream->buf_pos) < count &&
+      ! resize_cache (stream, stream->buf_pos + count, error)) {
+    read_size = -1;
+  } else {
     /* if the buffer is smaller that the request it is at EOF */
     read_size = stream->buf_size - stream->buf_pos;
     if ((gssize)count < read_size) {
@@ -571,6 +569,7 @@ ctpl_input_stream_read_word (CtplInputStream *stream,
     c = ctpl_input_stream_peek_c (stream, &err);
     if (err) {
       /* I/O error */
+      break;
     } else if (ctpl_input_stream_eof_fast (stream)) {
       break;
     } else {
@@ -672,13 +671,14 @@ ctpl_input_stream_skip (CtplInputStream *stream,
   gssize  n = 0;
   gchar   buf[SKIP_BUF_SIZE];
   
-  while (count > 0 && n >= 0) {
+  while (count > 0) {
     gssize n_read;
     
     n_read = ctpl_input_stream_read (stream, buf, MIN (count, SKIP_BUF_SIZE),
                                      error);
     if (n_read < 0) {
       n = -1;
+      break;
     } else {
       n += n_read;
       count -= (gsize)n_read;
