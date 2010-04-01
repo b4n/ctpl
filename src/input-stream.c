@@ -567,18 +567,64 @@ ctpl_input_stream_read_word (CtplInputStream *stream,
     gchar c;
     
     c = ctpl_input_stream_peek_c (stream, &err);
-    if (err) {
-      /* I/O error */
-      break;
-    } else if (ctpl_input_stream_eof_fast (stream)) {
+    if (err || ctpl_input_stream_eof_fast (stream) ||
+        ! memchr (accept, c, accept_length)) {
       break;
     } else {
-      if (memchr (accept, c, accept_length)) {
-        g_string_append_c (word, c);
-        ctpl_input_stream_get_c (stream, &err);
-      } else {
-        break;
-      }
+      g_string_append_c (word, c);
+      ctpl_input_stream_get_c (stream, &err);
+    }
+  }
+  if (err) {
+    g_propagate_error (error, err);
+  } else {
+    if (length) {
+      *length = word->len;
+    }
+  }
+  
+  return g_string_free (word, err != NULL);
+}
+
+/**
+ * ctpl_input_stream_read_symbol_full:
+ * @stream: A #CtplInputStream
+ * @max_len: The maximum number of bytes to read, or -1 for no limit
+ * @length: Return location for the read symbol length, or %NULL
+ * @error: return location for errors, or %NULL to ignore them
+ * 
+ * Reads a symbol from a #CtplInputStream. A symbol is a word composed of the
+ * characters from %CTPL_SYMBOL_CHARS.
+ * See ctpl_input_stream_read_word() and ctpl_input_stream_read_symbol().
+ * 
+ * Returns: A newly allocated string containing the read symbol, or %NULL on
+ *          error.
+ * 
+ * Since: 0.2
+ */
+/* Same as ctpl_input_stream_read_word() but uses ctpl_is_symbol() instead of a
+ * string of acceptable character to be faster */
+gchar *
+ctpl_input_stream_read_symbol_full (CtplInputStream *stream,
+                                    gssize           max_len,
+                                    gsize           *length,
+                                    GError         **error)
+{
+  GError   *err = NULL;
+  GString  *word;
+  gsize     max_length;
+  
+  max_length = (max_len < 0) ? G_MAXSIZE : (gsize)max_len;
+  word = g_string_new (NULL);
+  while (! err && word->len <= max_length) {
+    gchar c;
+    
+    c = ctpl_input_stream_peek_c (stream, &err);
+    if (err || ctpl_input_stream_eof_fast (stream) || ! ctpl_is_symbol (c)) {
+      break;
+    } else {
+      g_string_append_c (word, c);
+      ctpl_input_stream_get_c (stream, &err);
     }
   }
   if (err) {
@@ -633,6 +679,62 @@ ctpl_input_stream_peek_word (CtplInputStream *stream,
       gchar c = stream->buffer[pos++];
       
       if (memchr (accept, c, accept_length)) {
+        g_string_append_c (word, c);
+      } else {
+        break;
+      }
+      if (pos >= stream->buf_size) {
+        success = resize_cache (stream,
+                                stream->buf_size + INPUT_STREAM_GROW_SIZE,
+                                error);
+      }
+    } while (success && pos < stream->buf_size && word->len <= max_length);
+  }
+  if (success && length) {
+    *length = word->len;
+  }
+  
+  return g_string_free (word, ! success);
+}
+
+/**
+ * ctpl_input_stream_peek_symbol_full:
+ * @stream: A #CtplInputStream
+ * @max_len: The maximum number of bytes to peek, even if they still matches,
+ *           or -1 for no limit
+ * @length: Return location for the peeked length, or %NULL
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Peeks a word from a #CtplInputStream. See ctpl_input_stream_peek_word() and
+ * ctpl_input_stream_peek_symbol().
+ * 
+ * Returns: A newly allocated string containing the peeked symbol, or %NULL on
+ *          error.
+ * 
+ * Since: 0.2
+ */
+/* Same as ctpl_input_stream_peek_word() but uses ctpl_is_symbol() instead of a
+ * string of acceptable character to be faster */
+gchar *
+ctpl_input_stream_peek_symbol_full (CtplInputStream *stream,
+                                    gssize           max_len,
+                                    gsize           *length,
+                                    GError         **error)
+{
+  gboolean  success = FALSE;
+  GString  *word;
+  gsize     max_length;
+  
+  max_length = (max_len < 0) ? G_MAXSIZE : (gsize)max_len;
+  word = g_string_new (NULL);
+  if (ensure_cache_filled (stream, error)) {
+    gsize pos = stream->buf_pos;
+    
+    success = TRUE;
+    do {
+      gchar c = stream->buffer[pos++];
+      
+      if (ctpl_is_symbol (c)) {
         g_string_append_c (word, c);
       } else {
         break;
@@ -719,6 +821,47 @@ ctpl_input_stream_skip_word (CtplInputStream  *stream,
     c = ctpl_input_stream_peek_c (stream, &err);
     if (err || ctpl_input_stream_eof_fast (stream) ||
         ! memchr (reject, c, reject_length)) {
+      break;
+    } else {
+      ctpl_input_stream_get_c (stream, &err);
+      n++;
+    }
+  }
+  if (err) {
+    g_propagate_error (error, err);
+    n = -1;
+  }
+  
+  return n;
+}
+
+/**
+ * ctpl_input_stream_skip_blank:
+ * @stream: A #CtplInputStream
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Skips blank characters (as reported by ctpl_is_blank()).
+ * See ctpl_input_stream_skip().
+ * 
+ * Returns: The number of skipped characters.
+ * 
+ * Since: 0.2
+ */
+/* Same as ctpl_input_stream_skip_word() but uses ctpl_is_blank() instead of a
+ * string of acceptable character to be faster */
+gssize
+ctpl_input_stream_skip_blank (CtplInputStream  *stream,
+                              GError          **error)
+{
+  gssize  n = 0;
+  GError *err = NULL;
+  
+  while (! err) {
+    gchar c;
+    
+    c = ctpl_input_stream_peek_c (stream, &err);
+    if (err || ctpl_input_stream_eof_fast (stream) ||
+        ! ctpl_is_blank (c)) {
       break;
     } else {
       ctpl_input_stream_get_c (stream, &err);
