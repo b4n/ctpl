@@ -179,8 +179,8 @@ struct _CtplTokenExpr
  * @token.t_expr: The value of an expression token
  * @token.t_for: The value of a for token
  * @token.t_if: The value of an if token
- * @prev: Previous token
  * @next: Next token
+ * @last: Last token
  * 
  * The #CtplToken structure.
  */
@@ -193,9 +193,7 @@ struct _CtplToken
     CtplTokenFor   *t_for;
     CtplTokenIf    *t_if;
   } token;
-  CtplToken    *prev;
   CtplToken    *next;
-  CtplToken    *first;
   CtplToken    *last;
 };
 

@@ -57,9 +57,7 @@ token_new (void)
   
   token = g_slice_alloc (sizeof *token);
   if (token) {
-    token->prev = NULL;
     token->next = NULL;
-    token->first = NULL;
     token->last = NULL;
   }
   
@@ -349,7 +347,6 @@ ctpl_token_free (CtplToken *token,
 {
   while (token) {
     CtplToken *next;
-    CtplToken *prev;
     
     switch (token->type) {
       case CTPL_TOKEN_TYPE_DATA:
@@ -379,16 +376,11 @@ ctpl_token_free (CtplToken *token,
         break;
     }
     next = token->next;
-    prev = token->prev;
     g_slice_free1 (sizeof *token, token);
     token = NULL;
     if (chain) {
       /* free next token */
       token = next;
-    } else {
-      /* detach current token */
-      if (prev) prev->next = next;
-      if (next) next->prev = prev;
     }
   }
 }
@@ -404,6 +396,8 @@ void
 ctpl_token_append (CtplToken *token,
                    CtplToken *brother)
 {
+  CtplToken *first_tok = token;
+  
   if (token->last) {
     token = token->last;
   }
@@ -411,14 +405,8 @@ ctpl_token_append (CtplToken *token,
     token = token->next;
   }
   token->next = brother;
-  brother->prev = token;
   token->last = brother->last ? brother->last : brother;
-  if (! token->first) {
-    brother->first = token;
-  } else {
-    token->first->last = token->last;
-    brother->first = token->first;
-  }
+  first_tok->last = token->last;
 }
 
 /**
@@ -432,21 +420,8 @@ void
 ctpl_token_prepend (CtplToken *token,
                     CtplToken *brother)
 {
-  if (token->first) {
-    token = token->first;
-  }
-  while (token->prev) {
-    token = token->prev;
-  }
-  token->prev = brother;
   brother->next = token;
-  token->first = brother->first ? brother->first : brother;
-  if (! token->last) {
-    brother->last = token;
-  } else {
-    token->last->first = token->first;
-    brother->last = token->last;
-  }
+  brother->last = token->last ? token->last : token;
 }
 
 /* prints indentation for @depth */
