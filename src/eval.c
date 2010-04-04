@@ -604,14 +604,14 @@ ctpl_eval_operator (const CtplTokenExpr  *operator,
   
   ctpl_value_init (&lvalue);
   ctpl_value_init (&rvalue);
-  if (! ctpl_eval_value_internal (operator->token.t_operator.loperand,
+  if (! ctpl_eval_value_internal (operator->token.t_operator->loperand,
                                   env, &lvalue, error)) {
     rv = FALSE;
-  } else if (!ctpl_eval_value_internal (operator->token.t_operator.roperand,
+  } else if (!ctpl_eval_value_internal (operator->token.t_operator->roperand,
                                         env, &rvalue, error)) {
     rv = FALSE;
   } else {
-    rv = ctpl_eval_operator_internal (operator->token.t_operator.operator,
+    rv = ctpl_eval_operator_internal (operator->token.t_operator->operator,
                                       &lvalue, &rvalue, value, error);
   }
   ctpl_value_free_value (&rvalue);

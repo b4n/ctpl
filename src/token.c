@@ -138,11 +138,12 @@ ctpl_token_new_for (const char *array,
   token = token_new ();
   if (token) {
     token->type = CTPL_TOKEN_TYPE_FOR;
-    token->token.t_for.array = g_strdup (array);
-    token->token.t_for.iter = g_strdup (iterator);
+    token->token.t_for = g_slice_alloc (sizeof *token->token.t_for);
+    token->token.t_for->array = g_strdup (array);
+    token->token.t_for->iter = g_strdup (iterator);
     /* should be the children copied or so?
      * should be the children addable later? */
-    token->token.t_for.children = children;
+    token->token.t_for->children = children;
   }
   
   return token;
@@ -169,11 +170,12 @@ ctpl_token_new_if (CtplTokenExpr *condition,
   token = token_new ();
   if (token) {
     token->type = CTPL_TOKEN_TYPE_IF;
+    token->token.t_if = g_slice_alloc (sizeof *token->token.t_if);
     /* should be the children copied or so?
      * should be the children addable later? */
-    token->token.t_if.condition = condition;
-    token->token.t_if.if_children = if_children;
-    token->token.t_if.else_children = else_children;
+    token->token.t_if->condition = condition;
+    token->token.t_if->if_children = if_children;
+    token->token.t_if->else_children = else_children;
   }
   
   return token;
@@ -214,9 +216,10 @@ ctpl_token_expr_new_operator (CtplOperator    operator,
   token = ctpl_token_expr_new ();
   if (token) {
     token->type = CTPL_TOKEN_EXPR_TYPE_OPERATOR;
-    token->token.t_operator.operator = operator;
-    token->token.t_operator.loperand = loperand;
-    token->token.t_operator.roperand = roperand;
+    token->token.t_operator = g_slice_alloc (sizeof *token->token.t_operator);
+    token->token.t_operator->operator = operator;
+    token->token.t_operator->loperand = loperand;
+    token->token.t_operator->roperand = roperand;
   }
   
   return token;
@@ -309,9 +312,10 @@ ctpl_token_expr_free (CtplTokenExpr *token,
     switch (token->type) {
       case CTPL_TOKEN_EXPR_TYPE_OPERATOR:
         if (recurse) {
-          ctpl_token_expr_free (token->token.t_operator.loperand, recurse);
-          ctpl_token_expr_free (token->token.t_operator.roperand, recurse);
+          ctpl_token_expr_free (token->token.t_operator->loperand, recurse);
+          ctpl_token_expr_free (token->token.t_operator->roperand, recurse);
         }
+        g_slice_free1 (sizeof *token->token.t_operator, token->token.t_operator);
         break;
       
       case CTPL_TOKEN_EXPR_TYPE_SYMBOL:
@@ -357,17 +361,21 @@ ctpl_token_free (CtplToken *token,
         break;
       
       case CTPL_TOKEN_TYPE_FOR:
-        g_free (token->token.t_for.array);
-        g_free (token->token.t_for.iter);
+        g_free (token->token.t_for->array);
+        g_free (token->token.t_for->iter);
         
-        ctpl_token_free (token->token.t_for.children, TRUE);
+        ctpl_token_free (token->token.t_for->children, TRUE);
+        
+        g_slice_free1 (sizeof *token->token.t_for, token->token.t_for);
         break;
       
       case CTPL_TOKEN_TYPE_IF:
-        ctpl_token_expr_free (token->token.t_if.condition, TRUE);
+        ctpl_token_expr_free (token->token.t_if->condition, TRUE);
         
-        ctpl_token_free (token->token.t_if.if_children, TRUE);
-        ctpl_token_free (token->token.t_if.else_children, TRUE);
+        ctpl_token_free (token->token.t_if->if_children, TRUE);
+        ctpl_token_free (token->token.t_if->else_children, TRUE);
+        
+        g_slice_free1 (sizeof *token->token.t_if, token->token.t_if);
         break;
     }
     next = token->next;
@@ -474,13 +482,13 @@ ctpl_token_expr_dump_internal (const CtplTokenExpr *expr)
         break;
       
       case CTPL_TOKEN_EXPR_TYPE_OPERATOR:
-        if (expr->token.t_operator.loperand) {
-          ctpl_token_expr_dump_internal (expr->token.t_operator.loperand);
+        if (expr->token.t_operator->loperand) {
+          ctpl_token_expr_dump_internal (expr->token.t_operator->loperand);
         }
         g_print (" %s ",
-                 ctpl_operator_to_string (expr->token.t_operator.operator));
-        if (expr->token.t_operator.roperand) {
-          ctpl_token_expr_dump_internal (expr->token.t_operator.roperand);
+                 ctpl_operator_to_string (expr->token.t_operator->operator));
+        if (expr->token.t_operator->roperand) {
+          ctpl_token_expr_dump_internal (expr->token.t_operator->roperand);
         }
         break;
       
@@ -518,27 +526,27 @@ ctpl_token_dump_internal (const CtplToken *token,
       
       case CTPL_TOKEN_TYPE_FOR:
         g_print ("for: for '%s' in '%s'\n",
-                 token->token.t_for.iter, token->token.t_for.array);
-        if (token->token.t_for.children) {
-          ctpl_token_dump_internal (token->token.t_for.children,
+                 token->token.t_for->iter, token->token.t_for->array);
+        if (token->token.t_for->children) {
+          ctpl_token_dump_internal (token->token.t_for->children,
                                     TRUE, depth + 1);
         }
         break;
       
       case CTPL_TOKEN_TYPE_IF:
         g_print ("if: ");
-        ctpl_token_expr_dump_internal (token->token.t_if.condition);
+        ctpl_token_expr_dump_internal (token->token.t_if->condition);
         g_print ("\n");
-        if (token->token.t_if.if_children) {
+        if (token->token.t_if->if_children) {
           print_depth_prefix (depth);
           g_print (" then:\n");
-          ctpl_token_dump_internal (token->token.t_if.if_children,
+          ctpl_token_dump_internal (token->token.t_if->if_children,
                                     TRUE, depth + 1);
         }
-        if (token->token.t_if.else_children) {
+        if (token->token.t_if->else_children) {
           print_depth_prefix (depth);
           g_print (" else:\n");
-          ctpl_token_dump_internal (token->token.t_if.else_children,
+          ctpl_token_dump_internal (token->token.t_if->else_children,
                                     TRUE, depth + 1);
         }
         break;

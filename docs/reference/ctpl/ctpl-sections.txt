@@ -41,6 +41,7 @@ CtplTokenFor
 CtplTokenIf
 CtplTokenExprType
 CtplTokenExpr
+CtplTokenExprOperator
 ctpl_token_new_data
 ctpl_token_new_expr
 ctpl_token_new_for

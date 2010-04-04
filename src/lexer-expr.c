@@ -350,7 +350,7 @@ token_operator_to_string (CtplTokenExpr *token)
   /* by default, index the last op (error) */
   str = operators_array[operators_array_length].str;
   if (token->type == CTPL_TOKEN_EXPR_TYPE_OPERATOR) {
-    str = ctpl_operator_to_string (token->token.t_operator.operator);
+    str = ctpl_operator_to_string (token->token.t_operator->operator);
   }
   
   return str;
@@ -400,8 +400,8 @@ validate_token_list (GSList  *tokens,
       //~ g_debug ("found an operator:");
       //~ ctpl_token_expr_dump (operands[opt-1]);
       if (opt > 1) {
-        if (operator_is_prior (operators[0]->token.t_operator.operator,
-                               operators[1]->token.t_operator.operator)) {
+        if (operator_is_prior (operators[0]->token.t_operator->operator,
+                               operators[1]->token.t_operator->operator)) {
           CtplTokenExpr *nexpr;
           
           //~ g_debug ("Operator is prior");
@@ -409,8 +409,8 @@ validate_token_list (GSList  *tokens,
           operators[0] = operators[1];
           operators[1] = NULL;
           opt --;
-          nexpr->token.t_operator.loperand = operands[0];
-          nexpr->token.t_operator.roperand = operands[1];
+          nexpr->token.t_operator->loperand = operands[0];
+          nexpr->token.t_operator->roperand = operands[1];
           operands[0] = nexpr;
           operands[1] = NULL;
           opd = 1;
@@ -431,8 +431,8 @@ validate_token_list (GSList  *tokens,
     CtplTokenExpr *nexpr;
     
     nexpr = operators[0];
-    nexpr->token.t_operator.loperand = operands[0];
-    nexpr->token.t_operator.roperand = operands[1];
+    nexpr->token.t_operator->loperand = operands[0];
+    nexpr->token.t_operator->roperand = operands[1];
     expr = nexpr;
   } else {
     g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,

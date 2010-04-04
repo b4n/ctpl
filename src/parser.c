@@ -242,11 +242,11 @@ ctpl_parser_parse_token (const CtplToken *token,
       break;
     
     case CTPL_TOKEN_TYPE_FOR:
-      rv = ctpl_parser_parse_token_for (&token->token.t_for, env, output, error);
+      rv = ctpl_parser_parse_token_for (token->token.t_for, env, output, error);
       break;
     
     case CTPL_TOKEN_TYPE_IF:
-      rv = ctpl_parser_parse_token_if (&token->token.t_if, env, output, error);
+      rv = ctpl_parser_parse_token_if (token->token.t_if, env, output, error);
       break;
     
     case CTPL_TOKEN_TYPE_EXPR:

@@ -98,10 +98,11 @@ typedef enum {
   CTPL_OPERATOR_NONE
 } CtplOperator;
 
-typedef struct _CtplToken     CtplToken;
-typedef struct _CtplTokenFor  CtplTokenFor;
-typedef struct _CtplTokenIf   CtplTokenIf;
-typedef struct _CtplTokenExpr CtplTokenExpr;
+typedef struct _CtplToken             CtplToken;
+typedef struct _CtplTokenFor          CtplTokenFor;
+typedef struct _CtplTokenIf           CtplTokenIf;
+typedef struct _CtplTokenExpr         CtplTokenExpr;
+typedef struct _CtplTokenExprOperator CtplTokenExprOperator;
 
 /**
  * CtplTokenFor:
@@ -134,13 +135,25 @@ struct _CtplTokenIf
 };
 
 /**
+ * CtplTokenExprOperator:
+ * @operator: The operator
+ * @loperand: The left operand
+ * @roperand: The right operand
+ * 
+ * Represents a operator token in an expression.
+ */
+struct _CtplTokenExprOperator
+{
+  CtplOperator    operator;
+  CtplTokenExpr  *loperand;
+  CtplTokenExpr  *roperand;
+};
+
+/**
  * CtplTokenExpr:
  * @type: The type of the expression token
  * @token: The expression token
  * @token.t_operator: The value of an operator token
- * @token.t_operator.operator: The operator
- * @token.t_operator.loperand: The left operand
- * @token.t_operator.roperand: The right operand
  * @token.t_integer: The value of an integer token
  * @token.t_float: The value of a floating-point token
  * @token.t_symbol: The name of a symbol token
@@ -151,14 +164,10 @@ struct _CtplTokenExpr
 {
   CtplTokenExprType type;
   union {
-    struct {
-      CtplOperator    operator;
-      CtplTokenExpr  *loperand;
-      CtplTokenExpr  *roperand;
-    }         t_operator;
-    glong     t_integer;
-    gdouble   t_float;
-    gchar    *t_symbol;
+    CtplTokenExprOperator  *t_operator;
+    glong                   t_integer;
+    gdouble                 t_float;
+    gchar                  *t_symbol;
   } token;
 };
 
@@ -181,8 +190,8 @@ struct _CtplToken
   union {
     gchar          *t_data;
     CtplTokenExpr  *t_expr;
-    CtplTokenFor    t_for;
-    CtplTokenIf     t_if;
+    CtplTokenFor   *t_for;
+    CtplTokenIf    *t_if;
   } token;
   CtplToken    *prev;
   CtplToken    *next;
