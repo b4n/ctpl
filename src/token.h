@@ -28,9 +28,9 @@ G_BEGIN_DECLS
 /**
  * CtplTokenType:
  * @CTPL_TOKEN_TYPE_DATA: Data flow, not a real token
- * @CTPL_TOKEN_TYPE_VAR: A variable that should be replaced
  * @CTPL_TOKEN_TYPE_FOR: A loop through an array of value
  * @CTPL_TOKEN_TYPE_IF: A conditional branching
+ * @CTPL_TOKEN_TYPE_EXPR: An expression
  * 
  * Possible types of a token.
  */

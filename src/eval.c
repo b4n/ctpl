@@ -63,7 +63,7 @@ static gboolean   ctpl_eval_bool_value      (const CtplValue *value);
 
 
 /* check if value types matches @vtype and try to convert if necessary
- * throw a CTPL_EVAL_ERROR_INVALID_VALUE if cannot convert to requested type */
+ * throw a CTPL_EVAL_ERROR_INVALID_OPERAND if cannot convert to requested type */
 static gboolean
 ensure_operands_type (CtplValue     *lvalue,
                       CtplValue     *rvalue,
@@ -75,7 +75,7 @@ ensure_operands_type (CtplValue     *lvalue,
   
   if (! ctpl_value_convert (lvalue, vtype) ||
       ! ctpl_value_convert (rvalue, vtype)) {
-    g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_VALUE,
+    g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
                  "Invalid operands for operator '%s' (have '%s' and '%s', "
                  "expect operands compatible with '%s')",
                  operator_name,

@@ -57,8 +57,8 @@ typedef enum _CtplEnvironError
 typedef struct _CtplEnviron CtplEnviron;
 /**
  * CtplEnvironForeachFunc:
- * @environ: The #CtplEnviron on which the function was called
- * @cymbol: The current symbol
+ * @env: The #CtplEnviron on which the function was called
+ * @symbol: The current symbol
  * @value: The symbol's value
  * @user_data: User data passed to ctpl_environ_foreach()
  * 
@@ -73,7 +73,6 @@ typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
 
 /**
  * CtplEnviron:
- * @symbol_table: Table containing stacks of symbols
  * 
  * Represents an environment.
  */

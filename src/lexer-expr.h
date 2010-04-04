@@ -80,7 +80,7 @@ typedef enum _CtplLexerExprError
 GQuark          ctpl_lexer_expr_error_quark (void) G_GNUC_CONST;
 CtplTokenExpr  *ctpl_lexer_expr_lex         (CtplInputStream *stream,
                                              GError         **error);
-CtplTokenExpr  *ctpl_lexer_expr_lex_full    (CtplInputStream *mb,
+CtplTokenExpr  *ctpl_lexer_expr_lex_full    (CtplInputStream *stream,
                                              gboolean         lex_all,
                                              GError         **error);
 CtplTokenExpr  *ctpl_lexer_expr_lex_string  (const gchar *expr,
