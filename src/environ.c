@@ -465,7 +465,8 @@ read_array (CtplInputStream *stream,
     ctpl_value_set_array (value, CTPL_VTYPE_INT, 0, NULL);
     ctpl_value_init (&item);
     while (! err && in_array) {
-      if (read_value (stream, &item, &err)) {
+      if (ctpl_input_stream_skip_blank (stream, &err) >= 0 &&
+          read_value (stream, &item, &err)) {
         ctpl_value_array_append (value, &item);
         if (ctpl_input_stream_skip_blank (stream, &err) >= 0) {
           c = ctpl_input_stream_get_c (stream, &err);
@@ -474,7 +475,7 @@ read_array (CtplInputStream *stream,
           } else if (c == ARRAY_END_CHAR) {
             in_array = FALSE;
           } else if (c == ARRAY_SEPARATOR_CHAR) {
-            ctpl_input_stream_skip_blank (stream, &err);
+            /* nothing to do, just continue reading */
           } else {
             ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
                                          CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
