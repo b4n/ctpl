@@ -4,9 +4,3 @@
 ? Use statically allocated values in ctpl_parser_parse_token_expr()
 ? Add support for string literals in expressions (started in string-literals
   branch)
-? Use GIO (there is GMemory*Stream) as I/O layer instead of libmb?
-  Advantages would be to drop the libmb dependence, while using a well-used
-  I/O layer.
-  Disadvantages may be the speed and built-in functionalities we need.
-  Writing(?) a small library (or module) to extend GIO would probably be enough
-  for the latter.
