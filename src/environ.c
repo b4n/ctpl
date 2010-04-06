@@ -46,15 +46,18 @@
  *   </programlisting>
  * </example>
  * 
- * Environments can be loaded from #CtplInputStream, strings or files using
- * ctpl_environ_add_from_stream(), ctpl_environ_add_from_string() or
+ * Environments can also be loaded from #CtplInputStream<!-- -->s, strings or
+ * files using ctpl_environ_add_from_stream(), ctpl_environ_add_from_string() or
  * ctpl_environ_add_from_path(). Environment descriptions are of the form
- * <code>SYMBOL = VALUE;</code>. Some examples below:
+ * <code>SYMBOL = VALUE;</code> and can contain comments. Comments starts with a
+ * <code>#</code> (number sign) and ends at the next line ending.
+ * Some examples below:
  * <example>
  *   <title>An environment description</title>
  *   <programlisting>
  * foo            = "string value";
- * bar            = 42;
+ * # This is a comment
+ * bar            = 42; # An important number!
  * str            = "a more
  *                   complex\" string";
  * array          = [1, 2, "hello", ["world", "dolly"]];
@@ -412,12 +415,64 @@ ctpl_environ_merge (CtplEnviron        *env,
 #define ARRAY_SEPARATOR_CHAR  ','
 #define VALUE_SEPARATOR_CHAR  '='
 #define VALUE_END_CHAR        ';'
+#define SINGLE_COMMENT_START  '#'
 
 
 static gboolean   read_value              (CtplInputStream *stream,
                                            CtplValue       *value,
                                            GError         **error);
 
+
+/* skips characters that should be skipped: blanks and comments */
+static gssize
+skip_blank (CtplInputStream *stream,
+            GError         **error)
+{
+  gssize  skip = 0;
+  gssize  pass_skip;
+  
+  do {
+    pass_skip = ctpl_input_stream_skip_blank (stream, error);
+    if (pass_skip >= 0) {
+      GError *err = NULL;
+      
+      if (ctpl_input_stream_peek_c (stream, &err) == SINGLE_COMMENT_START) {
+        gboolean in_comment = TRUE;
+        
+        for (; in_comment; pass_skip++) {
+          gchar c;
+          
+          c = ctpl_input_stream_get_c (stream, &err);
+          if (err) {
+            break;
+          } else {
+            switch (c) {
+              case '\r':
+              case '\n':
+              case CTPL_EOF:
+                in_comment = FALSE;
+                break;
+            }
+          }
+        }
+        if (! err) {
+          pass_skip += ctpl_input_stream_skip_blank (stream, &err);
+        }
+      }
+      if (err) {
+        g_propagate_error (error, err);
+        pass_skip = -1;
+      }
+    }
+    if (pass_skip > 0) {
+      skip += pass_skip;
+    } else if (pass_skip < 0) {
+      skip = -1;
+    }
+  } while (pass_skip > 0);
+  
+  return skip;
+}
 
 /* tries to read a string literal */
 static gboolean
@@ -465,10 +520,10 @@ read_array (CtplInputStream *stream,
     ctpl_value_set_array (value, CTPL_VTYPE_INT, 0, NULL);
     ctpl_value_init (&item);
     while (! err && in_array) {
-      if (ctpl_input_stream_skip_blank (stream, &err) >= 0 &&
+      if (skip_blank (stream, &err) >= 0 &&
           read_value (stream, &item, &err)) {
         ctpl_value_array_append (value, &item);
-        if (ctpl_input_stream_skip_blank (stream, &err) >= 0) {
+        if (skip_blank (stream, &err) >= 0) {
           c = ctpl_input_stream_get_c (stream, &err);
           if (err) {
             /* I/O error */
@@ -534,7 +589,7 @@ load_next (CtplEnviron     *env,
 {
   gboolean  rv = FALSE;
   
-  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+  if (skip_blank (stream, error) >= 0) {
     gchar *symbol;
     
     symbol = ctpl_input_stream_read_symbol (stream, error);
@@ -545,7 +600,7 @@ load_next (CtplEnviron     *env,
                                    CTPL_ENVIRON_ERROR_LOADER_MISSING_SYMBOL,
                                    "Missing symbol");
     } else {
-      if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+      if (skip_blank (stream, error) >= 0) {
         GError *err = NULL;
         gchar   c;
         
@@ -559,12 +614,12 @@ load_next (CtplEnviron     *env,
                                        "Missing `%c` separator between symbol "
                                        "and value", VALUE_SEPARATOR_CHAR);
         } else {
-          if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+          if (skip_blank (stream, error) >= 0) {
             CtplValue value;
             
             ctpl_value_init (&value);
             if (read_value (stream, &value, error) &&
-                ctpl_input_stream_skip_blank (stream, error) >= 0) {
+                skip_blank (stream, error) >= 0) {
               c = ctpl_input_stream_get_c (stream, &err);
               if (err) {
                 /* I/O error */
@@ -577,7 +632,7 @@ load_next (CtplEnviron     *env,
                                              VALUE_END_CHAR);
               } else {
                 /* skip blanks again to try to reach end before next call */
-                if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+                if (skip_blank (stream, error) >= 0) {
                   ctpl_environ_push (env, symbol, &value);
                   rv = TRUE;
                 }
