@@ -485,6 +485,7 @@ ctpl_eval_operator_and_or (CtplValue     *lvalue,
   gboolean lres;
   gboolean rres;
   
+  (void)error; /* we don't use the error, silent compilers */
   lres = ctpl_eval_bool_value (lvalue);
   rres = ctpl_eval_bool_value (rvalue);
   switch (op) {

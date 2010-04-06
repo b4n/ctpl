@@ -87,7 +87,7 @@ ctpl_output_stream_write (CtplOutputStream  *stream,
   
   len = (length < 0) ? strlen (data) : (gsize)length;
   
-  return g_output_stream_write (stream, data, len, NULL, error) == len;
+  return g_output_stream_write (stream, data, len, NULL, error) == (gssize)len;
 }
 
 #undef ctpl_output_stream_put_c

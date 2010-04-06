@@ -162,6 +162,7 @@ read_number (CtplInputStream *stream,
   CtplTokenExpr  *token = NULL;
   CtplValue       value;
   
+  (void)state; /* we don't use the state, silent compilers */
   ctpl_value_init (&value);
   if (ctpl_input_stream_read_number (stream, &value, error)) {
     if (CTPL_VALUE_HOLDS_INT (&value)) {
@@ -186,6 +187,7 @@ read_symbol (CtplInputStream *stream,
   CtplTokenExpr *token = NULL;
   gchar         *symbol;
   
+  (void)state; /* we don't use the state, silent compilers */
   symbol = ctpl_input_stream_read_symbol (stream, error);
   if (symbol) {
     if (*symbol) {
@@ -460,6 +462,7 @@ lex_operator (CtplInputStream *stream,
   gchar           buf[OPERATORS_STR_MAXLEN];
   gssize          read_size;
   
+  (void)state; /* we don't use the state, silent compilers */
   read_size = ctpl_input_stream_peek (stream, buf, sizeof buf, error);
   if (read_size >= 0) {
     /*g_debug ("Lexing operator '%.*s'", sizoef buf, buf);*/

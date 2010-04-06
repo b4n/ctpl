@@ -484,7 +484,7 @@ ctpl_token_dump_internal (const CtplToken *token,
                           gsize            depth)
 {
   print_depth_prefix (depth);
-  g_print ("token[%p]: ", token);
+  g_print ("token[%p]: ", (gpointer)token);
   if (! token) {
     g_print ("\n");
   } else {
@@ -541,7 +541,7 @@ ctpl_token_dump_internal (const CtplToken *token,
 void
 ctpl_token_expr_dump (const CtplTokenExpr *token)
 {
-  g_print ("token expr[%p]: ", token);
+  g_print ("token expr[%p]: ", (gpointer)token);
   ctpl_token_expr_dump_internal (token);
   g_print ("\n");
 }

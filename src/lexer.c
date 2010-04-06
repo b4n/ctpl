@@ -368,6 +368,7 @@ ctpl_lexer_read_token_tpl_expr (CtplInputStream *stream,
   CtplToken      *token = NULL;
   CtplTokenExpr  *expr;
   
+  (void)state; /* we don't use the state, silent compilers */
   if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
     expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
     if (expr) {
@@ -476,6 +477,7 @@ ctpl_lexer_read_token_data (CtplInputStream *stream,
   GString    *gstring;
   GError     *err = NULL;
   
+  (void)state; /* we don't use the state, silent compilers */
   gstring = g_string_new ("");
   while (! err) {
     c = ctpl_input_stream_peek_c (stream, &err);
