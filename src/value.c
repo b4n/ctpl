@@ -1,6 +1,6 @@
 /* 
  * 
- * Copyright (C) 2007-2009 Colomban "Ban" Wendling <ban@herbesfolles.org>
+ * Copyright (C) 2007-2010 Colomban "Ban" Wendling <ban@herbesfolles.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
