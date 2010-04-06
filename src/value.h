@@ -48,15 +48,13 @@ typedef struct _CtplValue CtplValue;
 /* Public in order to be able to use statically allocated values. */
 /**
  * CtplValue:
- * @type: Type that the value holds
- * @value: Union containing the held value
  * 
  * Represents a generic value.
  */
 struct _CtplValue
 {
   /*<private>*/
-  gint type;
+  gint type; /* held type */
   union {
     glong     v_int;
     gdouble   v_float;

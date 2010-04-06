@@ -20,19 +20,41 @@ AC_SUBST(ctplincludedir)
 LT_PREREQ([2.2.0])
 LT_INIT
 AC_PROG_CC
+AC_PROG_CC_C99
 
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
 
 # Checks for libraries.
-PKG_CHECK_MODULES([LIBMB],  [libmb])
-PKG_CHECK_MODULES([GLIB],   [glib-2.0])
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.10])
+PKG_CHECK_MODULES([GIO],  [gio-2.0])
+# FIXME: needed by the ctpl utility to write to stdout
+HAVE_GIO_UNIX="no"
+PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0],
+                  [HAVE_GIO_UNIX="yes"],
+                  [HAVE_GIO_UNIX="no"
+                   AC_MSG_WARN([The ctpl command-line utility will not be built because of the following error: ${GIO_UNIX_PKG_ERRORS}])])
+AM_CONDITIONAL([BUILD_CTPL], [test x$HAVE_GIO_UNIX = xyes])
 
-# FIXME: hack!
-LIBS="$LIBS -lm"
+# needed for the math functions checks to work
+AC_CHECK_LIB([m], [acos])
 
-CFLAGS="$CFLAGS $LIBMB_CFLAGS $GLIB_CFLAGS"
-LIBS="$LIBS $LIBMB_LIBS $GLIB_LIBS"
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h string.h math.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_CHECK_FUNCS([memchr strchr fabs])
+# fpclassify() is a macro
+AC_CHECK_DECLS([fpclassify],
+               [AC_DEFINE([HAVE_FPCLASSIFY], [1],
+                          [Whether we have fpclassify])],
+               [],
+               [[#include <math.h>]])
 
 # paranoiac compilation
 AC_ARG_ENABLE([paranoia],
@@ -59,19 +81,7 @@ else
   AC_MSG_RESULT([[no]])
 fi
 
-# Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h math.h])
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
-
-# Checks for library functions.
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([memchr strchr fabs])
-AC_CHECK_FUNCS([fpclassify])
-
+# Output
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  docs/Makefile

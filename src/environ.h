@@ -22,7 +22,7 @@
 
 #include "value.h"
 #include <glib.h>
-#include <mb.h>
+#include "input-stream.h"
 
 G_BEGIN_DECLS
 
@@ -57,8 +57,8 @@ typedef enum _CtplEnvironError
 typedef struct _CtplEnviron CtplEnviron;
 /**
  * CtplEnvironForeachFunc:
- * @environ: The #CtplEnviron on which the function was called
- * @cymbol: The current symbol
+ * @env: The #CtplEnviron on which the function was called
+ * @symbol: The current symbol
  * @value: The symbol's value
  * @user_data: User data passed to ctpl_environ_foreach()
  * 
@@ -73,7 +73,6 @@ typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
 
 /**
  * CtplEnviron:
- * @symbol_table: Table containing stacks of symbols
  * 
  * Represents an environment.
  */
@@ -84,40 +83,40 @@ struct _CtplEnviron
 };
 
 
-GQuark            ctpl_environ_error_quark    (void) G_GNUC_CONST;
-CtplEnviron      *ctpl_environ_new            (void);
-void              ctpl_environ_free           (CtplEnviron *env);
-const CtplValue  *ctpl_environ_lookup         (const CtplEnviron *env,
-                                               const gchar       *symbol);
-void              ctpl_environ_push           (CtplEnviron     *env,
-                                               const gchar     *symbol,
-                                               const CtplValue *value);
-void              ctpl_environ_push_int       (CtplEnviron     *env,
-                                               const gchar     *symbol,
-                                               glong            value);
-void              ctpl_environ_push_float     (CtplEnviron     *env,
-                                               const gchar      *symbol,
-                                               gdouble           value);
-void              ctpl_environ_push_string    (CtplEnviron     *env,
-                                               const gchar     *symbol,
-                                               const gchar     *value);
-const CtplValue  *ctpl_environ_pop            (CtplEnviron *env,
-                                               const gchar *symbol);
-void              ctpl_environ_foreach        (CtplEnviron           *env,
-                                               CtplEnvironForeachFunc func,
-                                               gpointer               user_data);
-void              ctpl_environ_merge          (CtplEnviron        *env,
-                                               const CtplEnviron  *source,
-                                               gboolean            merge_symbols);
-gboolean          ctpl_environ_add_from_mb    (CtplEnviron *env,
-                                               MB          *mb,
-                                               GError     **error);
-gboolean          ctpl_environ_add_from_string(CtplEnviron  *env,
-                                               const gchar  *string,
-                                               GError      **error);
-gboolean          ctpl_environ_add_from_file  (CtplEnviron *env,
-                                               const gchar *filename,
-                                               GError     **error);
+GQuark            ctpl_environ_error_quark      (void) G_GNUC_CONST;
+CtplEnviron      *ctpl_environ_new              (void);
+void              ctpl_environ_free             (CtplEnviron *env);
+const CtplValue  *ctpl_environ_lookup           (const CtplEnviron *env,
+                                                 const gchar       *symbol);
+void              ctpl_environ_push             (CtplEnviron     *env,
+                                                 const gchar     *symbol,
+                                                 const CtplValue *value);
+void              ctpl_environ_push_int         (CtplEnviron     *env,
+                                                 const gchar     *symbol,
+                                                 glong            value);
+void              ctpl_environ_push_float       (CtplEnviron     *env,
+                                                 const gchar      *symbol,
+                                                 gdouble           value);
+void              ctpl_environ_push_string      (CtplEnviron     *env,
+                                                 const gchar     *symbol,
+                                                 const gchar     *value);
+const CtplValue  *ctpl_environ_pop              (CtplEnviron *env,
+                                                 const gchar *symbol);
+void              ctpl_environ_foreach          (CtplEnviron           *env,
+                                                 CtplEnvironForeachFunc func,
+                                                 gpointer               user_data);
+void              ctpl_environ_merge            (CtplEnviron        *env,
+                                                 const CtplEnviron  *source,
+                                                 gboolean            merge_symbols);
+gboolean          ctpl_environ_add_from_stream  (CtplEnviron     *env,
+                                                 CtplInputStream *stream,
+                                                 GError         **error);
+gboolean          ctpl_environ_add_from_string  (CtplEnviron  *env,
+                                                 const gchar  *string,
+                                                 GError      **error);
+gboolean          ctpl_environ_add_from_path    (CtplEnviron *env,
+                                                 const gchar *path,
+                                                 GError     **error);
 
 
 G_END_DECLS

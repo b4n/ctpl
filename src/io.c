@@ -17,18 +17,26 @@
  * 
  */
 
-#ifndef H_CTPL_H
-#define H_CTPL_H
-
-#include "environ.h"
-#include "eval.h"
-#include "lexer-expr.h"
-#include "lexer.h"
-#include "parser.h"
 #include "io.h"
-#include "input-stream.h"
-#include "output-stream.h"
-#include "token.h"
-#include "value.h"
+#include <glib.h>
 
-#endif /* guard */
+
+/**
+ * SECTION: io
+ * @short_description: CTPL's IO layer
+ * @include: ctpl/io.h
+ * 
+ * See the two sub-modules #CtplInputStream and #CtplOutputStream.
+ */
+
+GQuark
+ctpl_io_error_quark (void)
+{
+  static GQuark q = 0;
+  
+  if (G_UNLIKELY (q == 0)) {
+    q = g_quark_from_static_string ("ctpl-io-error");
+  }
+  
+  return q;
+}

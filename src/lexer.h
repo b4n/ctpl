@@ -21,8 +21,8 @@
 #define H_CTPL_LEXER_H
 
 #include "token.h"
-#include <mb.h>
 #include <glib.h>
+#include "input-stream.h"
 
 G_BEGIN_DECLS
 
@@ -63,11 +63,11 @@ typedef enum _CtplLexerError
 
 
 GQuark      ctpl_lexer_error_quark  (void) G_GNUC_CONST;
-CtplToken  *ctpl_lexer_lex          (MB      *mb,
-                                     GError **error);
+CtplToken  *ctpl_lexer_lex          (CtplInputStream *stream,
+                                     GError         **error);
 CtplToken  *ctpl_lexer_lex_string   (const gchar *template,
                                      GError     **error);
-CtplToken  *ctpl_lexer_lex_file     (const gchar *filename,
+CtplToken  *ctpl_lexer_lex_path     (const gchar *path,
                                      GError     **error);
 void        ctpl_lexer_free_tree    (CtplToken *root);
 void        ctpl_lexer_dump_tree    (const CtplToken *root);

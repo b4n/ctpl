@@ -30,20 +30,16 @@ typedef struct _CtplStackEntry  CtplStackEntry;
 
 /**
  * CtplStack:
- * @compare_func: Function to compare two stack elements
- * @free_func: Function to free a stack element
- * @last: Last pushed element, or NULL
- * @free_stack: List of elements the should be freed when stack is freed
  * 
  * The stack structure.
  */
 struct _CtplStack
 {
   /*<private>*/
-  GCompareFunc    compare_func;
-  GFreeFunc       free_func;
-  CtplStackEntry *last;
-  GSList         *free_stack;
+  GCompareFunc    compare_func; /* function to compare two stack elements */
+  GFreeFunc       free_func;    /* function to free a stack element */
+  CtplStackEntry *last;         /* last pushed element or %NULL */
+  GSList         *free_stack;   /* list of elements to free with the stack */
 };
 
 

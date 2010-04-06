@@ -18,13 +18,14 @@
  */
 
 #include "lexer-expr.h"
-#include "readutils.h"
 #include "token.h"
 #include "mathutils.h"
-#include <mb.h>
+#include "input-stream.h"
+#include "io.h"
 #include <glib.h>
 #include <string.h>
 #include <errno.h>
+#include "value.h"
 
 
 /**
@@ -89,8 +90,8 @@
  *     <term>Operands</term>
  *     <listitem>
  *       <para>
- *         Any numeric constant written in C notation (period (<code>.</code>)
- *         as the fraction separator, if any), or any reference to any
+ *         Any numeric constant that ctpl_input_stream_read_number() supports,
+ *         or any reference to any 
  *         <link linkend="ctpl-CtplEnviron">environment</link> variable.
  *       </para>
  *     </listitem>
@@ -131,45 +132,6 @@ struct _LexerExprState
   gint      depth;    /* current parenthesis depth */
 };
 
-/* the maximum length of the expression to display in error messages */
-#define ERRMSG_EXPR_LEN           5
-/*
- * @ERRMSG_EXPR_BUF_MAX_LEN:
- * 
- * The maximum size needed for the buffer given to errmsg_expr_display().
- * ERRMSG_EXPR_LEN + 3 (...) + 1 (EOS)
- */
-#define ERRMSG_EXPR_BUF_MAX_LEN   (ERRMSG_EXPR_LEN + 3 + 1)
-/*
- * errmsg_expr_display:
- * @buf: A character buffer where put the expression summary. This buffer should
- *       be greater or equal to @ERRMSG_EXPR_BUF_MAX_LEN.
- * @len: The size of @buf
- * @mb: The #MB from where get the current expression
- * 
- * Puts the current expression of @mb in @buf. This is used to display the
- * current expression, for example in error messages.
- * 
- * Typical use of this is as the following:
- * |[
- * gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
- * 
- * printf ("Current expression is '%s'\n",
- *         errmsg_expr_display (buf, sizeof buf, mb));
- * |]
- * 
- * Note that this might be implemented as a macro, then might computes its
- * arguments more than once.
- * 
- * Returns: @buf
- */
-#define errmsg_expr_display(buf, len, mb) \
-  (g_snprintf ((buf), (len), "%.*s%s", \
-               (int)MIN (mb_get_remaining_length (mb), ERRMSG_EXPR_LEN), \
-               mb_get_current_pointer (mb), \
-               (mb_get_remaining_length (mb) > ERRMSG_EXPR_LEN) ? "..." : ""), \
-   buf)
-
 
 /*<standard>*/
 GQuark
@@ -185,47 +147,54 @@ ctpl_lexer_expr_error_quark (void)
 }
 
 
-/* @mb: #MB holding the number.
+/* @stream: #CtplInputStream holding the number.
  * @state: Lexer state
- * See ctpl_read_double()
+ * @error: return location for errors, or %NULL to ignore them
+ * See ctpl_input_stream_read_double()
  * Returns: A new #CtplTokenExpr or %NULL if the input doesn't contain any valid
  *          number.
  */
 static CtplTokenExpr *
-read_number (MB              *mb,
-             LexerExprState  *state)
+read_number (CtplInputStream *stream,
+             LexerExprState  *state,
+             GError         **error)
 {
   CtplTokenExpr  *token = NULL;
-  gdouble         value;
-  gsize           n_read = 0;
+  CtplValue       value;
   
-  value = ctpl_read_double (mb, &n_read);
-  //~ g_debug ("%*s: %zu\n", mb->length - mb->offset, &mb->buffer[mb->offset], n_read);
-  if (n_read > 0) {
-    if (CTPL_MATH_FLOAT_EQ (value, (gdouble)(glong)value)) {
-      token = ctpl_token_expr_new_integer ((glong)value);
+  ctpl_value_init (&value);
+  if (ctpl_input_stream_read_number (stream, &value, error)) {
+    if (CTPL_VALUE_HOLDS_INT (&value)) {
+      token = ctpl_token_expr_new_integer (ctpl_value_get_int (&value));
     } else {
-      token = ctpl_token_expr_new_float (value);
+      token = ctpl_token_expr_new_float (ctpl_value_get_float (&value));
     }
   }
+  ctpl_value_free_value (&value);
   
   return token;
 }
 
-/* Reads a symbol from @mb
- * See ctpl_read_symbol()
- * Returns: A new #CtplTokenExpr holding the symbol, or %NULL if no symbol was
- *          read. */
+/* Reads a symbol from @stream
+ * See ctpl_input_stream_read_symbol()
+ * Returns: A new #CtplTokenExpr holding the symbol, or %NULL on error */
 static CtplTokenExpr *
-read_symbol (MB              *mb,
-             LexerExprState  *state)
+read_symbol (CtplInputStream *stream,
+             LexerExprState  *state,
+             GError         **error)
 {
   CtplTokenExpr *token = NULL;
   gchar         *symbol;
   
-  symbol = ctpl_read_symbol (mb);
+  symbol = ctpl_input_stream_read_symbol (stream, error);
   if (symbol) {
-    token = ctpl_token_expr_new_symbol (symbol, -1);
+    if (*symbol) {
+      token = ctpl_token_expr_new_symbol (symbol, -1);
+    } else {
+      ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
+                                   CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                                   "No valid symbol");
+    }
   }
   g_free (symbol);
   
@@ -280,6 +249,8 @@ static const struct {
 };
 /* number of true operators, without the NONE at the end */
 static const gsize operators_array_length = G_N_ELEMENTS (operators_array) - 1;
+/* the maximum length of a valid operator */
+#define            OPERATORS_STR_MAXLEN     (2)
 
 
 /**
@@ -385,7 +356,7 @@ validate_token_list (GSList  *tokens,
   GSList         *tmp;
   GSList         *last_opd = NULL;
   
-  //~ g_debug ("validating tokens...");
+  /*g_debug ("validating tokens...");*/
   /* we can assume the token list is fully valid, never having invalid token
    * suits as the caller have checked it, except for the last token that may be
    * an operator (then which misses its right operand) */
@@ -393,18 +364,18 @@ validate_token_list (GSList  *tokens,
     if ((i++ % 2) == 0) {
       operands[opd++] = tokens->data;
       last_opd = tokens;
-      //~ g_debug ("found an operand:");
-      //~ ctpl_token_expr_dump (operands[opd-1]);
+      /*g_debug ("found an operand:");
+      ctpl_token_expr_dump (operands[opd-1]);*/
     } else {
       operators[opt++] = tokens->data;
-      //~ g_debug ("found an operator:");
-      //~ ctpl_token_expr_dump (operands[opt-1]);
+      /*g_debug ("found an operator:");
+      ctpl_token_expr_dump (operands[opt-1]);*/
       if (opt > 1) {
         if (operator_is_prior (operators[0]->token.t_operator->operator,
                                operators[1]->token.t_operator->operator)) {
           CtplTokenExpr *nexpr;
           
-          //~ g_debug ("Operator is prior");
+          /*g_debug ("Operator is prior");*/
           nexpr = operators[0];
           operators[0] = operators[1];
           operators[1] = NULL;
@@ -415,7 +386,7 @@ validate_token_list (GSList  *tokens,
           operands[1] = NULL;
           opd = 1;
         } else {
-          //~ g_debug ("Operator is not prior");
+          /*g_debug ("Operator is not prior");*/
           operands[1] = validate_token_list (last_opd, error);
           opt --;
           
@@ -439,7 +410,7 @@ validate_token_list (GSList  *tokens,
                  "To few operands for operator %s",
                  token_operator_to_string (operators[opt - 1]));
   }
-  //~ g_debug ("done.");
+  /*_debug ("done.");*/
   
   return expr;
 }
@@ -447,23 +418,29 @@ validate_token_list (GSList  *tokens,
 /* Reads an operand.
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
-lex_operand (MB              *mb,
+lex_operand (CtplInputStream *stream,
              LexerExprState  *state,
              GError         **error)
 {
-  CtplTokenExpr  *token;
+  CtplTokenExpr  *token = NULL;
+  gssize          read_size;
+  gchar           buf[2] = {0, 0};
   
-  /*g_debug ("Lexing operand '%.*s'", (int)mb_get_remaining_length (mb),
-                                    mb_get_current_pointer (mb));*/
-  token = read_number (mb, state);
-  if (! token) {
-    token = read_symbol (mb, state);
-    if (! token) {
-      gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
-      
-      g_set_error (error, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                   "No valid operand at strat of expression '%s'",
-                   errmsg_expr_display (buf, sizeof buf, mb));
+  read_size = ctpl_input_stream_peek (stream, buf, 2, error);
+  if (read_size >= 0) {
+    gchar c      = buf[0];
+    gchar next_c = buf[1];
+    
+    if (g_ascii_isdigit (c) ||
+        (c == '.' && g_ascii_isdigit (next_c)) ||
+        c == '+' || c == '-') {
+      token = read_number (stream, state, error);
+    } else if (ctpl_is_symbol (c)) {
+      token = read_symbol (stream, state, error);
+    } else {
+      ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
+                                   CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                                   "No valid operand at start of expression");
     }
   }
   
@@ -473,27 +450,29 @@ lex_operand (MB              *mb,
 /* Reads an operator.
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
-lex_operator (MB             *mb,
-              LexerExprState *state,
-              GError        **error)
+lex_operator (CtplInputStream *stream,
+              LexerExprState  *state,
+              GError         **error)
 {
   CtplTokenExpr  *token   = NULL;
   gsize           off     = 0;
   CtplOperator    op      = CTPL_OPERATOR_NONE;
-  const gchar    *expr    = mb_get_current_pointer (mb);
-  gsize           length  = mb_get_remaining_length (mb);
+  gchar           buf[OPERATORS_STR_MAXLEN];
+  gssize          read_size;
   
-  //~ g_debug ("Lexing operator '%.*s'", (int)length, expr);
-  op = ctpl_operator_from_string (expr, length, &off);
-  if (op == CTPL_OPERATOR_NONE) {
-    gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
-    
-    g_set_error (error, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERATOR,
-                 "No valid operator at start of expression '%s'",
-                 errmsg_expr_display (buf, sizeof buf, mb));
-  } else {
-    mb_seek (mb, off, MB_SEEK_CUR);
-    token = ctpl_token_expr_new_operator (op, NULL, NULL);
+  read_size = ctpl_input_stream_peek (stream, buf, sizeof buf, error);
+  if (read_size >= 0) {
+    /*g_debug ("Lexing operator '%.*s'", sizoef buf, buf);*/
+    op = ctpl_operator_from_string (buf, read_size, &off);
+    if (op == CTPL_OPERATOR_NONE) {
+      ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
+                                   CTPL_LEXER_EXPR_ERROR_MISSING_OPERATOR,
+                                   "No valid operator");
+    } else {
+      if (ctpl_input_stream_skip (stream, off, error) >= 0) {
+        token = ctpl_token_expr_new_operator (op, NULL, NULL);
+      }
+    }
   }
   
   return token;
@@ -501,7 +480,7 @@ lex_operator (MB             *mb,
 
 /* Recursive part of the lexer (does all but doesn't validates some parts). */
 static CtplTokenExpr *
-ctpl_lexer_expr_lex_internal (MB               *mb,
+ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
                               LexerExprState   *state,
                               GError          **error)
 {
@@ -510,82 +489,91 @@ ctpl_lexer_expr_lex_internal (MB               *mb,
   GError         *err = NULL;
   gboolean        expect_operand = TRUE;
   
-  ctpl_read_skip_blank (mb);
-  while (! mb_eof (mb) && ! err) {
-    CtplTokenExpr  *token = NULL;
-    gchar           c = mb_cur_char (mb);
-    
-    if (c == ')') {
-      if (state->depth == 0) {
-        if (state->lex_all) {
-          /* if we validate all, throw an error */
-          g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                       "Too much closing parenthesis");
-        }
-        /* else, just stop lexing */
-      } else {
-        state->depth --;
-        mb_getc (mb); /* skip parenthesis */
-      }
-      /* stop lexing */
-      break;
-    } else {
-      if (expect_operand) {
-        /* try to read an operand */
-        if (c == '(') {
-          LexerExprState substate;
-          
-          mb_getc (mb); /* skip parenthesis */
-          substate = *state;
-          substate.depth ++;
-          token = ctpl_lexer_expr_lex_internal (mb, &substate, &err);
-          if (token &&
-              substate.depth != state->depth) {
-            g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                         "Missing closing parenthesis");
-          }
-        } else {
-          token = lex_operand (mb, state, &err);
-        }
-      } else {
-        /* try to read an operator */
-        token = lex_operator (mb, state, &err);
-      }
-    }
-    if (token) {
-      expect_operand = ! expect_operand;
-      tokens = g_slist_append (tokens, token);
-    } else if (! state->lex_all) {
-      /* if we don't validate all, we don't want to throw an error when no token
-       * was read, just stop lexing. */
-      g_clear_error (&err);
-      break;
-    }
-    /* skip blank chars */
-    ctpl_read_skip_blank (mb);
-  }
-  if (! err) {
-    if (! tokens) {
-      /* if no tokens were read, complain */
-      gchar buf[ERRMSG_EXPR_BUF_MAX_LEN];
+  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+    while (! ctpl_input_stream_eof (stream, &err) && ! err) {
+      CtplTokenExpr  *token = NULL;
+      gchar           c;
       
-      g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_FAILED,
-                   "No valid operand at start of expression '%s'",
-                   errmsg_expr_display (buf, sizeof buf, mb));
-    } else {
-      /* here check validity of token list, then create the final token. */
-      expr_tok = validate_token_list (tokens, &err);
+      c = ctpl_input_stream_peek_c (stream, &err);
+      if (err) {
+        /* I/O error */
+      } else {
+        if (c == ')') {
+          if (state->depth == 0) {
+            if (state->lex_all) {
+              /* if we validate all, throw an error */
+              g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                           "Too much closing parenthesis");
+            }
+            /* else, just stop lexing */
+          } else {
+            state->depth --;
+            ctpl_input_stream_get_c (stream, &err); /* skip parenthesis */
+          }
+          /* stop lexing */
+          break;
+        } else {
+          if (expect_operand) {
+            /* try to read an operand */
+            if (c == '(') {
+              LexerExprState substate;
+              
+              ctpl_input_stream_get_c (stream, &err); /* skip parenthesis */
+              if (! err) {
+                substate = *state;
+                substate.depth ++;
+                token = ctpl_lexer_expr_lex_internal (stream, &substate, &err);
+                if (token && substate.depth != state->depth) {
+                  ctpl_input_stream_set_error (stream, &err,
+                                               CTPL_LEXER_EXPR_ERROR,
+                                               CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                                               "Missing closing parenthesis");
+                }
+              }
+            } else {
+              token = lex_operand (stream, state, &err);
+            }
+          } else {
+            /* try to read an operator */
+            token = lex_operator (stream, state, &err);
+          }
+        }
+        if (token) {
+          expect_operand = ! expect_operand;
+          tokens = g_slist_append (tokens, token);
+        } else if (! state->lex_all) {
+          if (err->code != CTPL_IO_ERROR) {
+            /* if we don't validate all, we don't want to throw an error when no
+             * token was read, just stop lexing. */
+            g_clear_error (&err);
+          }
+          break;
+        }
+        /* skip blank chars */
+        ctpl_input_stream_skip_blank (stream, &err);
+      }
     }
-  }
-  if (err) {
-    GSList *tmp;
-    
-    for (tmp = tokens; tmp; tmp = tmp->next) {
-      ctpl_token_expr_free (tmp->data, FALSE);
+    if (! err) {
+      if (! tokens) {
+        /* if no tokens were read, complain */
+        ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_EXPR_ERROR,
+                                     CTPL_LEXER_EXPR_ERROR_FAILED,
+                                     "No valid operand at start of expression");
+      } else {
+        /* here check validity of token list, then create the final token. */
+        expr_tok = validate_token_list (tokens, &err);
+      }
     }
-    g_propagate_error (error, err);
+    if (err) {
+      GSList *tmp;
+      
+      for (tmp = tokens; tmp; tmp = tmp->next) {
+        ctpl_token_expr_free (tmp->data, FALSE);
+      }
+      g_propagate_error (error, err);
+    }
+    g_slist_free (tokens);
   }
-  g_slist_free (tokens);
   
   return expr_tok;
 }
@@ -593,50 +581,51 @@ ctpl_lexer_expr_lex_internal (MB               *mb,
 
 /**
  * ctpl_lexer_expr_lex:
- * @mb: A #MB holding an expression
+ * @stream: A #CtplInputStream from where read the expression
  * @error: Return location for errors, or %NULL to ignore them.
  * 
- * Tries to lex the expression in @mb.
- * If you want to lex a #MB that (may) hold other data after the expression,
- * see ctpl_lexer_expr_lex_full().
+ * Tries to lex the expression in @stream.
+ * If you want to lex a #CtplInputStream that (may) hold other data after the
+ * expression, see ctpl_lexer_expr_lex_full().
  * 
  * Returns: A new #CtplTokenExpr or %NULL on error.
  */
 CtplTokenExpr *
-ctpl_lexer_expr_lex (MB      *mb,
-                     GError **error)
+ctpl_lexer_expr_lex (CtplInputStream *stream,
+                     GError         **error)
 {
-  return ctpl_lexer_expr_lex_full (mb, TRUE, error);
+  return ctpl_lexer_expr_lex_full (stream, TRUE, error);
 }
 
 /**
  * ctpl_lexer_expr_lex_full:
- * @mb: A #MB
- * @lex_all: Whether to lex @mb until EOF or until the end of a valid
+ * @stream: A #CtplInputStream
+ * @lex_all: Whether to lex @stream until EOF or until the end of a valid
  *           expression. This is useful for expressions inside other data.
  * @error: Return location for errors, or %NULL to ignore them.
  * 
- * Tries to lex the expression in @mb.
+ * Tries to lex the expression in @stream.
  * 
  * Returns: A new #CtplTokenExpr or %NULL on error.
  */
 CtplTokenExpr *
-ctpl_lexer_expr_lex_full (MB       *mb,
-                          gboolean  lex_all,
-                          GError  **error)
+ctpl_lexer_expr_lex_full (CtplInputStream *stream,
+                          gboolean         lex_all,
+                          GError         **error)
 {
   LexerExprState  state = {0, TRUE};
   CtplTokenExpr  *expr_tok;
   GError         *err = NULL;
   
   state.lex_all = lex_all;
-  expr_tok = ctpl_lexer_expr_lex_internal (mb, &state, &err);
+  expr_tok = ctpl_lexer_expr_lex_internal (stream, &state, &err);
   if (! err) {
     /* don't report an error if one already set */
-    if (state.lex_all && ! mb_eof (mb)) {
+    if (state.lex_all && ! ctpl_input_stream_eof (stream, &err)) {
       /* if we lex all and we don't have reached EOF here, complain */
-      g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                   "Trash data at end of expression");
+      ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_EXPR_ERROR,
+                                   CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                                   "Trash data at end of expression");
     }
   }
   if (err) {
@@ -664,12 +653,12 @@ ctpl_lexer_expr_lex_string (const gchar *expr,
                             gssize       len,
                             GError     **error)
 {
-  CtplTokenExpr  *token = NULL;
-  MB             *mb;
+  CtplTokenExpr    *token = NULL;
+  CtplInputStream  *stream;
   
-  mb = mb_new (expr, (len < 0) ? strlen (expr) : (gsize)len, MB_DONTCOPY);
-  token = ctpl_lexer_expr_lex (mb, error);
-  mb_free (mb);
+  stream = ctpl_input_stream_new_for_memory (expr, len, NULL, NULL);
+  token = ctpl_lexer_expr_lex (stream, error);
+  ctpl_input_stream_unref (stream);
   
   return token;
 }

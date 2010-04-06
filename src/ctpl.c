@@ -23,9 +23,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <errno.h>
+#include <unistd.h> /* for STDOUT_FILENO */
 #include <glib.h>
-#include <mb.h>
+#include <gio/gio.h>
+#include <gio/gunixoutputstream.h>
 #include "ctpl.h"
 
 
@@ -111,6 +112,21 @@ printerr (const gchar *fmt,
   va_end (ap);
 }
 
+/* Creates a CtplInputStream from a command-line argument */
+static CtplInputStream *
+open_input_stream (const gchar *arg,
+                   GError     **error)
+{
+  GFile            *file;
+  CtplInputStream  *stream = NULL;
+  
+  file = g_file_new_for_commandline_arg (arg);
+  stream = ctpl_input_stream_new_for_gfile (file, error);
+  g_object_unref (file);
+  
+  return stream;
+}
+
 /* build the environment (OPT_env_files and OPT_env_chunks) */
 static CtplEnviron *
 build_environ (void)
@@ -124,14 +140,20 @@ build_environ (void)
     gsize i;
     
     for (i = 0; success && OPT_env_files[i] != NULL; i++) {
-      GError *err = NULL;
+      GError           *err = NULL;
+      CtplInputStream  *stream;
       
       printv ("Loading environment file '%s'...\n", OPT_env_files[i]);
-      if (! ctpl_environ_add_from_file (env, OPT_env_files[i], &err)) {
+      stream = open_input_stream (OPT_env_files[i], &err);
+      if (! stream ||
+          ! ctpl_environ_add_from_stream (env, stream, &err)) {
         printerr ("Failed to load environment from file '%s': %s\n",
                   OPT_env_files[i], err->message);
         g_error_free (err);
         success = FALSE;
+      }
+      if (stream) {
+        ctpl_input_stream_unref (stream);
       }
     }
   }
@@ -159,72 +181,35 @@ build_environ (void)
   return env;
 }
 
-/* writes @mb to the specified output (see OPT_output_file) */
-static gboolean
-write_output (MB      *mb,
-              GError **error)
-{
-  gboolean rv = FALSE;
-  
-  if (OPT_output_file) {
-    gssize len;
-    
-    len = (gssize)mb->length;
-    if (len < 0) {
-      g_set_error (error, 0, 0,
-                   "Output length is too big (%zu, mas is %zd)",
-                   mb->length, G_MAXSSIZE);
-      rv = FALSE;
-    } else {
-      rv = g_file_set_contents (OPT_output_file, mb->buffer, len, error);
-    }
-  } else {
-    gsize write_len;
-    
-    write_len = fwrite (mb->buffer, 1, mb->length, stdout);
-    if (write_len != mb->length) {
-      gint          errnum = errno;
-      GFileError    error_code = G_FILE_ERROR_IO;
-      const gchar  *error_str = "I/O error";
-      
-      if (errnum) {
-        error_code = g_file_error_from_errno (errnum);
-        error_str = g_strerror (errnum);
-      }
-      g_set_error (error, G_FILE_ERROR, error_code,
-                   "Failed to write %zu bytes: %s",
-                   mb->length - write_len, error_str);
-    } else {
-      rv = TRUE;
-    }
-  }
-  
-  return rv;
-}
-
 /* parses a template from a file */
 static gboolean
-parse_template (const gchar  *filename,
-                MB           *output,
-                CtplEnviron  *env,
-                GError      **error)
+parse_template (const gchar      *filename,
+                CtplOutputStream *output,
+                CtplEnviron      *env,
+                GError          **error)
 {
-  gboolean    rv = FALSE;
-  CtplToken  *tree;
+  gboolean          rv = FALSE;
+  CtplInputStream  *stream;
   
-  tree = ctpl_lexer_lex_file (filename, error);
-  if (tree) {
-    rv = ctpl_parser_parse (tree, env, output, error);
+  stream = open_input_stream (filename, error);
+  if (stream) {
+    CtplToken *tree;
+    
+    tree = ctpl_lexer_lex (stream, error);
+    ctpl_input_stream_unref (stream);
+    if (tree) {
+      rv = ctpl_parser_parse (tree, env, output, error);
+    }
+    ctpl_lexer_free_tree (tree);
   }
-  ctpl_lexer_free_tree (tree);
   
   return rv;
 }
 
 /* parses all templates from OPT_input_files */
 static gboolean
-parse_templates (CtplEnviron *env,
-                 MB          *output)
+parse_templates (CtplEnviron       *env,
+                 CtplOutputStream  *output)
 {
   gboolean success = TRUE;
   
@@ -247,12 +232,45 @@ parse_templates (CtplEnviron *env,
   return success;
 }
 
+static CtplOutputStream *
+get_output_stream (void)
+{
+  CtplOutputStream *stream = NULL;
+  
+  if (OPT_output_file) {
+    GFile              *file;
+    GError             *err = NULL;
+    GFileOutputStream  *gfostream;
+    
+    file = g_file_new_for_commandline_arg (OPT_output_file);
+    gfostream = g_file_replace (file, NULL, FALSE, 0, NULL, &err);
+    if (! gfostream) {
+      printerr ("Failed to open output: %s\n", err->message);
+      g_error_free (err);
+    } else {
+      stream = ctpl_output_stream_new (gfostream);
+      g_object_unref (gfostream);
+    }
+  } else {
+    GOutputStream *gostream;
+    
+    /* FIXME: how to get rid of GIOUnix for that? */
+    gostream = g_unix_output_stream_new (STDOUT_FILENO, TRUE);
+    stream = ctpl_output_stream_new (gostream);
+    g_object_unref (gostream);
+  }
+  
+  return stream;
+}
+
 
 int main (int     argc,
           char  **argv)
 {
   int     err   = 1;
   GError *error = NULL;
+  
+  g_type_init ();
   
   if (! parse_options (&argc, &argv, &error)) {
     printerr ("Option parsing failed: %s\n", error->message);
@@ -265,18 +283,14 @@ int main (int     argc,
     if (! env) {
       err = 1;
     } else {
-      MB *output;
+      CtplOutputStream *ostream = get_output_stream ();
       
-      output = mb_new (NULL, 0, MB_GROWABLE | MB_FREEABLE);
-      if (parse_templates (env, output)) {
-        if (! write_output (output, &error)) {
-          printerr ("Failed to write output: %s\n", error->message);
-          g_clear_error (&error);
-        } else {
+      if (ostream) {
+        if (parse_templates (env, ostream)) {
           err = 0;
         }
+        ctpl_output_stream_unref (ostream);
       }
-      mb_free (output);
     }
     ctpl_environ_free (env);
   }

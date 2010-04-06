@@ -20,7 +20,7 @@
 #include "parser.h"
 #include "eval.h"
 #include "token.h"
-#include <mb.h>
+#include "output-stream.h"
 #include <glib.h>
 #include <string.h>
 
@@ -90,32 +90,6 @@ ctpl_parser_error_quark (void)
 }
 
 
-/* Tries to write @buf[0:@len] to @mb.
- * Returns: %TRUE on success, %FALSE otherwise, in which case @error contains
- *          the error message. */
-static gboolean
-write_buf (MB          *mb,
-           const gchar *buf,
-           gssize       len,
-           GError     **error)
-{
-  gboolean rv;
-  gsize    length;
-  
-  if (len < 0) {
-    length = strlen (buf);
-  } else {
-    length = (gsize)len;
-  }
-  rv = (mb_write (mb, buf, length) == 0);
-  if (! rv) {
-    g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_FAILED,
-                 "Failed to write to output buffer");
-  }
-  
-  return rv;
-}
-
 /* wrapper around ctpl_environ_lookup() that reports an error if the symbol
  * could not be found */
 static const CtplValue *
@@ -137,18 +111,18 @@ lookup_symbol (const CtplEnviron *env,
 
 /* "parses" a data token */
 static gboolean
-ctpl_parser_parse_token_data (const char *data,
-                              MB         *output,
-                              GError    **error)
+ctpl_parser_parse_token_data (const gchar      *data,
+                              CtplOutputStream *output,
+                              GError          **error)
 {
-  return write_buf (output, data, -1, error);
+  return ctpl_output_stream_write (output, data, -1, error);
 }
 
 /* Tries to parse a `for` token */
 static gboolean
 ctpl_parser_parse_token_for (const CtplTokenFor  *token,
                              CtplEnviron         *env,
-                             MB                  *output,
+                             CtplOutputStream    *output,
                              GError             **error)
 {
   /* we can safely assume token holds array here */
@@ -181,7 +155,7 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
 static gboolean
 ctpl_parser_parse_token_if (const CtplTokenIf  *token,
                             CtplEnviron        *env,
-                            MB                 *output,
+                            CtplOutputStream   *output,
                             GError            **error)
 {
   gboolean  rv = FALSE;
@@ -201,10 +175,10 @@ ctpl_parser_parse_token_if (const CtplTokenIf  *token,
 
 /* Tries to parse an expression (a variable, a complete expression, ...). */
 static gboolean
-ctpl_parser_parse_token_expr (CtplTokenExpr  *expr,
-                              CtplEnviron    *env,
-                              MB             *output,
-                              GError        **error)
+ctpl_parser_parse_token_expr (CtplTokenExpr    *expr,
+                              CtplEnviron      *env,
+                              CtplOutputStream *output,
+                              GError          **error)
 {
   CtplValue  *eval_value;
   gboolean    rv = FALSE;
@@ -218,7 +192,7 @@ ctpl_parser_parse_token_expr (CtplTokenExpr  *expr,
       g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_FAILED,
                    "Cannot convert expression to a printable format");
     } else {
-      rv = write_buf (output, strval, -1, error);
+      rv = ctpl_output_stream_write (output, strval, -1, error);
     }
     g_free (strval);
   }
@@ -229,10 +203,10 @@ ctpl_parser_parse_token_expr (CtplTokenExpr  *expr,
 
 /* Tries to parse a token by dispatching calls to specific parsers. */
 static gboolean
-ctpl_parser_parse_token (const CtplToken *token,
-                         CtplEnviron     *env,
-                         MB              *output,
-                         GError         **error)
+ctpl_parser_parse_token (const CtplToken   *token,
+                         CtplEnviron       *env,
+                         CtplOutputStream  *output,
+                         GError           **error)
 {
   gboolean rv = FALSE;
   
@@ -266,7 +240,7 @@ ctpl_parser_parse_token (const CtplToken *token,
  * ctpl_parser_parse:
  * @tree: A #CtplToken from which start parsing
  * @env: A #CtplEnviron representing the parsing environment
- * @output: A #MB in which write parsing output
+ * @output: A #CtplInputStream in which write parsing output
  * @error: Location where return a #GError or %NULL to ignore errors
  * 
  * Parses a token tree against an environment and outputs the result to @output.
@@ -275,10 +249,10 @@ ctpl_parser_parse_token (const CtplToken *token,
  *          set to the error that occurred.
  */
 gboolean
-ctpl_parser_parse (const CtplToken *tree,
-                   CtplEnviron     *env,
-                   MB              *output,
-                   GError         **error)
+ctpl_parser_parse (const CtplToken   *tree,
+                   CtplEnviron       *env,
+                   CtplOutputStream  *output,
+                   GError           **error)
 {
   gboolean rv = TRUE;
   

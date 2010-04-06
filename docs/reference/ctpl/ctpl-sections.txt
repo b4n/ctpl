@@ -7,7 +7,7 @@ CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex
 ctpl_lexer_lex_string
-ctpl_lexer_lex_file
+ctpl_lexer_lex_path
 ctpl_lexer_free_tree
 ctpl_lexer_dump_tree
 <SUBSECTION Standard>
@@ -97,8 +97,8 @@ ctpl_environ_push_string
 ctpl_environ_pop
 ctpl_environ_foreach
 ctpl_environ_merge
-ctpl_environ_add_from_file
-ctpl_environ_add_from_mb
+ctpl_environ_add_from_stream
+ctpl_environ_add_from_path
 ctpl_environ_add_from_string
 <SUBSECTION Standard>
 ctpl_environ_error_quark
@@ -183,16 +183,61 @@ ctpl_math_int_to_string
 </SECTION>
 
 <SECTION>
-<TITLE>Read utilities</TITLE>
-<FILE>readutils</FILE>
+<TITLE>CtplInputStream</TITLE>
+<FILE>input-stream</FILE>
+CTPL_EOF
 CTPL_BLANK_CHARS
+ctpl_is_blank
 CTPL_SYMBOL_CHARS
+ctpl_is_symbol
 CTPL_ESCAPE_CHAR
 CTPL_STRING_DELIMITER_CHAR
-ctpl_read_word
-ctpl_read_symbol
-ctpl_read_skip_chars
-ctpl_read_skip_blank
-ctpl_read_string_literal
-ctpl_read_double
+CtplInputStream
+ctpl_input_stream_new
+ctpl_input_stream_new_for_gfile
+ctpl_input_stream_new_for_memory
+ctpl_input_stream_new_for_path
+ctpl_input_stream_new_for_uri
+ctpl_input_stream_ref
+ctpl_input_stream_unref
+ctpl_input_stream_set_error
+ctpl_input_stream_read
+ctpl_input_stream_get_c
+ctpl_input_stream_read_double
+ctpl_input_stream_read_long
+ctpl_input_stream_read_number
+ctpl_input_stream_read_string_literal
+ctpl_input_stream_read_symbol
+ctpl_input_stream_read_symbol_full
+ctpl_input_stream_read_word
+ctpl_input_stream_peek
+ctpl_input_stream_peek_c
+ctpl_input_stream_peek_symbol
+ctpl_input_stream_peek_symbol_full
+ctpl_input_stream_peek_word
+ctpl_input_stream_skip
+ctpl_input_stream_skip_blank
+ctpl_input_stream_skip_word
+ctpl_input_stream_eof
+ctpl_input_stream_eof_fast
+</SECTION>
+
+<SECTION>
+<TITLE>CtplOutputStream</TITLE>
+<FILE>output-stream</FILE>
+CtplOutputStream
+ctpl_output_stream_new
+ctpl_output_stream_ref
+ctpl_output_stream_unref
+ctpl_output_stream_write
+ctpl_output_stream_put_c
+</SECTION>
+
+<SECTION>
+<TITLE>Generic IO</TITLE>
+<FILE>io</FILE>
+CtplIOError
+CTPL_IO_ERROR
+<SUBSECTION Standard>
+ctpl_io_error_quark
 </SECTION>
