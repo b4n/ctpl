@@ -1,0 +1,10 @@
+{if 1}
+  a
+  {if 1}
+  {else}
+  {end}
+{else}
+  {if 1}
+  {end}
+  {if 1}
+{end}

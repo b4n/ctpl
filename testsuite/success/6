@@ -1,0 +1,18 @@
+<html>
+<head>
+  <title>LOOOOL</title>
+</head>
+
+<body>
+  <h1>MON SUPER FLUUUUUUUX11111one11111eleven1111111</h1>
+  
+  {for i in array}
+    {if i != 1}
+    <h2>{i}</h2>
+    <p>
+      {i}
+    </p>
+    {end}
+  {end}
+</body>
+</html>

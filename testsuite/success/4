@@ -1,0 +1,18 @@
+{if bar != foo}
+  neq
+  {if bar != bar}
+    failure!
+  {else}
+    {for v in array}
+      {if v}
+        {for v2 in array}
+          {v}[{v2}]
+        {end}
+      {else}
+        (no value)
+      {end}
+    {end}
+  {end}
+{else}
+  eq
+{end}

@@ -1,0 +1,24 @@
+foo = "(was foo)";
+bar = "(was bar)";
+num = -0x1fep2;
+num1 = +42; #or 2
+# a number
+# and then
+num2 = 0o22;
+num3 = 0b10111;
+array = [ "first", "second", "third"];
+
+array2 # haha
+= #hoho
+
+[ # hum
+	1 # encore...
+	,
+	2,
+	3,
+# hop hop
+4
+,
+#bon, on va arreter les conneries
+5] # un dernier pour la route
+; # fini

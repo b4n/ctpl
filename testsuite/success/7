@@ -1,0 +1,18 @@
+{if 0 || foo}
+  foo is not false!
+  {if foo}
+    OK
+  {else}
+    WTF? FIXME!!!
+  {end}
+{else}
+  foo is false.
+  {if 0 && foo}
+    The impossible happened!
+  {end}
+  {if 1 || 0 }
+    You must see this!
+  {else}
+    ERROR!!!
+  {end}
+{end}
