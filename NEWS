@@ -1,0 +1,63 @@
+# 0.2
+  
+  The version 0.2 is an API and ABI break from the previous 0.1 branch.
+  
+  ## Changes summary (in-depth):
+  
+  ### New features and important changes
+  
+  * GIO replaces LibMB. Impact is:
+    * Less memory usage (input template may or may not be loaded into memory);
+    * Small performance regression, between 4% to 32% [1] (on extreme cases),
+      measured on heavy templates;
+    * Any GIO stream may be live-lexed, from local files to remote FTP, Samba,
+      DAV, etc.
+  * Better lexer error reporting, with line and position marks;
+  * Improved numeric constants loading, including:
+    * Integers are now loaded as integers, impacting:
+      * No more precision loss;
+      * Shorter maximum value, but still more than reasonable (C's long: in 64
+        bits machines should be something like from -9223372036854775807 to
+        +9223372036854775807, and -2147483647 to +2147483647 on 32 bits
+        machines).
+    * Support for octal and binary constants via 0o and 0b prefix respectively;
+  * Improved token representation, saving about from 19% to 28% of memory use
+    for the token tree (no measurable performance impact);
+  * Add support for single-line comments in environ descriptions;
+  * Fix support of array values that starts with blanks in environ descriptions.
+  
+  As you can see, the main improvements of this release are less memory
+  consumption (about 30/40% better!) and GIO usage bringing almost universal
+  input.
+  
+  ## Quid of the performances?
+  
+  Yes, we lost about 4% to 32% [1] of speed. But I decided that the gain worth
+  it: GIO allows live streams to be parsed without loading them previously into
+  memory, which means that the memory usage is about the same minus about the
+  size of the input template.
+  Since the parsing of a 140M (28366227 lines) example template took 14.9508s
+  before and 15.7122s now (4.85% slower), I thought it was reasonable when we
+  gained about 140M of memory. Another test (135M input, 10944000 lines) took
+  10.7558s before and 12.5084s now (31.54% slower), but needed about 130M less
+  memory.
+  
+  And still note that these are very heavy templates (yes, 11-28.4M lines!), and
+  real world templates are really really smaller. And this is the lexing, which
+  is done only once per template, the parsing is not impacted.
+  
+  Finally, note that invalid templates may be found invalid without reading the
+  whole input, especially if the invalid data is at the start. This makes for
+  example a 350M invalid template to be immediately (huh, about 0.009s, and this
+  includes program launching) reported as invalid, and this about 99% faster
+  than before (without any I/O latency).
+  
+  [1] note that the measurement was done with all the changes (except token tree
+      optimization), which can mean that the overhead is not only due to GIO but
+      to the new features too.
+      Another thing to note is that this measurement always used a cached file
+      input, meaning that any I/O gain or loss due not to load the whole
+      template at once was not took into account; but I/O doesn't make so much
+      sense since it depends heavily on the input location (even two hard drives
+      might behave quite differently, depending on their speed, cache size and
+      so on). But with I/O, results moves from +21.98% to -1.46% slower.
