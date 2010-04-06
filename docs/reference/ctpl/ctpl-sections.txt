@@ -36,10 +36,12 @@ ctpl_lexer_expr_error_quark
 <FILE>token</FILE>
 CtplOperator
 CtplTokenType
+CtplTokenValue
 CtplToken
 CtplTokenFor
 CtplTokenIf
 CtplTokenExprType
+CtplTokenExprValue
 CtplTokenExpr
 CtplTokenExprOperator
 ctpl_token_new_data

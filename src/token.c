@@ -149,7 +149,7 @@ ctpl_token_new_for (const char *array,
 
 /**
  * ctpl_token_new_if:
- * @condititon: A string containing a condition ("a > b", "1 < 2", "a = 2", ...)
+ * @condition: The expression condition
  * @if_children: Branching if condition evaluate to true
  * @else_children: Branching if condition evaluate to false, or %NULL
  * 

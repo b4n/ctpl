@@ -40,7 +40,7 @@
  * ctpl_environ_push_string (env, "symbol name", "symbol value");
  * ctpl_environ_push_int (env, "response", 42);
  * 
- * // ...
+ * /<!-- -->* ... *<!-- -->/
  * 
  * ctpl_environ_free (env);
  *   </programlisting>

@@ -62,7 +62,7 @@
  * val = ctpl_value_new ();
  * ctpl_value_set_int (val, 42);
  * 
- * // Free all data allocated for value and the held data
+ * /<!-- -->* Free all data allocated for value and the held data *<!-- -->/
  * ctpl_value_free (val);
  * </programlisting>
  * </example>
@@ -75,7 +75,7 @@
  * ctpl_value_init (&val);
  * ctpl_value_set_int (&val, 42);
  * 
- * // Free all data allocated for the held data
+ * /<!-- -->* Free all data allocated for the held data *<!-- -->/
  * ctpl_value_free_value (&val);
  * </programlisting>
  * </example>
