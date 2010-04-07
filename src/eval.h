@@ -54,11 +54,13 @@ typedef enum _CtplEvalError
 
 
 GQuark      ctpl_eval_error_quark   (void) G_GNUC_CONST;
-CtplValue  *ctpl_eval_value         (const CtplTokenExpr *expr,
-                                     const CtplEnviron   *env,
-                                     GError             **error);
+gboolean    ctpl_eval_value         (const CtplTokenExpr  *expr,
+                                     const CtplEnviron    *env,
+                                     CtplValue            *value,
+                                     GError              **error);
 gboolean    ctpl_eval_bool          (const CtplTokenExpr *expr,
                                      const CtplEnviron   *env,
+                                     gboolean            *result,
                                      GError             **error);
 
 

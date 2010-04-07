@@ -55,10 +55,6 @@ ctpl_eval_error_quark (void)
 }
 
 
-static gboolean   ctpl_eval_value_internal  (const CtplTokenExpr *expr,
-                                             const CtplEnviron   *env,
-                                             CtplValue           *value,
-                                             GError             **error);
 static gboolean   ctpl_eval_bool_value      (const CtplValue *value);
 
 
@@ -605,11 +601,11 @@ ctpl_eval_operator (const CtplTokenExpr  *operator,
   
   ctpl_value_init (&lvalue);
   ctpl_value_init (&rvalue);
-  if (! ctpl_eval_value_internal (operator->token.t_operator->loperand,
-                                  env, &lvalue, error)) {
+  if (! ctpl_eval_value (operator->token.t_operator->loperand,
+                         env, &lvalue, error)) {
     rv = FALSE;
-  } else if (!ctpl_eval_value_internal (operator->token.t_operator->roperand,
-                                        env, &rvalue, error)) {
+  } else if (! ctpl_eval_value (operator->token.t_operator->roperand,
+                                env, &rvalue, error)) {
     rv = FALSE;
   } else {
     rv = ctpl_eval_operator_internal (operator->token.t_operator->operator,
@@ -621,12 +617,23 @@ ctpl_eval_operator (const CtplTokenExpr  *operator,
   return rv;
 }
 
-/* Tries to evaluate a value */
-static gboolean
-ctpl_eval_value_internal (const CtplTokenExpr  *expr,
-                          const CtplEnviron    *env,
-                          CtplValue            *value,
-                          GError              **error)
+/**
+ * ctpl_eval_value:
+ * @expr: The #CtplTokenExpr to evaluate
+ * @env: The expression's environment, where lookup symbols
+ * @value: #CtplValue where store the evaluation result on success
+ * @error: Return location for errors, or %NULL to ignore them
+ * 
+ * Computes the given #CtplTokenExpr with the environ @env, storing the resutl
+ * in @value.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_eval_value (const CtplTokenExpr  *expr,
+                 const CtplEnviron    *env,
+                 CtplValue            *value,
+                 GError              **error)
 {
   gboolean rv = TRUE;
   
@@ -668,31 +675,6 @@ ctpl_eval_value_internal (const CtplTokenExpr  *expr,
   return rv;
 }
 
-/**
- * ctpl_eval_value:
- * @expr: The #CtplTokenExpr to evaluate
- * @env: The expression's environment, where lookup symbols
- * @error: Return location for errors, or %NULL to ignore them
- * 
- * Computes the given expression.
- * 
- * Returns: The result of the expression evaluation or %NULL on error.
- */
-CtplValue *
-ctpl_eval_value (const CtplTokenExpr *expr,
-                 const CtplEnviron   *env,
-                 GError             **error)
-{
-  CtplValue *value;
-  
-  value = ctpl_value_new ();
-  if (! ctpl_eval_value_internal (expr, env, value, error)) {
-    ctpl_value_free (value), value = NULL;
-  }
-  
-  return value;
-}
-
 /* Gets a boolean form a value */
 static gboolean
 ctpl_eval_bool_value (const CtplValue *value)
@@ -730,31 +712,30 @@ ctpl_eval_bool_value (const CtplValue *value)
  * ctpl_eval_bool:
  * @expr: The #CtplTokenExpr to evaluate
  * @env: The expression's environment, where lookup symbols
+ * @result: Return location for the expression result, or %NULL
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Computes the given expression to a boolean.
  * Computing to a boolean means computing the expression's value and then check
  * if this value should be considered as %FALSE or %TRUE.
  * 
- * As the returned value is not sufficient to know whether the evaluation
- * actually succeeded or not, you should check whether an error was set or not
- * to know it reliably.
- * 
- * Returns: The result of the expression evaluation, or %FALSE on error.
+ * Returns: %TRUE on success, %FALSE otherwise.
  */
 gboolean
 ctpl_eval_bool (const CtplTokenExpr  *expr,
                 const CtplEnviron    *env,
+                gboolean             *result,
                 GError              **error)
 {
   CtplValue value;
-  gboolean  eval = FALSE;
+  gboolean  rv;
   
   ctpl_value_init (&value);
-  if (ctpl_eval_value_internal (expr, env, &value, error)) {
-    eval = ctpl_eval_bool_value (&value);
+  rv = ctpl_eval_value (expr, env, &value, error);
+  if (rv && result) {
+    *result = ctpl_eval_bool_value (&value);
   }
   ctpl_value_free_value (&value);
   
-  return eval;
+  return rv;
 }

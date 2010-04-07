@@ -160,16 +160,13 @@ ctpl_parser_parse_token_if (const CtplTokenIf  *token,
 {
   gboolean  rv = FALSE;
   gboolean  eval;
-  GError   *err = NULL;
   
-  eval = ctpl_eval_bool (token->condition, env, &err);
-  if (err != NULL) {
-    g_propagate_error (error, err);
-  } else {
+  if (ctpl_eval_bool (token->condition, env, &eval, error)) {
     rv = ctpl_parser_parse (eval ? token->if_children
                                  : token->else_children,
                             env, output, error);
   }
+  
   return rv;
 }
 
@@ -180,14 +177,14 @@ ctpl_parser_parse_token_expr (CtplTokenExpr    *expr,
                               CtplOutputStream *output,
                               GError          **error)
 {
-  CtplValue  *eval_value;
-  gboolean    rv = FALSE;
+  CtplValue eval_value;
+  gboolean  rv = FALSE;
   
-  eval_value = ctpl_eval_value (expr, env, error);
-  if (eval_value) {
+  ctpl_value_init (&eval_value);
+  if (ctpl_eval_value (expr, env, &eval_value, error)) {
     gchar *strval;
     
-    strval = ctpl_value_to_string (eval_value);
+    strval = ctpl_value_to_string (&eval_value);
     if (! strval) {
       g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_FAILED,
                    "Cannot convert expression to a printable format");
@@ -196,7 +193,7 @@ ctpl_parser_parse_token_expr (CtplTokenExpr    *expr,
     }
     g_free (strval);
   }
-  ctpl_value_free (eval_value);
+  ctpl_value_free_value (&eval_value);
   
   return rv;
 }
