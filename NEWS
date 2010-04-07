@@ -8,7 +8,7 @@
   
   * GIO replaces LibMB. Impact is:
     * Less memory usage (input template may or may not be loaded into memory);
-    * Small performance regression, between 4% to 32% [1] (on extreme cases),
+    * Small performance regression, between 8% to 19% [1] (on extreme cases),
       measured on heavy templates;
     * Any GIO stream may be live-lexed, from local files to remote FTP, Samba,
       DAV, etc.
@@ -32,14 +32,14 @@
   
   ## Quid of the performances?
   
-  Yes, we lost about 4% to 32% [1] of speed. But I decided that the gain worth
+  Yes, we lost about 8% to 19% [1] of speed. But I decided that the gain worth
   it: GIO allows live streams to be parsed without loading them previously into
   memory, which means that the memory usage is about the same minus about the
   size of the input template.
-  Since the parsing of a 140M (28366227 lines) example template took 14.9508s
-  before and 15.7122s now (4.85% slower), I thought it was reasonable when we
+  Since the parsing of a 140M (28366227 lines) example template took 15.9612s
+  before and 17.4756s now (8.67% slower), I thought it was reasonable when we
   gained about 140M of memory. Another test (135M input, 10944000 lines) took
-  10.7558s before and 12.5084s now (31.54% slower), but needed about 130M less
+  11.4204s before and 13.3378s now (14.38% slower), but needed about 130M less
   memory.
   
   And still note that these are very heavy templates (yes, 11-28.4M lines!), and
@@ -60,4 +60,4 @@
       template at once was not took into account; but I/O doesn't make so much
       sense since it depends heavily on the input location (even two hard drives
       might behave quite differently, depending on their speed, cache size and
-      so on). But with I/O, results moves from +21.98% to -1.46% slower.
+      so on). But with I/O, results moves from +18.66% to -3.59% slower.
