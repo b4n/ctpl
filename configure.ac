@@ -11,6 +11,19 @@ AC_CONFIG_HEADERS([config.h])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+#
+# revision of the library (libtool stuff)
+# 
+# CURRENT:REVISION:AGE
+# 
+# Remember to bump library version before releases; here the rules:
+# If you have:
+#   * not changed the interface (bug fixes):          CURRENT:REV+1:AGE
+#   * augmented the interface (new things):           CURRENT+1:0:AGE+1
+#   * broken the interface (removed/changed things):  CURRENT+1:0:0
+CTPL_LTVERSION="0:0:0"
+AC_SUBST([CTPL_LTVERSION])
+
 pkgconfigdir="${libdir}/pkgconfig"
 ctplincludedir="${includedir}/ctpl"
 AC_SUBST(pkgconfigdir)
