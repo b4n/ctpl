@@ -65,6 +65,8 @@
  */
 
 
+typedef struct _CtplStackEntry  CtplStackEntry;
+
 /*
  * CtplStackEntry:
  * @ref_count: Reference count of the entry
@@ -79,6 +81,21 @@ struct _CtplStackEntry
   gpointer        data;
   CtplStackEntry *parent;
 };
+
+/**
+ * CtplStack:
+ * 
+ * Opaque object representing a stack.
+ */
+struct _CtplStack
+{
+  /*<private>*/
+  GCompareFunc    compare_func; /* function to compare two stack elements */
+  GFreeFunc       free_func;    /* function to free a stack element */
+  CtplStackEntry *last;         /* last pushed element or %NULL */
+  GSList         *free_stack;   /* list of elements to free with the stack */
+};
+
 
 /* initialises a stack entry */
 static void

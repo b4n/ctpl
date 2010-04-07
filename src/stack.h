@@ -25,22 +25,7 @@
 G_BEGIN_DECLS
 
 
-typedef struct _CtplStack       CtplStack;
-typedef struct _CtplStackEntry  CtplStackEntry;
-
-/**
- * CtplStack:
- * 
- * The stack structure.
- */
-struct _CtplStack
-{
-  /*<private>*/
-  GCompareFunc    compare_func; /* function to compare two stack elements */
-  GFreeFunc       free_func;    /* function to free a stack element */
-  CtplStackEntry *last;         /* last pushed element or %NULL */
-  GSList         *free_stack;   /* list of elements to free with the stack */
-};
+typedef struct _CtplStack CtplStack;
 
 
 CtplStack  *ctpl_stack_new      (GCompareFunc compare_func,
