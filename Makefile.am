@@ -1,7 +1,5 @@
 SUBDIRS = src data docs
 
-pkgconfig_DATA=ctpl.pc
-
 EXTRA_DIST = COPYING \
              HACKING \
              NEWS \

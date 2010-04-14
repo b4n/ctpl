@@ -1,6 +1,9 @@
 
 man_MANS = 
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = ctpl.pc
+
 if BUILD_CTPL
 man_MANS += ctpl.1
 endif

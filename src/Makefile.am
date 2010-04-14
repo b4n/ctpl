@@ -20,6 +20,7 @@ libctpl_la_SOURCES  = environ.c \
                       token.c \
                       value.c
 
+ctplincludedir = $(includedir)/ctpl
 ctplinclude_HEADERS = ctpl.h \
                       environ.h \
                       eval.h \

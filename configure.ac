@@ -24,11 +24,6 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 CTPL_LTVERSION="0:0:0"
 AC_SUBST([CTPL_LTVERSION])
 
-pkgconfigdir="${libdir}/pkgconfig"
-ctplincludedir="${includedir}/ctpl"
-AC_SUBST(pkgconfigdir)
-AC_SUBST(ctplincludedir)
-
 # Checks for programs.
 LT_PREREQ([2.2.0])
 LT_INIT
@@ -98,10 +93,10 @@ fi
 AC_CONFIG_FILES([Makefile
                  src/Makefile
                  data/Makefile
+                 data/ctpl.pc
                  docs/Makefile
                  docs/reference/Makefile
                  docs/reference/ctpl/Makefile
                  docs/reference/ctpl/version.xml
-                 ctpl.pc
                  README])
 AC_OUTPUT
