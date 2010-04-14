@@ -116,7 +116,7 @@
  * <example>
  *   <title>A more complicated expression</title>
  *   <programlisting>
- *     (foo + 2) * 3 - 1 * bar
+ *     (foo + 1) * 3 - 2 * bar
  *   </programlisting>
  * </example>
  * Of course, the latter example supposes that the environment contains the two
@@ -289,7 +289,7 @@ ctpl_operator_to_string (CtplOperator op)
  * 
  * Tries to convert a string to an operator, as the lexer may do.
  * 
- * Returns: The read operator or @CTPL_OPERATOR_NONE if none successfully read.
+ * Returns: The read operator or %CTPL_OPERATOR_NONE if none successfully read.
  */
 CtplOperator
 ctpl_operator_from_string (const gchar *str,

@@ -31,6 +31,11 @@
  * A #CtplEnviron represents an environment of symbols used to lookup, push and
  * pop symbols when computing a template.
  * 
+ * Use ctpl_environ_new() to create a new environment; and then
+ * ctpl_environ_push(), ctpl_environ_push_int(), ctpl_environ_push_float() and
+ * ctpl_environ_push_string() to fill it. Finally, free it with
+ * ctpl_environ_free().
+ * 
  * <example>
  *   <title>Creating and filling a environment</title>
  *   <programlisting>
@@ -98,7 +103,7 @@ ctpl_environ_init (CtplEnviron *env)
 /**
  * ctpl_environ_new:
  * 
- * Creates a new #CtplEnviron
+ * Creates a new #CtplEnviron.
  * 
  * Returns: A new #CtplEnviron
  */
@@ -153,8 +158,8 @@ ctpl_environ_lookup_stack (const CtplEnviron *env,
  * 
  * Looks up for a symbol in the given #CtplEnviron.
  * 
- * Returns: A #CtplValue or %NULL if the symbol can't be found. This value
- *          should not be freed.
+ * Returns: The #CtplValue holding the symbol's value, or %NULL if the symbol
+ *          can't be found. This value should not be modified or freed.
  */
 const CtplValue *
 ctpl_environ_lookup (const CtplEnviron *env,
@@ -180,9 +185,9 @@ ctpl_environ_lookup (const CtplEnviron *env,
  * Pushes a symbol into a #CtplEnviron.
  * Pushing a symbol adds it or overwrites the value in place for it while
  * keeping any already present value for latter poping.
- * The push/pop concept is simple as a stack: when you push, to adds a value on
- * to of a stack, and when you pop, you remove the top element of this stack,
- * revealing the previous value.
+ * The push/pop concept is simple as a stack: when you push, you add a value on
+ * the top of a stack, and when you pop, you remove the top element of this
+ * stack, revealing the previous value.
  */
 void
 ctpl_environ_push (CtplEnviron     *env,
@@ -273,13 +278,13 @@ ctpl_environ_push_string (CtplEnviron  *env,
  * @env: A #CtplEnviron
  * @symbol: A symbol name
  * 
- * Pops a symbol from a #CtplValue. See ctpl_environ_push() for details on
+ * Pops a symbol from a #CtplEnviron. See ctpl_environ_push() for details on
  * pushing and poping.
  * Use ctpl_environ_lookup() if you want to get the symbol's value without
  * poping it from the environ.
  * 
- * Returns: A #CtplValue or %NULL if the symbol can't be found. This value
- *          should not be freed.
+ * Returns: The #CtplValue holding the symbol's value, or %NULL if the symbol
+ *          can't be found. This value should not be modified or freed.
  */
 const CtplValue *
 ctpl_environ_pop (CtplEnviron *env,
@@ -329,7 +334,7 @@ ctpl_environ_foreach_hfunc (gpointer  symbol,
  * @func: A #CtplEnvironForeachFunc
  * @user_data: user data to pass to @func
  * 
- * Calls @func on each symbol on the environment.
+ * Calls @func on each symbol of the environment.
  */
 void
 ctpl_environ_foreach (CtplEnviron            *env,
@@ -384,7 +389,7 @@ ctpl_environ_merge_hfunc (gpointer  symbol,
  * is true or ignored if %FALSE.
  * 
  * <warning>
- *   Currently, symbol merging only pushes the topmost value for the source
+ *   Currently, symbol merging only pushes the topmost value from the source
  *   environ rather than pushing it entirely.
  * </warning>
  */

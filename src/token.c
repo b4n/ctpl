@@ -117,9 +117,9 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
 
 /**
  * ctpl_token_new_for:
- * @array: String containing the name of the array to iterate
+ * @array: String containing the name of the array to iterate over
  * @iterator: String containing the name of the array iterator
- * @children: Sub-tree that should be treated on each loop iteration.
+ * @children: Sub-tree that should be computed on each loop iteration
  * 
  * Creates a new token holding a for statement.
  * 
@@ -195,7 +195,8 @@ ctpl_token_expr_new (void)
 
 /**
  * ctpl_token_expr_new_operator:
- * @operator: A binary operator (one of the CTPL_OPERATOR_*)
+ * @operator: A binary operator (one of the
+ *            <link linkend="CtplOperator"><code>CTPL_OPERATOR_*</code></link>)
  * @loperand: The left operand of the operator
  * @roperand: The right operand of the operator
  * 

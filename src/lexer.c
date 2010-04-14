@@ -30,15 +30,16 @@
  * @short_description: Syntax analyser
  * @include: ctpl/lexer.h
  * 
- * Syntax analyser creating a token tree from an input data in the CTPL
- * language.
+ * Syntax analyser creating a <link linkend="ctpl-CtplToken">token tree</link>
+ * from an input data in the CTPL language.
  * 
  * To analyse some data, use ctpl_lexer_lex(), ctpl_lexer_lex_string() or
- * ctpl_lexer_lex_file().
+ * ctpl_lexer_lex_path(); to destroy the created token tree, use
+ * ctpl_lexer_free_tree().
  * To dump a tree, use ctpl_lexer_dump_tree().
  * 
  * <example>
- * <title>Usage of lexer and error management</title>
+ * <title>Usage of the lexer and error management</title>
  * <programlisting>
  * CtplToken *tree;
  * GError    *error = NULL;
@@ -48,7 +49,7 @@
  *   fprintf (stderr, "Failed to analyse input data: %s\n", error->message);
  *   g_clear_error (&error);
  * } else {
- *   /<!-- -->* do anything you want with the tree here *<!-- -->/
+ *   /<!-- -->* do what you want with the tree here *<!-- -->/
  *   
  *   ctpl_lexer_free_tree (tree);
  * }
@@ -594,10 +595,11 @@ ctpl_lexer_lex_internal (CtplInputStream *stream,
  * @error: A #GError return location for error reporting, or %NULL to ignore
  *         errors.
  * 
- * Analyses some given data and try to create a tree of tokens representing it.
+ * Analyses some given data and tries to create a tree of tokens representing
+ * it.
  * 
  * Returns: A new #CtplToken tree holding all read tokens or %NULL on error.
- *          The new tree should be freed with ctpl_lexer_free_tree() whan no
+ *          The new tree should be freed with ctpl_lexer_free_tree() when no
  *          longer needed.
  */
 CtplToken *
@@ -627,7 +629,7 @@ ctpl_lexer_lex (CtplInputStream *stream,
  * @template: A string containing the template data
  * @error: Return location for errors, or %NULL to ignore them.
  * 
- * Lexes a template from a string.
+ * Convenient function to lex a template from a string.
  * See ctpl_lexer_lex().
  * 
  * Returns: A new #CtplToken tree or %NULL on error.
@@ -652,7 +654,7 @@ ctpl_lexer_lex_string (const gchar *template,
  *        filename encoding
  * @error: Return location for errors, or %NULL to ignore them
  * 
- * Lexes a template from a file.
+ * Convenient function to lex a template from a file.
  * See ctpl_lexer_lex().
  * 
  * Errors can come from the %G_IO_ERROR domain if the file loading fails, or

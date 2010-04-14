@@ -206,7 +206,7 @@ ctpl_input_stream_new_for_uri (const gchar *uri,
  * ctpl_input_stream_ref:
  * @stream: A #CtplInputStream
  * 
- * Adds a reference to a #CtplInputStream
+ * Adds a reference to a #CtplInputStream.
  * 
  * Returns: The stream
  * 
@@ -224,7 +224,7 @@ ctpl_input_stream_ref (CtplInputStream *stream)
  * ctpl_input_stream_unref:
  * @stream: A #CtplInputStream
  * 
- * Removes a reference from a #CtplInputStream. if the reference count drops to
+ * Removes a reference from a #CtplInputStream. If the reference count drops to
  * 0, frees the stream.
  * 
  * Since: 0.2
@@ -478,9 +478,8 @@ ctpl_input_stream_read (CtplInputStream *stream,
  * 
  * <warning>
  *   <para>
- *     Note a peek might resize the internal stream's cache to fit at least
- *     @count. Therefore, peeking too much data at once should be done with some
- *     care.
+ *     A peek might resize the internal stream's cache to fit at least @count.
+ *     Therefore, peeking too much data at once should be done with some care.
  *   </para>
  * </warning>
  * 
@@ -517,7 +516,7 @@ ctpl_input_stream_peek (CtplInputStream *stream,
  * ctpl_input_stream_read_word:
  * @stream: A #CtplInputStream
  * @accept: string of the character acceptable for the word
- * @accept_len: length of @accept, can be -1 if @accept is null-terminated
+ * @accept_len: length of @accept, can be -1 if @accept is 0-terminated
  * @max_len: maximum number of bytes to read, or -1 for no limit
  * @length: return location for the length of the read word, or %NULL
  * @error: Return location for errors, or %NULL to ignore them
@@ -642,7 +641,7 @@ ctpl_input_stream_read_symbol_full (CtplInputStream *stream,
  * ctpl_input_stream_peek_word:
  * @stream: A #CtplInputStream
  * @accept: string of the character acceptable for the word
- * @accept_len: length of @accept, can be -1 if @accept is null-terminated
+ * @accept_len: length of @accept, can be -1 if @accept is 0-terminated
  * @max_len: maximum number of bytes to peek, or -1 for no limit
  * @length: return location for the length of the read word, or %NULL
  * @error: return location for errors, or %NULL to ignore them
@@ -705,7 +704,7 @@ ctpl_input_stream_peek_word (CtplInputStream *stream,
  * @length: Return location for the peeked length, or %NULL
  * @error: Return location for errors, or %NULL to ignore them
  * 
- * Peeks a word from a #CtplInputStream. See ctpl_input_stream_peek_word() and
+ * Peeks a symbol from a #CtplInputStream. See ctpl_input_stream_peek_word() and
  * ctpl_input_stream_peek_symbol().
  * 
  * Returns: A newly allocated string containing the peeked symbol, or %NULL on
@@ -794,7 +793,7 @@ ctpl_input_stream_skip (CtplInputStream *stream,
  * ctpl_input_stream_skip_word:
  * @stream: A #CtplInputStream
  * @reject: A string of the characters to skip
- * @reject_len: Length of @reject, can be -1 if null-terminated
+ * @reject_len: Length of @reject, can be -1 if 0-terminated
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Skips all the characters matching @reject from a #CtplInputStream until the
@@ -889,7 +888,7 @@ ctpl_input_stream_skip_blank (CtplInputStream  *stream,
  * For instance, a string might look like this, assuming the escape character is
  * <code>\</code> (backslash) and the quoting character is <code>"</code>
  * (double quote): <code>"a valid string with \"special\" characters such as
- * \\ backslashes"</code>
+ * \\ (backslash)"</code>
  * 
  * Returns: The read string, or %NULL on error
  * 
@@ -1409,7 +1408,7 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
  * Reads an integer from a #CtplInputStream. See ctpl_input_stream_read_number()
  * for details.
  * 
- * Returns: The read integer, ot 0 on error.
+ * Returns: The read integer, or 0 on error.
  * 
  * Since: 0.2
  */
@@ -1438,7 +1437,7 @@ ctpl_input_stream_read_long (CtplInputStream *stream,
 /**
  * ctpl_input_stream_get_c:
  * @stream: A #CtplInputStream
- * @error: Return location for errors, to %NULL to ignore them
+ * @error: Return location for errors, or %NULL to ignore them
  * 
  * Reads a character from a #CtplInputStream.
  * 

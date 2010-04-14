@@ -44,7 +44,8 @@ G_BEGIN_DECLS
  * @CTPL_PARSER_ERROR_FAILED: An error occurred without any precision on what
  *                            failed.
  * 
- * Error codes that parsing functions can throw.
+ * Error codes that parsing functions can throw, from the %CTPL_PARSER_ERROR
+ * domain.
  */
 typedef enum _CtplParserError
 {

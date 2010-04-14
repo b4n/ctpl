@@ -66,7 +66,8 @@ G_BEGIN_DECLS
  * @CTPL_LEXER_EXPR_ERROR_FAILED:           An error occurred without any
  *                                          precision on what failed.
  * 
- * Error codes that lexing functions can throw.
+ * Error codes that lexing functions can throw, from the %CTPL_LEXER_EXPR_ERROR
+ * domain.
  */
 typedef enum _CtplLexerExprError
 {

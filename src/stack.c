@@ -29,7 +29,7 @@
  * 
  * A stack optimised for storing same data multiple times at once.
  * E.g., pushing "foo", "bar", "bar", "bar" could use only 2 data structures
- * and not 4 as the three last values may shares the same structure.
+ * and not 4 since the three last elements may shares the same structure.
  * 
  * If a comparison function was given when creating the stack with
  * ctpl_stack_new(), when you push an element in the stack that the comparison
@@ -292,11 +292,11 @@ ctpl_stack_push (CtplStack *stack,
  * ctpl_stack_pop:
  * @stack: A #CtplStack from which pop the last element
  * 
- * Gets an remove the last pushed element from @stack.
+ * Gets and removes the last pushed element from @stack.
  * 
  * Returns: The last pushed data, or %NULL if the stack was empty. As it is not
  *          possible to know if this function returned %NULL because of an empty
- *          stack or because the last pushed value is %NULL, you should use
+ *          stack or because the last pushed element is %NULL, you should use
  *          ctpl_stack_is_empty() to check whether the stack contains or not
  *          some elements.
  */
@@ -319,8 +319,9 @@ ctpl_stack_pop (CtplStack *stack)
  * ctpl_stack_peek:
  * @stack: A #CtplStack
  * 
- * Peeks (gets) the top-level value of a #CtplStack.
- * See ctpl_stack_pop() if you want to get the value and pop it from the stack.
+ * Peeks (gets) the top-level element of a #CtplStack.
+ * See ctpl_stack_pop() if you want to get the element and pop it from the
+ * stack.
  * 
  * Returns: The top-level data of @stack, or %NULL if the stack is empty.
  */

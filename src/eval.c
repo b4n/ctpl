@@ -628,6 +628,8 @@ ctpl_eval_operator (const CtplTokenExpr  *operator,
  * in @value.
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
+ * 
+ * Since: 0.2
  */
 gboolean
 ctpl_eval_value (const CtplTokenExpr  *expr,
@@ -717,9 +719,11 @@ ctpl_eval_bool_value (const CtplValue *value)
  * 
  * Computes the given expression to a boolean.
  * Computing to a boolean means computing the expression's value and then check
- * if this value should be considered as %FALSE or %TRUE.
+ * if this value should be considered as false or true.
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
+ * 
+ * Since: 0.2
  */
 gboolean
 ctpl_eval_bool (const CtplTokenExpr  *expr,

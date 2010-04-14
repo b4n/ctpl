@@ -41,7 +41,7 @@ G_BEGIN_DECLS
  * @CTPL_IO_ERROR_FAILED:         Something went wrong
  * 
  * Errors that can be thrown by I/O functions (#CtplInputStream and
- * #CtplOutputStream methods).
+ * #CtplOutputStream methods), from the %CTPL_IO_ERROR domain.
  */
 typedef enum _CtplIOError
 {

@@ -44,7 +44,7 @@ G_BEGIN_DECLS
  *                                                environment description
  * @CTPL_ENVIRON_ERROR_FAILED:                    An error occurred
  * 
- * Errors in the CtplEnviron domain.
+ * Errors in the %CTPL_ENVIRON_ERROR domain.
  */
 typedef enum _CtplEnvironError
 {

@@ -30,13 +30,13 @@ G_BEGIN_DECLS
 /**
  * CTPL_START_CHAR:
  * 
- * Character delimiting start of language tokens from raw data.
+ * Character delimiting the start of language tokens from raw data.
  */
 #define CTPL_START_CHAR '{'
 /**
  * CTPL_END_CHAR:
  * 
- * Character delimiting end of language tokens from raw data.
+ * Character delimiting the end of language tokens from raw data.
  */
 #define CTPL_END_CHAR   '}'
 
@@ -53,7 +53,8 @@ G_BEGIN_DECLS
  * @CTPL_LEXER_ERROR_FAILED: An error occurred without any precision on what
  *                           failed.
  * 
- * Error codes that lexing functions can throw.
+ * Error codes that lexing functions can throw, from the %CTPL_LEXER_ERROR
+ * domain.
  */
 typedef enum _CtplLexerError
 {

@@ -36,8 +36,8 @@
  * uninitialised with ctpl_value_free_value().
  * 
  * You can set the data they holds with ctpl_value_set_int(),
- * ctpl_value_set_float(), ctpl_value_set_string(), ctpl_value_set_array(), you
- * can add data to an array value with ctpl_value_array_append(),
+ * ctpl_value_set_float(), ctpl_value_set_string() and ctpl_value_set_array();
+ * you can add elements to an array value with ctpl_value_array_append(),
  * ctpl_value_array_prepend(), ctpl_value_array_append_int(),
  * ctpl_value_array_prepend_int(), ctpl_value_array_append_float(),
  * ctpl_value_array_prepend_float(), ctpl_value_array_append_string() and
@@ -92,7 +92,7 @@ static void   ctpl_value_set_array_internal   (CtplValue     *value,
  * 
  * Initialises a #CtplValue.
  * This function is useful for statically allocated values, and is not required
- * for values created by ctpl_value_new().
+ * for dynamically allocated values created by ctpl_value_new().
  */
 void
 ctpl_value_init (CtplValue *value)
@@ -130,8 +130,9 @@ ctpl_value_new (void)
  * @src_value: A #CtplValue to copy
  * @dst_value: A #CtplValue into which copy @src_value
  * 
- * Copies a #CtplValue to another.
- * See ctpl_value_dup() if you want to duplicate the value.
+ * Copies the value of a #CtplValue into another.
+ * See ctpl_value_dup() if you want to duplicate the value and not only its
+ * content.
  */
 void
 ctpl_value_copy (const CtplValue *src_value,
@@ -184,7 +185,7 @@ ctpl_value_dup (const CtplValue *value)
  * 
  * Frees the data held by a #CtplValue.
  * This function is only useful to the end user for statically allocated values
- * as ctpl_value_free() does all the job needed to completely release an
+ * since ctpl_value_free() does all the job needed to completely release an
  * allocated #CtplValue.
  */
 void
@@ -214,9 +215,9 @@ ctpl_value_free_value (CtplValue *value)
  * @value: A #CtplValue
  * 
  * Frees all resources used by a #CtplValue.
- * This function can't be used with statically allocated as it frees the value
- * itself; if you want to free a statically allocated value, use
- * ctpl_value_free_value().
+ * This function can't be used with statically allocated values since it frees
+ * the value itself and not only its content. If you want to free a statically
+ * allocated value, use ctpl_value_free_value().
  */
 void
 ctpl_value_free (CtplValue *value)
@@ -390,8 +391,7 @@ ctpl_value_set_float (CtplValue *value,
  * @val: A string
  * 
  * Sets the value of a #CtplValue to the given string.
- * The string will be duplicated the either a static string or a temporary
- * allocated buffer.
+ * The string is copied.
  */
 void
 ctpl_value_set_string (CtplValue   *value,
@@ -780,7 +780,7 @@ ctpl_value_array_prepend_string (CtplValue   *value,
  * ctpl_value_array_length:
  * @value:  A #CtplValue holding an array
  * 
- * Gets the number of elements of the array of a #CtplValue.
+ * Gets the number of elements in a #CtplValue that holds an array.
  * 
  * Returns: The number of elements in @value.
  */
@@ -810,8 +810,8 @@ ctpl_value_get_held_type (const CtplValue *value)
  * 
  * Gets a human-readable name for a value type.
  * 
- * Returns: A static string of a displayable name of the type held by @v. This
- *          string must not be modified or freed.
+ * Returns: A static string of a displayable name for @type. This string must
+ *          not be modified or freed.
  */
 const gchar *
 ctpl_value_type_get_name (CtplValueType type)
@@ -892,7 +892,7 @@ ctpl_value_get_string (const CtplValue *value)
  * element holds a #CtplValue holding the element value.
  * 
  * Returns: A #GSList owned by the value that must not be freed, neither the
- *          list itself nor its values, or %NULL in an error occurs.
+ *          list itself nor its values, or %NULL on error.
  */
 const GSList *
 ctpl_value_get_array (const CtplValue *value)
@@ -911,7 +911,7 @@ ctpl_value_get_array (const CtplValue *value)
  * The value must hold an array and all array's elements must be integers.
  * 
  * Returns: A newly allocated array of integers that should be freed with
- *          g_free() or %NULL if an error occurs.
+ *          g_free() or %NULL on error.
  */
 glong *
 ctpl_value_get_array_int (const CtplValue *value,
@@ -956,7 +956,7 @@ ctpl_value_get_array_int (const CtplValue *value,
  * @value must hold an array and all array's elements must be floats.
  * 
  * Returns: A newly allocated array of floats that should be freed with g_free()
- *          or %NULL if an error occurs.
+ *          or %NULL on error.
  */
 gdouble *
 ctpl_value_get_array_float (const CtplValue *value,
@@ -1000,8 +1000,8 @@ ctpl_value_get_array_float (const CtplValue *value,
  * Gets the values held by a #CtplValue as an array of strings.
  * @value must hold an array containing only strings.
  * 
- * Returns: A newly allocated %NULL-terminated array of strings. Free with
- *          g_strfreev() when no longer needed.
+ * Returns: A newly allocated %NULL-terminated array of strings, or %NULL on
+ *          error. Free with g_strfreev() when no longer needed.
  */
 gchar **
 ctpl_value_get_array_string (const CtplValue *value,
@@ -1048,7 +1048,7 @@ ctpl_value_get_array_string (const CtplValue *value,
  *   <para>
  *     Arrays are flattened to the form [val1, val2, val3]. It may not be what
  *     you want, but flattening an array is not the primary goal of this
- *     function and you should consider doing this yourself if it is what you
+ *     function and you should consider doing it yourself if it is what you
  *     want - flattening an array.
  *   </para>
  * </note>

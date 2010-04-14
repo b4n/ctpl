@@ -31,7 +31,7 @@ G_BEGIN_DECLS
  * @CTPL_VTYPE_INT: Integer (C's long int)
  * @CTPL_VTYPE_FLOAT: Floating point value (C's double)
  * @CTPL_VTYPE_STRING: 0-terminated string (C string)
- * @CTPL_VTYPE_ARRAY: Array of values
+ * @CTPL_VTYPE_ARRAY: Array of #CtplValue<!-- -->s
  * 
  * Represents the types that a #CtplValue can hold.
  */

@@ -53,7 +53,7 @@ struct _CtplInputStream
 /**
  * CTPL_EOF:
  * 
- * End-Of-File constant
+ * End-Of-File constant.
  * 
  * Since: 0.2
  */
@@ -242,7 +242,7 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
  *           or -1 for no limit
  * @error: Return location for errors, or %NULL to ignore them
  * 
- * Peeks a word from a #CtplInputStream. See ctpl_input_stream_peek_word() and
+ * Peeks a symbol from a #CtplInputStream. See ctpl_input_stream_peek_word() and
  * ctpl_input_stream_peek_symbol_full().
  * 
  * Returns: A newly allocated string containing the peeked symbol, or %NULL on

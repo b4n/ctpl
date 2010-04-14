@@ -43,7 +43,7 @@ G_BEGIN_DECLS
  * @CTPL_EVAL_ERROR_FAILED: An error occurred without any precision on what
  *                          failed.
  * 
- * Error codes that eval functions can throw.
+ * Error codes that eval functions can throw, from the %CTPL_EVAL_ERROR domain.
  */
 typedef enum _CtplEvalError
 {

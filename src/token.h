@@ -27,8 +27,8 @@ G_BEGIN_DECLS
 
 /**
  * CtplTokenType:
- * @CTPL_TOKEN_TYPE_DATA: Data flow, not a real token
- * @CTPL_TOKEN_TYPE_FOR: A loop through an array of value
+ * @CTPL_TOKEN_TYPE_DATA: Data flow, not an language token
+ * @CTPL_TOKEN_TYPE_FOR: A loop through an array of values
  * @CTPL_TOKEN_TYPE_IF: A conditional branching
  * @CTPL_TOKEN_TYPE_EXPR: An expression
  * 
@@ -44,7 +44,8 @@ typedef enum _CtplTokenType
 
 /**
  * CtplTokenExprType:
- * @CTPL_TOKEN_EXPR_TYPE_OPERATOR:  An operator (CTPL_OPERATOR_*)
+ * @CTPL_TOKEN_EXPR_TYPE_OPERATOR:  An operator
+ *            (<link linkend="CtplOperator"><code>CTPL_OPERATOR_*</code></link>)
  * @CTPL_TOKEN_EXPR_TYPE_INTEGER:   An integer
  * @CTPL_TOKEN_EXPR_TYPE_FLOAT:     A floating-point value
  * @CTPL_TOKEN_EXPR_TYPE_SYMBOL:    A symbol (a name to be found in the environ)
@@ -110,7 +111,7 @@ typedef struct _CtplTokenExprOperator CtplTokenExprOperator;
  * @iter: The symbol of the iterator
  * @children: Tree to repeat on iterations
  * 
- * Holds information about a for statement.
+ * Holds information about a <code>for</code> statement.
  */
 struct _CtplTokenFor
 {
@@ -125,7 +126,7 @@ struct _CtplTokenFor
  * @if_children: Branching if @condition evaluate to true
  * @else_children: Branching if @condition evaluate to false
  * 
- * Holds information about a if statement.
+ * Holds information about an <code>if</code> statement.
  */
 struct _CtplTokenIf
 {
@@ -249,7 +250,7 @@ void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
  * ctpl_token_get_type:
  * @token: A #CtplToken
  * 
- * Gets the type of a #CtplToken
+ * Gets the type of a #CtplToken.
  * 
  * Returns: The <link linkend="CtplTokenType">type</link> of @token.
  */

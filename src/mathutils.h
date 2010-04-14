@@ -32,8 +32,8 @@ G_BEGIN_DECLS
 
 /**
  * CTPL_MATH_FLOAT_EQ:
- * @a: a floating-point value
- * @b: another floating-point value
+ * @a: A floating-point value
+ * @b: Another floating-point value
  * 
  * Checks whether two floating-point values are equal.
  * 

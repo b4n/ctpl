@@ -54,6 +54,8 @@
  * Adds a reference to a #CtplOutputStream.
  * 
  * Returns: The stream
+ * 
+ * Since: 0.2
  */
 
 /**
@@ -62,13 +64,15 @@
  * 
  * Removes a reference from a #CtplOutputStream. When its reference count
  * reaches 0, the stream is destroyed.
+ * 
+ * Since: 0.2
  */
 
 /**
  * ctpl_output_stream_write:
  * @stream: A #CtplOutputStream
- * @data: Data to write
- * @length: Length of the data in bytes, or -1 if it is a null-terminated string
+ * @data: The data to write
+ * @length: Length of the data in bytes, or -1 if it is a 0-terminated string
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Writes a buffer to a #CtplOutputStream.
@@ -94,7 +98,7 @@ ctpl_output_stream_write (CtplOutputStream  *stream,
 /**
  * ctpl_output_stream_put_c:
  * @stream: A #CtplOutputStream
- * @c: A character
+ * @c: The character to write
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Writes a character to a #CtplOutputStream.
