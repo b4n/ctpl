@@ -1,0 +1,53 @@
+.TH CTPL 1 "15 Apr 2010"
+.SH NAME
+\fBctpl\fP \- CTPL command-line template parsing tool
+
+.SH SYNOPSIS
+.B ctpl
+[\fIOPTION\fR]... \fIINPUTFILE\fR...
+.SH DESCRIPTION
+.B ctpl
+parses one or more \fIINPUTFILE\fR template against the provided environment and
+outputs the result.
+
+.LP
+.SH OPTIONS
+
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Prints the command line options.
+
+.TP
+\fB\-o\fR, \fB\-\-output\fR=\fIFILE\fR
+Write output to \fIFILE\fR. If not provided, defaults to stdout.
+
+.TP
+\fB\-e\fR, \fB\-\-env\-file\fR=\fIENVFILE\fR
+Add environment from \fIENVFILE\fR. This option may appear more than once.
+
+.TP
+\fB\-c\fR, \fB\-\-env\-chunk\fR=\fICHUNK\fR
+Add environment chunk \fICHUNK\fR. This option may appear more than once.
+
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Be verbose.
+
+.TP
+\fB\-\-version\fR
+Print the version information and exit.
+
+.SH REPORTING BUGS
+Report ctpl bugs to ban@herbesfolles.org
+.br
+CTPL home page: <http://ctpl.tuxfamily.org>
+
+.SH AUTHOR
+Colomban Wendling (ban@herbesfolles.org)
+
+.SH COPYRIGHT
+Copyright \(co 2010 Colomban Wendling.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.

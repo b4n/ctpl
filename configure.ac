@@ -97,6 +97,7 @@ fi
 # Output
 AC_CONFIG_FILES([Makefile
                  src/Makefile
+                 data/Makefile
                  docs/Makefile
                  docs/reference/Makefile
                  docs/reference/ctpl/Makefile

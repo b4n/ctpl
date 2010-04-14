@@ -1,4 +1,4 @@
-SUBDIRS = src docs
+SUBDIRS = src data docs
 
 pkgconfig_DATA=ctpl.pc
 
