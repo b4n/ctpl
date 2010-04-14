@@ -5,7 +5,9 @@ pkgconfig_DATA=ctpl.pc
 EXTRA_DIST = COPYING \
              HACKING \
              NEWS \
-             TODO
+             TODO \
+             README \
+             autogen.sh
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
 

@@ -1,0 +1,27 @@
+General Information
+===================
+
+This is CTPL version @VERSION@. CTPL (which stands for C Template (Parser)
+Library) is a template engine library written in C and distributed under the
+terms of the GNU GPL. It allows fast and easy parsing of templates and fine
+control over template parsing environment.
+
+More information can be found on-line at the official website:
+  http://ctpl.tuxfamily.org/
+
+Installation
+============
+
+You need the following packages to build CTPL:
+ - libglib (http://www.gtk.org/)
+ - libgio (http://www.gtk.org/)
+ - pkg-config (http://www.freedesktop.org/software/pkgconfig/)
+ - A working C compiler (GCC for example, http://gcc.gnu.org/)
+ - A make utility (GNU make (http://www.gnu.org/software/make) is recommended)
+
+You may also want the following packages that enables extra features:
+ - gio-unix GIO module (http://www.gtk.org/) is needed for the ctpl command-line
+   tool. It generally comes together with GIO on platforms that supports it.
+ - gtk-doc (http://www.gtk.org/) if you want to (re)build the documentation
+
+For detailed installation instructions, see the INSTALL file.
