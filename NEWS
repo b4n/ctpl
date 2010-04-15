@@ -22,9 +22,11 @@
         machines).
     * Support for octal and binary constants via 0o and 0b prefix respectively;
   * Improved token representation, saving about from 19% to 28% of memory use
-    for the token tree (no measurable performance impact);
+    for the token tree (no measurable performance impact) (already in 0.1.90);
   * Add support for single-line comments in environ descriptions;
-  * Fix support of array values that starts with blanks in environ descriptions.
+  * Fix support of array values that starts with blanks in environ descriptions;
+  * `make distcheck` and out-of-tree build now work;
+  * Add man page for the ctpl command-line utility.
   
   As you can see, the main improvements of this release are less memory
   consumption (about 30/40% better!) and GIO usage bringing almost universal
@@ -61,3 +63,33 @@
       sense since it depends heavily on the input location (even two hard drives
       might behave quite differently, depending on their speed, cache size and
       so on). But with I/O, results moves from +18.66% to -3.59% slower.
+
+
+# 0.1.90
+  
+  The version 0.1.90 is the last of the 0.1.x branch. It is the 0.2-minus-one
+  release, with a part of the 0.1-compatible improvements that will come in the
+  upcoming 0.2 branch.
+  
+  ## Changes summary
+  
+  * Improved token representation, saving about from 20% to 30% of memory use
+    for the token tree (no measurable performance impact);
+  * New ctpl_environ_foreach() and ctpl_environ_merge() functions;
+  * Fix missing inclusion of readutils.h in the global header.
+
+
+# 0.1.1
+  
+  The version 0.1.1 is a bugfix release for the 0.1 branch.
+  
+  ## Changes summary
+  
+  * Fixed stack overflow with very large token trees;
+  * Great speed improvement with large token trees.
+
+
+# 0.1
+  
+  The version 0.1 is the first release of CTPL. CTPL is a template engine
+  library aiming to easily allow template parsing from C programs.
