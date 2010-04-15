@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([CTPL], [0.1.90], [ban@herbesfolles.org])
+AC_INIT([CTPL], [0.2], [ban@herbesfolles.org])
 AC_CONFIG_SRCDIR([src/stack.c])
 AC_CONFIG_AUX_DIR([build/aux])
 AC_CONFIG_MACRO_DIR([build/m4])
@@ -21,7 +21,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 #   * not changed the interface (bug fixes):          CURRENT:REV+1:AGE
 #   * augmented the interface (new things):           CURRENT+1:0:AGE+1
 #   * broken the interface (removed/changed things):  CURRENT+1:0:0
-CTPL_LTVERSION="0:0:0"
+CTPL_LTVERSION="1:0:0"
 AC_SUBST([CTPL_LTVERSION])
 
 # Checks for programs.
