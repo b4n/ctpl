@@ -1,12 +1,16 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.63])
-AC_INIT([CTPL], [0.2], [ban@herbesfolles.org])
+AC_PREREQ([2.64])
+AC_INIT([CTPL],
+        [0.2],
+        [ban@herbesfolles.org],
+        [ctpl],
+        [http://ctpl.tuxfamily.org])
 AC_CONFIG_SRCDIR([src/stack.c])
 AC_CONFIG_AUX_DIR([build/aux])
 AC_CONFIG_MACRO_DIR([build/m4])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign])
 AC_CONFIG_HEADERS([config.h])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
