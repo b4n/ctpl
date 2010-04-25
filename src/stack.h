@@ -28,15 +28,22 @@ G_BEGIN_DECLS
 typedef struct _CtplStack CtplStack;
 
 
+G_GNUC_INTERNAL
 CtplStack  *ctpl_stack_new      (GCompareFunc compare_func,
                                  GFreeFunc    free_func);
+G_GNUC_INTERNAL
 void        ctpl_stack_free     (CtplStack *stack);
 
+G_GNUC_INTERNAL
 void        ctpl_stack_push     (CtplStack *stack,
                                  gpointer   data);
+G_GNUC_INTERNAL
 gboolean    ctpl_stack_push_ref (CtplStack *stack);
+G_GNUC_INTERNAL
 gpointer    ctpl_stack_pop      (CtplStack *stack);
+G_GNUC_INTERNAL
 gpointer    ctpl_stack_peek     (const CtplStack *stack);
+G_GNUC_INTERNAL
 gboolean    ctpl_stack_is_empty (const CtplStack *stack);
 
 

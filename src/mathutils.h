@@ -47,8 +47,10 @@ G_BEGIN_DECLS
 #endif
 
 
+G_GNUC_INTERNAL
 gboolean    ctpl_math_string_to_float   (const gchar *string,
                                          gdouble     *value);
+G_GNUC_INTERNAL
 gboolean    ctpl_math_string_to_int     (const gchar *string,
                                          glong       *value);
 
