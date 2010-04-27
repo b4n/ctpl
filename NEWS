@@ -1,3 +1,13 @@
+# 0.2.1
+
+  The version 0.2.1 is a bugfix release for the 0.2 branch.
+  
+  ## Changes summary
+  
+  * Do not export the private API;
+  * Little cleaning of the build system.
+
+
 # 0.2
   
   The version 0.2 is an API and ABI break from the previous 0.1 branch.
