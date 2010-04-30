@@ -331,6 +331,7 @@ token_operator_to_string (CtplTokenExpr *token)
 
 /*
  * validate_token_list:
+ * @stream: The #CtplInputStream from where tokens comes (for error reporting)
  * @tokens: The list of tokens to validate
  * @error: Return location for an error, or %NULL to ignore them
  * 
@@ -346,8 +347,9 @@ token_operator_to_string (CtplTokenExpr *token)
  * Returns: A new #CtplTokenExpr or %NULL on error.
  */
 static CtplTokenExpr *
-validate_token_list (GSList  *tokens,
-                     GError **error)
+validate_token_list (CtplInputStream *stream,
+                     GSList          *tokens,
+                     GError         **error)
 {
   CtplTokenExpr  *expr = NULL;
   CtplTokenExpr  *operands[2] = {NULL, NULL};
@@ -389,7 +391,7 @@ validate_token_list (GSList  *tokens,
           opd = 1;
         } else {
           /*g_debug ("Operator is not prior");*/
-          operands[1] = validate_token_list (last_opd, error);
+          operands[1] = validate_token_list (stream, last_opd, error);
           opt --;
           
           break;
@@ -408,9 +410,12 @@ validate_token_list (GSList  *tokens,
     nexpr->token.t_operator->roperand = operands[1];
     expr = nexpr;
   } else {
-    g_set_error (error, CTPL_LEXER_ERROR, CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,
-                 "To few operands for operator %s",
-                 token_operator_to_string (operators[opt - 1]));
+    /* even though the location reported by ctpl_input_stream_set_error() may
+     * not be perfectly exact, it is probably better with it than without */
+    ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
+                                 CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,
+                                 "Too few operands for operator '%s'",
+                                 token_operator_to_string (operators[opt - 1]));
   }
   /*_debug ("done.");*/
   
@@ -564,7 +569,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
                                      "No valid operand at start of expression");
       } else {
         /* here check validity of token list, then create the final token. */
-        expr_tok = validate_token_list (tokens, &err);
+        expr_tok = validate_token_list (stream, tokens, &err);
       }
     }
     if (err) {
