@@ -129,7 +129,7 @@ typedef struct _LexerExprState LexerExprState;
 struct _LexerExprState
 {
   gboolean  lex_all;  /* character ending the stream to lex, or 0 for none */
-  gint      depth;    /* current parenthesis depth */
+  guint     depth;    /* current parenthesis depth */
 };
 
 
@@ -507,7 +507,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
         /* I/O error */
       } else {
         if (c == ')') {
-          if (state->depth == 0) {
+          if (state->depth <= 0) {
             if (state->lex_all) {
               /* if we validate all, throw an error */
               ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_EXPR_ERROR,
@@ -622,7 +622,7 @@ ctpl_lexer_expr_lex_full (CtplInputStream *stream,
                           gboolean         lex_all,
                           GError         **error)
 {
-  LexerExprState  state = {0, TRUE};
+  LexerExprState  state = {TRUE, 0};
   CtplTokenExpr  *expr_tok;
   GError         *err = NULL;
   
