@@ -510,8 +510,9 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
           if (state->depth == 0) {
             if (state->lex_all) {
               /* if we validate all, throw an error */
-              g_set_error (&err, CTPL_LEXER_EXPR_ERROR, CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                           "Too much closing parenthesis");
+              ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_EXPR_ERROR,
+                                           CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                                           "Too much closing parenthesis");
             }
             /* else, just stop lexing */
           } else {
