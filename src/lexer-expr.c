@@ -203,7 +203,7 @@ read_symbol (CtplInputStream *stream,
   return token;
 }
 
-/* Gets whether op1 has priority over po2.
+/* Gets whether op1 has priority over op2.
  * If both operators have the same priority, returns %TRUE */
 /* FIXME: the prior op must be the left one if they have the same priority */
 static gboolean
@@ -212,12 +212,13 @@ operator_is_prior (CtplOperator op1,
 {
   if ((op1 == CTPL_OPERATOR_EQUAL || op1 == CTPL_OPERATOR_INF ||
        op1 == CTPL_OPERATOR_INFEQ || op1 == CTPL_OPERATOR_SUP ||
-       op1 == CTPL_OPERATOR_SUPEQ || op1 == CTPL_OPERATOR_NEQ) ||
-       ((op1 == CTPL_OPERATOR_MUL || op1 == CTPL_OPERATOR_DIV ||
-         op1 == CTPL_OPERATOR_MODULO) &&
-        ! operator_is_prior (op2, CTPL_OPERATOR_EQUAL)) ||
-        ((op1 == CTPL_OPERATOR_PLUS || op1 == CTPL_OPERATOR_MINUS) &&
-         ! operator_is_prior (op2, CTPL_OPERATOR_MUL))) {
+       op1 == CTPL_OPERATOR_SUPEQ || op1 == CTPL_OPERATOR_NEQ ||
+       op1 == CTPL_OPERATOR_AND   || op1 == CTPL_OPERATOR_OR) ||
+      ((op1 == CTPL_OPERATOR_MUL || op1 == CTPL_OPERATOR_DIV ||
+        op1 == CTPL_OPERATOR_MODULO) &&
+       ! operator_is_prior (op2, CTPL_OPERATOR_EQUAL)) ||
+      ((op1 == CTPL_OPERATOR_PLUS || op1 == CTPL_OPERATOR_MINUS) &&
+       ! operator_is_prior (op2, CTPL_OPERATOR_MUL))) {
     return TRUE;
   }
   return FALSE;
