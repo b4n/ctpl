@@ -255,7 +255,7 @@ get_output_stream (void)
     GOutputStream *gostream;
     
     /* FIXME: how to get rid of GIOUnix for that? */
-    gostream = g_unix_output_stream_new (STDOUT_FILENO, TRUE);
+    gostream = g_unix_output_stream_new (STDOUT_FILENO, FALSE);
     stream = ctpl_output_stream_new (gostream);
     g_object_unref (gostream);
   }
