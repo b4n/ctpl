@@ -45,7 +45,7 @@
  * GError    *error = NULL;
  * 
  * tree = ctpl_lexer_lex (input, &error);
- * if (! tree) {
+ * if (tree == NULL) {
  *   fprintf (stderr, "Failed to analyse input data: %s\n", error->message);
  *   g_clear_error (&error);
  * } else {

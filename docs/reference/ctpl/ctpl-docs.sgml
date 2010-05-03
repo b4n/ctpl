@@ -166,9 +166,9 @@ procede_template (CtplInputStream  *input,
   if (tree != NULL) {
     /* then, parse this tree against the environment */
     success = ctpl_parser_parse (tree, env, output, error);
+    /* and finally, free the built tree */
+    ctpl_lexer_free_tree (tree);
   }
-  /* free the built tree */
-  ctpl_lexer_free_tree (tree);
   
   return success;
 }
