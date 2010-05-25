@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.64])
 AC_INIT([CTPL],
-        [0.2.1],
+        [0.2.2],
         [ban@herbesfolles.org],
         [ctpl],
         [http://ctpl.tuxfamily.org])
@@ -25,7 +25,7 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 #   * not changed the interface (bug fixes):          CURRENT:REV+1:AGE
 #   * augmented the interface (new things):           CURRENT+1:0:AGE+1
 #   * broken the interface (removed/changed things):  CURRENT+1:0:0
-CTPL_LTVERSION="1:1:0"
+CTPL_LTVERSION="1:2:0"
 AC_SUBST([CTPL_LTVERSION])
 
 # Checks for programs.
