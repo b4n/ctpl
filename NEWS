@@ -1,3 +1,17 @@
+# 0.2.2
+
+  The version 0.2.2 is a bugfix release for the 0.2 branch.
+  
+  ## Changes summary
+  
+  * Fix lexing of a whole expression input (using ctpl_lexer_expr_lex() or
+    one of its variants);
+  * Fix priority of boolean operators AND and OR;
+  * Fix support of operators <= and >=;
+  * Better error reporting in the expression lexer;
+  * New alternative build system: Waf (from a work by Enrico Tröger, thanks).
+
+
 # 0.2.1
 
   The version 0.2.1 is a bugfix release for the 0.2 branch.
