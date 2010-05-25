@@ -25,3 +25,32 @@ You may also want the following packages that enables extra features:
  - gtk-doc (http://www.gtk.org/) if you want to (re)build the documentation
 
 For detailed installation instructions, see the INSTALL file.
+
+If you are working on Windows, you may want to consider using the alternate
+build system, see below.
+
+
+Alternate installation, Waf
+===========================
+
+There is an alternate build system that use Waf (http://code.google.com/p/waf/).
+This build system is not very well supported and have some lacks but it is easy
+to use on MS Windows where Autotools-based build systems are often harder to get
+working.
+
+Dependencies with this build system are the same than with the standard one,
+except that Make is not needed, but you need Python >= 2.4
+(http://www.python.org).
+
+Everything (should) work, except building the documentation from source.
+Documentation can be installed if it is already build, but it cannot be
+generated from sources for now. You then either need to generate it with the
+standard build system or to get it pre-generated (it can be found pre-generated
+in release tarballs) if you want it.
+
+To configure, build and install CTPL with the Waf build system, do the
+following (on Windows, prefix with the path to Python):
+  ./waf configure --prefix=/where/you/want/to/install
+  ./waf build
+  # Gain administrator rights if needed
+  ./waf install

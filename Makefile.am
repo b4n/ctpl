@@ -5,7 +5,9 @@ EXTRA_DIST = COPYING \
              NEWS \
              TODO \
              README \
-             autogen.sh
+             autogen.sh \
+             waf \
+             wscript
 
 DISTCLEANFILES = config.status \
                  config.log
