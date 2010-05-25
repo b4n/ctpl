@@ -6,7 +6,7 @@ lib_LTLIBRARIES = libctpl.la
 libctpl_la_CPPFLAGS = -DG_LOG_DOMAIN=\"CTPL\"
 libctpl_la_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@
 libctpl_la_LDFLAGS  = -version-info @CTPL_LTVERSION@
-libctpl_la_LIBADD   = @GLIB_LIBS@ @GIO_LIBS@
+libctpl_la_LIBADD   = @GLIB_LIBS@ @GIO_LIBS@ -lm
 libctpl_la_SOURCES  = environ.c \
                       eval.c \
                       io.c \
