@@ -3,8 +3,9 @@ SUBDIRS = src data docs
 EXTRA_DIST = COPYING \
              HACKING \
              NEWS \
-             TODO \
              README \
+             THANKS \
+             TODO \
              autogen.sh \
              waf \
              wscript
