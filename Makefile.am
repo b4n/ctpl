@@ -1,6 +1,7 @@
 SUBDIRS = src data docs
 
-EXTRA_DIST = COPYING \
+EXTRA_DIST = AUTHORS \
+             COPYING \
              HACKING \
              NEWS \
              README \
