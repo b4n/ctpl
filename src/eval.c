@@ -637,7 +637,8 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
                  CtplValue            *value,
                  GError              **error)
 {
-  gboolean rv = TRUE;
+  gboolean  rv = TRUE;
+  GSList   *indexes;
   
   switch (expr->type) {
     case CTPL_TOKEN_EXPR_TYPE_FLOAT:
@@ -666,6 +667,43 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
     case CTPL_TOKEN_EXPR_TYPE_OPERATOR:
       rv = ctpl_eval_operator (expr, env, value, error);
       break;
+  }
+  indexes = expr->indexes;
+  while (rv && indexes) {
+    gchar *value_str = ctpl_value_to_string (value);
+    
+    rv = FALSE;
+    /* FIXME: improve error messages? */
+    if (! CTPL_VALUE_HOLDS_ARRAY (value)) {
+      g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                   "Value '%s' cannot be indexed", value_str);
+    } else {
+      CtplValue idx_value;
+      
+      if (! ctpl_eval_value (indexes->data, env, &idx_value, error)) {
+      } else if (! ctpl_value_convert (&idx_value, CTPL_VTYPE_INT)) {
+        g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
+                     "Cannot convert index of value '%s' to integer",
+                     value_str);
+      } else {
+        CtplValue  *new_value;
+        guint       idx = (guint)ctpl_value_get_int (&idx_value);
+        
+        new_value = ctpl_value_array_index (value, idx);
+        if (! new_value) {
+          g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
+                       "Cannot index value '%s' at %u", value_str, idx);
+        } else {
+          ctpl_value_copy (new_value, value);
+          indexes = indexes->next;
+          rv = TRUE;
+        }
+      }
+    }
+    if (! rv) {
+      ctpl_value_free (value);
+    }
+    g_free (value_str);
   }
   //~ {
     //~ gchar *dump;
