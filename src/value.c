@@ -791,6 +791,24 @@ ctpl_value_array_length (const CtplValue *value)
 }
 
 /**
+ * ctpl_value_array_index:
+ * @value: A #CtplValue holding an array
+ * @idx: The array's index to get
+ * 
+ * Index an array, getting its @idx-th element.
+ * 
+ * Returns: The @idx-th element of @value.
+ */
+CtplValue *
+ctpl_value_array_index (const CtplValue *value,
+                        guint            idx)
+{
+  g_return_val_if_fail (CTPL_VALUE_HOLDS_ARRAY (value), NULL);
+  
+  return g_slist_nth_data (value->value.v_array, idx);
+}
+
+/**
  * ctpl_value_get_held_type:
  * @value: A #CtplValue
  * 
