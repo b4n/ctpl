@@ -180,6 +180,8 @@ struct _CtplTokenExpr
 {
   CtplTokenExprType   type;
   CtplTokenExprValue  token;
+  /*< element-type: CtplTokenExpr >*/
+  GSList             *indexes;
 };
 
 /**

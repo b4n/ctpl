@@ -186,9 +186,9 @@ ctpl_token_expr_new (void)
   CtplTokenExpr *token;
   
   token = g_slice_alloc (sizeof *token);
-  /*if (token) {
-    // ...
-  }*/
+  if (token) {
+    token->indexes = NULL;
+  }
   
   return token;
 }
@@ -325,6 +325,10 @@ ctpl_token_expr_free (CtplTokenExpr *token,
       case CTPL_TOKEN_EXPR_TYPE_INTEGER:
         /* nothing to free for integers and floats */
         break;
+    }
+    while (token->indexes) {
+      ctpl_token_expr_free (token->indexes->data, TRUE);
+      token->indexes = token->indexes->next;
     }
     g_slice_free1 (sizeof *token, token);
   }

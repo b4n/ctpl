@@ -427,6 +427,46 @@ validate_token_list (CtplInputStream *stream,
   return expr;
 }
 
+static gboolean
+lex_operand_index (CtplInputStream *stream,
+                   CtplTokenExpr   *operand,
+                   GError         **error)
+{
+  gboolean success = TRUE;
+  
+  /* if we have something that looks like an index, try to read it */
+  /* FIXME: handle blanks before the index */
+  while (success && ctpl_input_stream_peek_c (stream, NULL) == '[') {
+    CtplTokenExpr  *idx;
+    
+    success = FALSE;
+    ctpl_input_stream_get_c (stream, NULL); /* eat the [ */
+    idx = ctpl_lexer_expr_lex_full (stream, FALSE, error);
+    if (idx) {
+      GError *err = NULL;
+      gchar   c;
+      
+      c = ctpl_input_stream_get_c (stream, &err);
+      if (err || c != ']') {
+        if (err) {
+          g_propagate_error (error, err);
+        } else {
+          ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
+                                       CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
+                                       "Unexpected character '%c', expected "
+                                       "index end", c);
+        }
+        ctpl_token_expr_free (idx, TRUE);
+      } else {
+        operand->indexes = g_slist_append (operand->indexes, idx);
+        success = TRUE;
+      }
+    }
+  }
+  
+  return success;
+}
+
 /* Reads an operand.
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
@@ -453,6 +493,9 @@ lex_operand (CtplInputStream *stream,
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
                                    CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
                                    "No valid operand at start of expression");
+    }
+    if (token && ! lex_operand_index (stream, token, error)) {
+      ctpl_token_expr_free (token, TRUE); token = NULL;
     }
   }
   
