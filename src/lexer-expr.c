@@ -599,7 +599,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
           expect_operand = ! expect_operand;
           tokens = g_slist_append (tokens, token);
         } else if (! state->lex_all) {
-          if (err->code != CTPL_IO_ERROR) {
+          if (err->domain != CTPL_IO_ERROR) {
             /* if we don't validate all, we don't want to throw an error when no
              * token was read, just stop lexing. */
             g_clear_error (&err);
