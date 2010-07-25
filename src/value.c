@@ -801,15 +801,22 @@ ctpl_value_array_length (const CtplValue *value)
  * 
  * Index an array, getting its @idx-th element.
  * 
- * Returns: The @idx-th element of @value.
+ * Returns: The @idx-th element of @value, or %NULL if @idx is out of bounds.
  */
 CtplValue *
 ctpl_value_array_index (const CtplValue *value,
-                        guint            idx)
+                        gsize            idx)
 {
+  gsize   i;
+  GSList *tmp;
+  
   g_return_val_if_fail (CTPL_VALUE_HOLDS_ARRAY (value), NULL);
   
-  return g_slist_nth_data (value->value.v_array, idx);
+  for (i = 0, tmp = value->value.v_array; i < idx && tmp; i++) {
+    tmp = tmp->next;
+  }
+  
+  return tmp ? tmp->data : NULL;
 }
 
 /**
