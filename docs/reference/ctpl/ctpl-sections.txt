@@ -54,6 +54,7 @@ ctpl_token_prepend
 ctpl_token_get_type
 ctpl_token_dump
 ctpl_token_expr_new_operator
+ctpl_token_expr_new_value
 ctpl_token_expr_new_integer
 ctpl_token_expr_new_float
 ctpl_token_expr_new_symbol
