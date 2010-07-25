@@ -397,9 +397,12 @@ void
 ctpl_value_set_string (CtplValue   *value,
                        const gchar *val)
 {
+  gchar *val_dup;
+  
+  val_dup = g_strdup (val);
   ctpl_value_free_value (value);
   value->type = CTPL_VTYPE_STRING;
-  value->value.v_string = g_strdup (val);
+  value->value.v_string = val_dup;
 }
 
 /*
@@ -413,13 +416,14 @@ static void
 ctpl_value_set_array_internal (CtplValue     *value,
                                const GSList  *values)
 {
+  GSList *new_values = NULL;
+  
+  for (; values != NULL; values = values->next) {
+    new_values = g_slist_append (new_values, ctpl_value_dup (values->data));
+  }
   ctpl_value_free_value (value);
   value->type = CTPL_VTYPE_ARRAY;
-  value->value.v_array = NULL; /* needed by the GSList at first appending */
-  for (; values != NULL; values = values->next) {
-    value->value.v_array = g_slist_append (value->value.v_array,
-                                           ctpl_value_dup (values->data));
-  }
+  value->value.v_array = new_values;
 }
 
 /**
