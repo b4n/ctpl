@@ -165,11 +165,7 @@ read_number (CtplInputStream *stream,
   (void)state; /* we don't use the state, silent compilers */
   ctpl_value_init (&value);
   if (ctpl_input_stream_read_number (stream, &value, error)) {
-    if (CTPL_VALUE_HOLDS_INT (&value)) {
-      token = ctpl_token_expr_new_integer (ctpl_value_get_int (&value));
-    } else {
-      token = ctpl_token_expr_new_float (ctpl_value_get_float (&value));
-    }
+    token = ctpl_token_expr_new_value (&value);
   }
   ctpl_value_free_value (&value);
   

@@ -225,6 +225,29 @@ ctpl_token_expr_new_operator (CtplOperator    operator,
 }
 
 /**
+ * ctpl_token_expr_new_value:
+ * @value: A #CtplValue
+ * 
+ * Creates a new #CtplTokenExpr holding a value.
+ * 
+ * Returns: A new #CtplTokenExpr that should be freed with
+ *          ctpl_token_expr_free() when no longer needed.
+ */
+CtplTokenExpr *
+ctpl_token_expr_new_value (const CtplValue *value)
+{
+  CtplTokenExpr *token;
+  
+  token = ctpl_token_expr_new ();
+  if (token) {
+    token->type = CTPL_TOKEN_EXPR_TYPE_VALUE;
+    ctpl_value_copy (value, &token->token.t_value);
+  }
+  
+  return token;
+}
+
+/**
  * ctpl_token_expr_new_integer:
  * @integer: The value of the integer token
  * 
@@ -232,17 +255,19 @@ ctpl_token_expr_new_operator (CtplOperator    operator,
  * 
  * Returns: A new #CtplTokenExpr that should be freed with
  *          ctpl_token_expr_free() when no longer needed.
+ *
+ * Deprecated: 0.3: Use ctpl_token_expr_new_value() instead.
  */
 CtplTokenExpr *
 ctpl_token_expr_new_integer (glong integer)
 {
-  CtplTokenExpr *token;
+  CtplTokenExpr  *token;
+  CtplValue       value;
   
-  token = ctpl_token_expr_new ();
-  if (token) {
-    token->type             = CTPL_TOKEN_EXPR_TYPE_INTEGER;
-    token->token.t_integer  = integer;
-  }
+  ctpl_value_init (&value);
+  ctpl_value_set_int (&value, integer);
+  token = ctpl_token_expr_new_value (&value);
+  ctpl_value_free_value (&value);
   
   return token;
 }
@@ -255,17 +280,19 @@ ctpl_token_expr_new_integer (glong integer)
  * 
  * Returns: A new #CtplTokenExpr that should be freed with
  *          ctpl_token_expr_free() when no longer needed.
+ *
+ * Deprecated: 0.3: Use ctpl_token_expr_new_value() instead.
  */
 CtplTokenExpr *
 ctpl_token_expr_new_float (gdouble real)
 {
-  CtplTokenExpr *token;
+  CtplTokenExpr  *token;
+  CtplValue       value;
   
-  token = ctpl_token_expr_new ();
-  if (token) {
-    token->type           = CTPL_TOKEN_EXPR_TYPE_FLOAT;
-    token->token.t_float  = real;
-  }
+  ctpl_value_init (&value);
+  ctpl_value_set_float (&value, real);
+  token = ctpl_token_expr_new_value (&value);
+  ctpl_value_free_value (&value);
   
   return token;
 }
@@ -321,9 +348,8 @@ ctpl_token_expr_free (CtplTokenExpr *token,
         g_free (token->token.t_symbol);
         break;
       
-      case CTPL_TOKEN_EXPR_TYPE_FLOAT:
-      case CTPL_TOKEN_EXPR_TYPE_INTEGER:
-        /* nothing to free for integers and floats */
+      case CTPL_TOKEN_EXPR_TYPE_VALUE:
+        ctpl_value_free_value (&token->token.t_value);
         break;
     }
     while (token->indexes) {
@@ -450,16 +476,14 @@ ctpl_token_expr_dump_internal (const CtplTokenExpr *expr)
     g_print ("nil");
   } else {
     switch (expr->type) {
-      case CTPL_TOKEN_EXPR_TYPE_FLOAT: {
-        char buf[G_ASCII_DTOSTR_BUF_SIZE];
+      case CTPL_TOKEN_EXPR_TYPE_VALUE: {
+        gchar *desc;
         
-        g_print ("%s", g_ascii_dtostr (buf, sizeof (buf), expr->token.t_float));
+        desc = ctpl_value_to_string (&expr->token.t_value);
+        g_print ("%s", desc);
+        g_free (desc);
         break;
       }
-      
-      case CTPL_TOKEN_EXPR_TYPE_INTEGER:
-        g_print ("%ld", expr->token.t_integer);
-        break;
       
       case CTPL_TOKEN_EXPR_TYPE_OPERATOR:
         if (expr->token.t_operator->loperand) {

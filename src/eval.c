@@ -641,12 +641,8 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
   GSList   *indexes;
   
   switch (expr->type) {
-    case CTPL_TOKEN_EXPR_TYPE_FLOAT:
-      ctpl_value_set_float (value, expr->token.t_float);
-      break;
-    
-    case CTPL_TOKEN_EXPR_TYPE_INTEGER:
-      ctpl_value_set_int (value, expr->token.t_integer);
+    case CTPL_TOKEN_EXPR_TYPE_VALUE:
+      ctpl_value_copy (&expr->token.t_value, value);
       break;
     
     case CTPL_TOKEN_EXPR_TYPE_SYMBOL: {
