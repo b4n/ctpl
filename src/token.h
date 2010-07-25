@@ -20,6 +20,7 @@
 #ifndef H_CTPL_TOKEN_H
 #define H_CTPL_TOKEN_H
 
+#include "value.h"
 #include <glib.h>
 
 G_BEGIN_DECLS
@@ -46,8 +47,7 @@ typedef enum _CtplTokenType
  * CtplTokenExprType:
  * @CTPL_TOKEN_EXPR_TYPE_OPERATOR:  An operator
  *            (<link linkend="CtplOperator"><code>CTPL_OPERATOR_*</code></link>)
- * @CTPL_TOKEN_EXPR_TYPE_INTEGER:   An integer
- * @CTPL_TOKEN_EXPR_TYPE_FLOAT:     A floating-point value
+ * @CTPL_TOKEN_EXPR_TYPE_VALUE:     An inline value value
  * @CTPL_TOKEN_EXPR_TYPE_SYMBOL:    A symbol (a name to be found in the environ)
  * 
  * Possibles types of an expression token.
@@ -55,8 +55,7 @@ typedef enum _CtplTokenType
 typedef enum _CtplTokenExprType
 {
   CTPL_TOKEN_EXPR_TYPE_OPERATOR,
-  CTPL_TOKEN_EXPR_TYPE_INTEGER,
-  CTPL_TOKEN_EXPR_TYPE_FLOAT,
+  CTPL_TOKEN_EXPR_TYPE_VALUE,
   CTPL_TOKEN_EXPR_TYPE_SYMBOL
 } CtplTokenExprType;
 
@@ -153,8 +152,7 @@ struct _CtplTokenExprOperator
 /**
  * CtplTokenExprValue:
  * @t_operator: The value of an operator token
- * @t_integer: The value of an integer token
- * @t_float: The value of a floating-point token
+ * @t_value: The value of an inline value token
  * @t_symbol: The name of a symbol token
  * 
  * Represents the possible values of an expression token (see #CtplTokenExpr).
@@ -162,8 +160,7 @@ struct _CtplTokenExprOperator
 union _CtplTokenExprValue
 {
   CtplTokenExprOperator  *t_operator;
-  glong                   t_integer;
-  gdouble                 t_float;
+  CtplValue               t_value;
   gchar                  *t_symbol;
 };
 typedef union _CtplTokenExprValue CtplTokenExprValue;
@@ -231,8 +228,7 @@ CtplToken    *ctpl_token_new_if             (CtplTokenExpr *condition,
 CtplTokenExpr *ctpl_token_expr_new_operator (CtplOperator    operator,
                                              CtplTokenExpr  *loperand,
                                              CtplTokenExpr  *roperand);
-CtplTokenExpr *ctpl_token_expr_new_integer  (glong integer);
-CtplTokenExpr *ctpl_token_expr_new_float    (gdouble real);
+CtplTokenExpr *ctpl_token_expr_new_value    (const CtplValue *value);
 CtplTokenExpr *ctpl_token_expr_new_symbol   (const gchar *symbol,
                                              gssize       len);
 void          ctpl_token_free               (CtplToken *token,
@@ -255,6 +251,11 @@ void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
  * Returns: The <link linkend="CtplTokenType">type</link> of @token.
  */
 #define ctpl_token_get_type(token) ((token)->type)
+
+#ifndef CTPL_DISABLE_DEPRECATED
+CtplTokenExpr *ctpl_token_expr_new_integer  (glong integer) G_GNUC_DEPRECATED;
+CtplTokenExpr *ctpl_token_expr_new_float    (gdouble real) G_GNUC_DEPRECATED;
+#endif /* CTPL_DISABLE_DEPRECATED */
 
 
 G_END_DECLS
