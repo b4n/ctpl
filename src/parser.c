@@ -90,25 +90,6 @@ ctpl_parser_error_quark (void)
 }
 
 
-/* wrapper around ctpl_environ_lookup() that reports an error if the symbol
- * could not be found */
-static const CtplValue *
-lookup_symbol (const CtplEnviron *env,
-               const gchar       *symbol,
-               GError           **error)
-{
-  const CtplValue *value;
-  
-  value = ctpl_environ_lookup (env, symbol);
-  if (! value) {
-    g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_SYMBOL_NOT_FOUND,
-                 "Symbol '%s' not found in the environment",
-                 symbol);
-  }
-  
-  return value;
-}
-
 /* "parses" a data token */
 static gboolean
 ctpl_parser_parse_token_data (const gchar      *data,
