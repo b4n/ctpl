@@ -212,16 +212,10 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
                                        "of 'for' statement");
         } else {
           if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
-            gchar *array_name;
+            CtplTokenExpr *array_expr;
             
-            array_name = ctpl_input_stream_read_symbol (stream, error);
-            if (! array_name) {
-              /* I/O error */
-            } else if (! *array_name) {
-              /* missing array symbol, fail */
-              ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
-                                           CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                           "No array identifier for 'for' loop");
+            array_expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
+            if (! array_expr) {
             } else {
               if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
                 gint    c;
@@ -252,8 +246,9 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
                                                    CTPL_LEXER_ERROR_SYNTAX_ERROR,
                                                    "Unclosed 'for' block");
                     } else {
-                      token = ctpl_token_new_for (array_name, iter_name,
+                      token = ctpl_token_new_for (array_expr, iter_name,
                                                   for_children);
+                      array_expr = NULL; /* avoid freeing expression */
                     }
                   }
                   if (err) {
@@ -262,7 +257,7 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
                 }
               }
             }
-            g_free (array_name);
+            ctpl_token_expr_free (array_expr, TRUE);
           }
         }
         g_free (keyword_in);

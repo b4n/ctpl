@@ -126,20 +126,24 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
                              GError             **error)
 {
   /* we can safely assume token holds array here */
-  const CtplValue  *value;
-  gboolean          rv = FALSE;
+  CtplValue value;
+  gboolean  rv = FALSE;
   
-  value = lookup_symbol (env, token->array, error);
-  if (value) {
-    if (! CTPL_VALUE_HOLDS_ARRAY (value)) {
+  ctpl_value_init (&value);
+  if (ctpl_eval_value (token->array, env, &value, error)) {
+    if (! CTPL_VALUE_HOLDS_ARRAY (&value)) {
+      gchar *array_name;
+      
+      array_name = ctpl_value_to_string (&value);
       g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_INCOMPATIBLE_SYMBOL,
-                   "Symbol '%s' is used as an array but is not",
-                   token->array);
+                   "Cannot iterate over value '%s'",
+                   array_name);
+      g_free (array_name);
     } else {
       const GSList *array_items;
       
       rv = TRUE;
-      array_items = ctpl_value_get_array (value);
+      array_items = ctpl_value_get_array (&value);
       for (; rv && array_items; array_items = array_items->next) {
         ctpl_environ_push (env, token->iter, array_items->data);
         rv = ctpl_parser_parse (token->children, env, output, error);
@@ -147,6 +151,7 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
       }
     }
   }
+  ctpl_value_free_value (&value);
   
   return rv;
 }
