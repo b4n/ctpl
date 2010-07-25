@@ -115,9 +115,9 @@ typedef struct _CtplTokenExprOperator CtplTokenExprOperator;
  */
 struct _CtplTokenFor
 {
-  gchar      *array;
-  gchar      *iter;
-  CtplToken  *children;
+  CtplTokenExpr  *array;
+  gchar          *iter;
+  CtplToken      *children;
 };
 
 /**
@@ -224,9 +224,9 @@ struct _CtplToken
 CtplToken    *ctpl_token_new_data           (const gchar *data,
                                              gssize       len);
 CtplToken    *ctpl_token_new_expr           (CtplTokenExpr *expr);
-CtplToken    *ctpl_token_new_for            (const gchar *array,
-                                             const gchar *iterator,
-                                             CtplToken   *children);
+CtplToken    *ctpl_token_new_for            (CtplTokenExpr *array,
+                                             const gchar   *iterator,
+                                             CtplToken     *children);
 CtplToken    *ctpl_token_new_if             (CtplTokenExpr *condition,
                                              CtplToken     *if_children,
                                              CtplToken     *else_children);

@@ -117,7 +117,7 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
 
 /**
  * ctpl_token_new_for:
- * @array: String containing the name of the array to iterate over
+ * @array: Expression to iterate over (should expand to an iteratable value)
  * @iterator: String containing the name of the array iterator
  * @children: Sub-tree that should be computed on each loop iteration
  * 
@@ -127,9 +127,9 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
  *          longer needed.
  */
 CtplToken *
-ctpl_token_new_for (const char *array,
-                    const char *iterator,
-                    CtplToken  *children)
+ctpl_token_new_for (CtplTokenExpr  *array,
+                    const gchar    *iterator,
+                    CtplToken      *children)
 {
   CtplToken *token;
   
@@ -137,7 +137,7 @@ ctpl_token_new_for (const char *array,
   if (token) {
     token->type = CTPL_TOKEN_TYPE_FOR;
     token->token.t_for = g_slice_alloc (sizeof *token->token.t_for);
-    token->token.t_for->array = g_strdup (array);
+    token->token.t_for->array = array;
     token->token.t_for->iter = g_strdup (iterator);
     /* should be the children copied or so?
      * should be the children addable later? */
@@ -363,7 +363,7 @@ ctpl_token_free (CtplToken *token,
         break;
       
       case CTPL_TOKEN_TYPE_FOR:
-        g_free (token->token.t_for->array);
+        ctpl_token_expr_free (token->token.t_for->array, TRUE);
         g_free (token->token.t_for->iter);
         
         ctpl_token_free (token->token.t_for->children, TRUE);
@@ -505,8 +505,9 @@ ctpl_token_dump_internal (const CtplToken *token,
         break;
       
       case CTPL_TOKEN_TYPE_FOR:
-        g_print ("for: for '%s' in '%s'\n",
-                 token->token.t_for->iter, token->token.t_for->array);
+        g_print ("for: for '%s' in '", token->token.t_for->iter);
+        ctpl_token_expr_dump_internal (token->token.t_for->array);
+        g_print ("'\n");
         if (token->token.t_for->children) {
           ctpl_token_dump_internal (token->token.t_for->children,
                                     TRUE, depth + 1);
