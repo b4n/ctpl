@@ -668,8 +668,7 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
       rv = ctpl_eval_operator (expr, env, value, error);
       break;
   }
-  indexes = expr->indexes;
-  while (rv && indexes) {
+  for (indexes = expr->indexes; rv && indexes; indexes = indexes->next) {
     gchar *value_str = ctpl_value_to_string (value);
     
     rv = FALSE;
@@ -687,15 +686,14 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
                      value_str);
       } else {
         CtplValue  *new_value;
-        guint       idx = (guint)ctpl_value_get_int (&idx_value);
+        glong       idx = ctpl_value_get_int (&idx_value);
         
-        new_value = ctpl_value_array_index (value, idx);
-        if (! new_value) {
+        if (idx < 0 ||
+            ! (new_value = ctpl_value_array_index (value, (gsize)idx))) {
           g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
-                       "Cannot index value '%s' at %u", value_str, idx);
+                       "Cannot index value '%s' at %ld", value_str, idx);
         } else {
           ctpl_value_copy (new_value, value);
-          indexes = indexes->next;
           rv = TRUE;
         }
       }
