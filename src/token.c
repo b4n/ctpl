@@ -32,7 +32,7 @@
  * Represents a CTPL language token.
  * 
  * A #CtplToken is created with ctpl_token_new_data(), ctpl_token_new_expr(),
- * ctpl_token_new_for() or ctpl_token_new_if(), and freed with
+ * ctpl_token_new_for_expr() or ctpl_token_new_if(), and freed with
  * ctpl_token_free().
  * You can append or prepend tokens to others with ctpl_token_append() and
  * ctpl_token_prepend().
@@ -116,7 +116,7 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
 }
 
 /**
- * ctpl_token_new_for:
+ * ctpl_token_new_for_expr:
  * @array: Expression to iterate over (should expand to an iteratable value)
  * @iterator: String containing the name of the array iterator
  * @children: Sub-tree that should be computed on each loop iteration
@@ -127,9 +127,9 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
  *          longer needed.
  */
 CtplToken *
-ctpl_token_new_for (CtplTokenExpr  *array,
-                    const gchar    *iterator,
-                    CtplToken      *children)
+ctpl_token_new_for_expr (CtplTokenExpr  *array,
+                         const gchar    *iterator,
+                         CtplToken      *children)
 {
   CtplToken *token;
   
@@ -145,6 +145,28 @@ ctpl_token_new_for (CtplTokenExpr  *array,
   }
   
   return token;
+}
+
+/**
+ * ctpl_token_new_for:
+ * @array: String containing the name of the array to iterate over
+ * @iterator: String containing the name of the array iterator
+ * @children: Sub-tree that should be computed on each loop iteration
+ * 
+ * Creates a new token holding a for statement.
+ * 
+ * Returns: A new #CtplToken that should be freed with ctpl_token_free() when no
+ *          longer needed.
+ * 
+ * Deprecated: 0.3: Use ctpl_token_new_for_expr() instead
+ */
+CtplToken *
+ctpl_token_new_for (const gchar  *array,
+                    const gchar  *iterator,
+                    CtplToken    *children)
+{
+  return ctpl_token_new_for_expr (ctpl_token_expr_new_symbol (array, -1),
+                                  iterator, children);
 }
 
 /**
