@@ -292,7 +292,10 @@ procede_template (CtplInputStream  *input,
                   See <link linkend="ctpl-CtplLexerExpr">CtplLexerExpr</link>
                   for details on the syntax of expressions. Basically, it may be
                   any mathematical-like expression that may include reference(s)
-                  to variable(s).
+                  to variable(s). Variable can also be indexed with a C-like
+                  syntax if they expand to an indexable type (basically, an
+                  array). The index expression must expand to an integer or
+                  compatible.
                 </para>
               </listitem>
             </varlistentry>
@@ -350,6 +353,19 @@ procede_template (CtplInputStream  *input,
 &lt;/html&gt;
               </programlisting>
             </informalexample>
+          </para>
+        </example>
+        
+        <example>
+          <title>Array indexation</title>
+          <para>
+            <informalexample>
+              <programlisting>
+{array[2]}
+              </programlisting>
+            </informalexample>
+            This example will output the 3rd element (array indexes starts at
+            zero) of the array named <code>array</code>.
           </para>
         </example>
       </section>
