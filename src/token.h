@@ -169,6 +169,7 @@ typedef union _CtplTokenExprValue CtplTokenExprValue;
  * CtplTokenExpr:
  * @type: The type of the expression token
  * @token: The value of the token
+ * @indexes: A list of #CtplTokenExpr to use to index the token (in-order, LTR)
  * 
  * Represents an expression token. The fields in this structure should be
  * considered private and are documented only for internal usage.
@@ -177,7 +178,6 @@ struct _CtplTokenExpr
 {
   CtplTokenExprType   type;
   CtplTokenExprValue  token;
-  /*< element-type: CtplTokenExpr >*/
   GSList             *indexes;
 };
 

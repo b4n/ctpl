@@ -149,6 +149,7 @@ ctpl_value_array_prepend_float
 ctpl_value_array_append_string
 ctpl_value_array_prepend_string
 ctpl_value_array_length
+ctpl_value_array_index
 ctpl_value_get_held_type
 ctpl_value_get_int
 ctpl_value_get_float
