@@ -39,8 +39,8 @@
  * To dump a #CtplToken, use ctpl_token_dump().
  * 
  * A #CtplTokenExpr is created with ctpl_token_expr_new_operator(), 
- * ctpl_token_expr_new_integer(), ctpl_token_expr_new_float() or
- * ctpl_token_expr_new_symbol(), and freed with ctpl_token_expr_free().
+ * ctpl_token_expr_new_value() or ctpl_token_expr_new_symbol(), and freed with
+ * ctpl_token_expr_free().
  * To dump a #CtplTokenExpr, use ctpl_token_expr_dump().
  */
 
