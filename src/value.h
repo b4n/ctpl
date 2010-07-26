@@ -183,7 +183,7 @@ void          ctpl_value_array_prepend_string (CtplValue       *value,
                                                const gchar     *val);
 gsize         ctpl_value_array_length         (const CtplValue *value);
 CtplValue *   ctpl_value_array_index          (const CtplValue *value,
-                                               guint            idx);
+                                               gsize            idx);
 CtplValueType ctpl_value_get_held_type        (const CtplValue *value);
 glong         ctpl_value_get_int              (const CtplValue *value);
 gdouble       ctpl_value_get_float            (const CtplValue *value);
