@@ -93,6 +93,8 @@
  *         Any numeric constant that ctpl_input_stream_read_number() supports,
  *         or any reference to any 
  *         <link linkend="ctpl-CtplEnviron">environment</link> variable.
+ *         An operand may be suffixed with an index of the form
+ *         <code>[&lt;expression&gt;]</code>.
  *       </para>
  *     </listitem>
  *   </varlistentry>
@@ -119,8 +121,15 @@
  *     (foo + 1) * 3 - 2 * bar
  *   </programlisting>
  * </example>
- * Of course, the latter example supposes that the environment contains the two
- * variables @foo and @bar.
+ * <example>
+ *   <title>An expression with indexes</title>
+ *   <programlisting>
+ *     array[array[idx + 1]] * array[idx]
+ *   </programlisting>
+ * </example>
+ * Of course, the latter examples supposes that the environment contains the
+ * variables @foo, @bar, @array and @idx, and that they contains appropriate
+ * values for latter evaluation.
  */
 
 
