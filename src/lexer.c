@@ -246,8 +246,8 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
                                                    CTPL_LEXER_ERROR_SYNTAX_ERROR,
                                                    "Unclosed 'for' block");
                     } else {
-                      token = ctpl_token_new_for (array_expr, iter_name,
-                                                  for_children);
+                      token = ctpl_token_new_for_expr (array_expr, iter_name,
+                                                       for_children);
                       array_expr = NULL; /* avoid freeing expression */
                     }
                   }

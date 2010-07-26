@@ -222,7 +222,12 @@ struct _CtplToken
 CtplToken    *ctpl_token_new_data           (const gchar *data,
                                              gssize       len);
 CtplToken    *ctpl_token_new_expr           (CtplTokenExpr *expr);
-CtplToken    *ctpl_token_new_for            (CtplTokenExpr *array,
+#ifndef CTPL_DISABLE_DEPRECATED
+CtplToken    *ctpl_token_new_for            (const gchar   *array,
+                                             const gchar   *iterator,
+                                             CtplToken     *children) G_GNUC_DEPRECATED;
+#endif /* CTPL_DISABLE_DEPRECATED */
+CtplToken    *ctpl_token_new_for_expr       (CtplTokenExpr *array,
                                              const gchar   *iterator,
                                              CtplToken     *children);
 CtplToken    *ctpl_token_new_if             (CtplTokenExpr *condition,
