@@ -235,21 +235,21 @@ procede_template (CtplInputStream  *input,
               <term>The <code>for</code> loop</term>
               <listitem>
                 <para>
-                  The <code>for</code> loop allows to iterate over an array from
-                  the environment, and computes the loop body for each element
-                  in the array.
+                  The <code>for</code> loop allows to iterate over an expression
+                  that expands to an array, and computes the loop body for each
+                  element in that array.
                 </para>
                 <para>
                   The syntax is the following:
                   <informalexample>
                     <programlisting>
-{for &lt;iterator&gt; in &lt;array&gt;}&lt;loop body&gt;{end}
+{for &lt;iterator&gt; in &lt;expression&gt;}&lt;loop body&gt;{end}
                     </programlisting>
                   </informalexample>
                   <code>iterator</code> is the variable name referring to
                   the current array's element;
-                  <code>array</code> is the array over which iterate, as named
-                  in the environment;
+                  <code>expression</code> is an expression (see below) that expands
+                  to the array over which iterate;
                   <code>loop body</code> is the data that will be evaluated on
                   each iteration of the loop, and may contain any elements
                   (raw data or instructions).
