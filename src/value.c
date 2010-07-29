@@ -895,8 +895,9 @@ ctpl_value_get_string (const CtplValue *value)
  * Gets the values of a #CtplValue holding an array as a #GSList in which each
  * element holds a #CtplValue holding the element value.
  * 
- * Returns: A #GSList owned by the value that must not be freed, neither the
- *          list itself nor its values, or %NULL on error.
+ * Returns: (element-type Ctpl.Value) (transfer none): A #GSList owned by the
+ *          value that must not be freed, neither the list itself nor its
+ *          values, or %NULL on error.
  */
 const GSList *
 ctpl_value_get_array (const CtplValue *value)
@@ -909,13 +910,13 @@ ctpl_value_get_array (const CtplValue *value)
 /**
  * ctpl_value_get_array_int:
  * @value: A #CtplValue holding an array of integers
- * @length: Return location for the array length, or %NULL
+ * @length: (out) (allow-none): Return location for the array length, or %NULL
  * 
  * Gets the values of a #CtplValue as an array of int.
  * The value must hold an array and all array's elements must be integers.
  * 
- * Returns: A newly allocated array of integers that should be freed with
- *          g_free() or %NULL on error.
+ * Returns: (array length=length) (transfer full): A newly allocated array of
+ *          integers that should be freed with g_free() or %NULL on error.
  */
 glong *
 ctpl_value_get_array_int (const CtplValue *value,
@@ -954,13 +955,13 @@ ctpl_value_get_array_int (const CtplValue *value,
 /**
  * ctpl_value_get_array_float:
  * @value: A #CtplValue holding an array of floats
- * @length: Return location for the array length, or %NULL
+ * @length: (out) (allow-none): Return location for the array length, or %NULL
  * 
  * Gets the values of a #CtplValue as an array of floats.
  * @value must hold an array and all array's elements must be floats.
  * 
- * Returns: A newly allocated array of floats that should be freed with g_free()
- *          or %NULL on error.
+ * Returns: (array length=length) (transfer full): A newly allocated array of
+ *          floats that should be freed with g_free() or %NULL on error.
  */
 gdouble *
 ctpl_value_get_array_float (const CtplValue *value,
@@ -999,13 +1000,15 @@ ctpl_value_get_array_float (const CtplValue *value,
 /**
  * ctpl_value_get_array_string:
  * @value: A #CtplValue holding an array of strings
- * @length: Return location for the length of the returned array, or %NULL.
+ * @length: (out) (allow-none): Return location for the length of the returned
+ *                              array, or %NULL.
  * 
  * Gets the values held by a #CtplValue as an array of strings.
  * @value must hold an array containing only strings.
  * 
- * Returns: A newly allocated %NULL-terminated array of strings, or %NULL on
- *          error. Free with g_strfreev() when no longer needed.
+ * Returns: (array length=length) (transfer full): A newly allocated
+ *          %NULL-terminated array of strings, or %NULL on error. Free with
+ *          g_strfreev() when no longer needed.
  */
 gchar **
 ctpl_value_get_array_string (const CtplValue *value,

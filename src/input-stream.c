@@ -245,7 +245,7 @@ ctpl_input_stream_unref (CtplInputStream *stream)
 /**
  * ctpl_input_stream_set_error:
  * @stream: A #CtplInputStream
- * @error: A #GError to fill, may be %NULL
+ * @error: (out callee-allocates) (allow-none): A #GError to fill, may be %NULL
  * @domain: The domain of the error to report
  * @code: The code of the error
  * @format: printf-like format string
@@ -517,8 +517,9 @@ ctpl_input_stream_peek (CtplInputStream *stream,
  * @stream: A #CtplInputStream
  * @accept: string of the character acceptable for the word
  * @accept_len: length of @accept, can be -1 if @accept is 0-terminated
- * @max_len: maximum number of bytes to read, or -1 for no limit
- * @length: return location for the length of the read word, or %NULL
+ * @max_len: (default -1): maximum number of bytes to read, or -1 for no limit
+ * @length: (out) (allow-none): return location for the length of the read word,
+ *                              or %NULL
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Reads a word from a #CtplInputStream. A word is a sequence of characters
@@ -588,8 +589,10 @@ ctpl_input_stream_read_word (CtplInputStream *stream,
 /**
  * ctpl_input_stream_read_symbol_full:
  * @stream: A #CtplInputStream
- * @max_len: The maximum number of bytes to read, or -1 for no limit
- * @length: Return location for the read symbol length, or %NULL
+ * @max_len: (default -1): The maximum number of bytes to read, or -1 for no
+ *                         limit
+ * @length: (out) (allow-none): Return location for the read symbol length, or
+ *                              %NULL
  * @error: return location for errors, or %NULL to ignore them
  * 
  * Reads a symbol from a #CtplInputStream. A symbol is a word composed of the
@@ -642,8 +645,9 @@ ctpl_input_stream_read_symbol_full (CtplInputStream *stream,
  * @stream: A #CtplInputStream
  * @accept: string of the character acceptable for the word
  * @accept_len: length of @accept, can be -1 if @accept is 0-terminated
- * @max_len: maximum number of bytes to peek, or -1 for no limit
- * @length: return location for the length of the read word, or %NULL
+ * @max_len: (default -1): maximum number of bytes to peek, or -1 for no limit
+ * @length: (out) (allow-none): return location for the length of the read word,
+ *                              or %NULL
  * @error: return location for errors, or %NULL to ignore them
  * 
  * Peeks a word from a #CtplInputStream. See ctpl_input_stream_peek() and
@@ -699,9 +703,9 @@ ctpl_input_stream_peek_word (CtplInputStream *stream,
 /**
  * ctpl_input_stream_peek_symbol_full:
  * @stream: A #CtplInputStream
- * @max_len: The maximum number of bytes to peek, even if they still matches,
- *           or -1 for no limit
- * @length: Return location for the peeked length, or %NULL
+ * @max_len: (default -1): The maximum number of bytes to peek, even if they
+ *                         still matches, or -1 for no limit
+ * @length: (out) (allow-none): Return location for the peeked length, or %NULL
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Peeks a symbol from a #CtplInputStream. See ctpl_input_stream_peek_word() and

@@ -290,7 +290,8 @@ ctpl_operator_to_string (CtplOperator op)
  * ctpl_operator_from_string:
  * @str: A string starting with an operator
  * @len: length to read from @str, or -1 to read the whole string.
- * @operator_len: Return location for the length of the read operator, or %NULL.
+ * @operator_len: (out) (allow-none): Return location for the length of the read
+ *                                    operator, or %NULL.
  * 
  * Tries to convert a string to an operator, as the lexer may do.
  * 

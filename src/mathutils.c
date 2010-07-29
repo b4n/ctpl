@@ -37,7 +37,7 @@
 /**
  * ctpl_math_string_to_float:
  * @string: A string containing a number
- * @value: A pointer to fill with the result
+ * @value: (out): A pointer to fill with the result
  * 
  * Converts a whole string to a float.
  * 
@@ -56,7 +56,7 @@ ctpl_math_string_to_float (const gchar *string,
 /**
  * ctpl_math_string_to_int:
  * @string: A string containing a number
- * @value: A pointer to fill with the result
+ * @value: (out): A pointer to fill with the result
  * 
  * Converts a whole string to an integer.
  * 
