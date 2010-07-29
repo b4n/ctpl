@@ -141,7 +141,7 @@ void              ctpl_input_stream_set_error           (CtplInputStream  *strea
                                                          GQuark            domain,
                                                          gint              code,
                                                          const gchar      *format,
-                                                         ...);
+                                                         ...) G_GNUC_PRINTF (5, 6);
 gboolean          ctpl_input_stream_eof                 (CtplInputStream *stream,
                                                          GError         **error);
 gboolean          ctpl_input_stream_eof_fast            (CtplInputStream *stream);
