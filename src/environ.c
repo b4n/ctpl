@@ -73,6 +73,18 @@
  */
 
 
+/**
+ * CtplEnviron:
+ * 
+ * Represents an environment.
+ */
+struct _CtplEnviron
+{
+  /*<private>*/
+  GHashTable     *symbol_table; /* hash table containing stacks of symbols */
+};
+
+
 /*<standard>*/
 GQuark
 ctpl_environ_error_quark (void)
