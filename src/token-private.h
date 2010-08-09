@@ -178,26 +178,35 @@ struct _CtplToken
 };
 
 
+G_GNUC_INTERNAL
 CtplToken    *ctpl_token_new_data           (const gchar *data,
                                              gssize       len);
+G_GNUC_INTERNAL
 CtplToken    *ctpl_token_new_expr           (CtplTokenExpr *expr);
 #define ctpl_token_new_for ctpl_token_new_for_expr
+G_GNUC_INTERNAL
 CtplToken    *ctpl_token_new_for_expr       (CtplTokenExpr *array,
                                              const gchar   *iterator,
                                              CtplToken     *children);
+G_GNUC_INTERNAL
 CtplToken    *ctpl_token_new_if             (CtplTokenExpr *condition,
                                              CtplToken     *if_children,
                                              CtplToken     *else_children);
+G_GNUC_INTERNAL
 CtplTokenExpr *ctpl_token_expr_new_operator (CtplOperator    operator,
                                              CtplTokenExpr  *loperand,
                                              CtplTokenExpr  *roperand);
+G_GNUC_INTERNAL
 CtplTokenExpr *ctpl_token_expr_new_value    (const CtplValue *value);
+G_GNUC_INTERNAL
 CtplTokenExpr *ctpl_token_expr_new_symbol   (const gchar *symbol,
                                              gssize       len);
 /* ctpl_token_free(): see token.h */
 /* ctpl_token__expr_free(): see token.h */
+G_GNUC_INTERNAL
 void          ctpl_token_append             (CtplToken *token,
                                              CtplToken *brother);
+G_GNUC_INTERNAL
 void          ctpl_token_prepend            (CtplToken *token,
                                              CtplToken *brother);
 /* ctpl_token_dump(): see token.h */
