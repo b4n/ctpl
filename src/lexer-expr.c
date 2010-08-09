@@ -18,6 +18,7 @@
  */
 
 #include "lexer-expr.h"
+#include "lexer-private.h"
 #include "token.h"
 #include "token-private.h"
 #include "mathutils.h"

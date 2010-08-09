@@ -28,30 +28,6 @@ G_BEGIN_DECLS
 
 
 /**
- * CTPL_OPERATOR_CHARS:
- * 
- * Characters valid for an operator.
- */
-#define CTPL_OPERATOR_CHARS "+-/*=><%!&|"
-/**
- * CTPL_OPERAND_CHARS:
- * 
- * Characters valid for an operand
- */
-#define CTPL_OPERAND_CHARS  "." /* for floating point values */ \
-                            "+-" /* for signs */ \
-                            CTPL_BLANK_CHARS \
-                            CTPL_SYMBOL_CHARS
-/**
- * CTPL_EXPR_CHARS:
- * 
- * Characters valid inside an expression
- */
-#define CTPL_EXPR_CHARS     "()" \
-                            CTPL_OPERATOR_CHARS \
-                            CTPL_OPERAND_CHARS
-
-/**
  * CTPL_LEXER_EXPR_ERROR:
  * 
  * Error domain of #CtplLexerExprError.

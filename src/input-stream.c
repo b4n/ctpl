@@ -25,6 +25,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include "io.h"
+#include "lexer-private.h"
 #include "value.h"
 
 

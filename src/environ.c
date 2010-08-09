@@ -411,7 +411,7 @@ ctpl_environ_merge (CtplEnviron        *env,
 #include <string.h>
 #include "input-stream.h"
 #include "mathutils.h"
-#include "lexer.h"      /* for CTPL_SYMBOL_CHARS */
+#include "lexer-private.h"      /* for CTPL_*_CHARS */
 
 
 /* syntax characters */

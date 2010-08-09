@@ -58,68 +58,6 @@ struct _CtplInputStream
  * Since: 0.2
  */
 #define CTPL_EOF  0
-/**
- * CTPL_BLANK_CHARS:
- * 
- * Characters treated as blank, commonly used as separator.
- */
-#define CTPL_BLANK_CHARS  " \t\v\r\n"
-/* number of bytes in %CTPL_BLANK_CHARS */
-#define CTPL_BLANK_CHARS_LEN ((sizeof CTPL_BLANK_CHARS) - 1)
-/**
- * ctpl_is_blank:
- * @c: A character
- * 
- * Checks whether a character is one from %CTPL_BLANK_CHARS, but can be more
- * optimized than a simple search in the string.
- * 
- * Returns: %TRUE is @c is a blank character, %FALSE otherwise.
- * 
- * Since: 0.2
- */
-#define ctpl_is_blank(c) ((c) == ' '  || \
-                          (c) == '\t' || \
-                          (c) == '\v' || \
-                          (c) == '\r' || \
-                          (c) == '\n')
-/**
- * CTPL_SYMBOL_CHARS:
- * 
- * Characters that are valid for a symbol.
- */
-#define CTPL_SYMBOL_CHARS "abcdefghijklmnopqrstuvwxyz" \
-                          "ABCDEFGHIJKLMNOPQRSTUVWXYZ" \
-                          "0123456789" \
-                          "_"
-/* number of bytes in %CTPL_SYMBOL_CHARS */
-#define CTPL_SYMBOL_CHARS_LEN ((sizeof CTPL_SYMBOL_CHARS) - 1)
-/**
- * ctpl_is_symbol:
- * @c: A character
- * 
- * Checks whether a character is one from %CTPL_SYMBOL_CHARS, but can be more
- * optimized than a simple search in the string.
- * 
- * Returns: %TRUE is @c is a symbol character, %FALSE otherwise.
- * 
- * Since: 0.2
- */
-#define ctpl_is_symbol(c) (((c) >= 'a' && (c) <= 'z') || \
-                           ((c) >= 'A' && (c) <= 'Z') || \
-                           ((c) >= '0' && (c) <= '9') || \
-                           (c) == '_')
-/**
- * CTPL_ESCAPE_CHAR:
- * 
- * Character used to escape a special character.
- */
-#define CTPL_ESCAPE_CHAR  '\\'
-/**
- * CTPL_STRING_DELIMITER_CHAR:
- * 
- * Character surrounding string literals.
- */
-#define CTPL_STRING_DELIMITER_CHAR '"'
 
 
 CtplInputStream  *ctpl_input_stream_new                 (GInputStream  *stream,

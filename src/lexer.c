@@ -18,6 +18,7 @@
  */
 
 #include "lexer.h"
+#include "lexer-private.h"
 #include "input-stream.h"
 #include "lexer-expr.h"
 #include "token.h"
