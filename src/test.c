@@ -130,13 +130,14 @@ rewind_ctpl_input_stream (CtplInputStream **stream)
 {
   gboolean success = FALSE;
   GError  *err = NULL;
+  GInputStream *substream = ctpl_input_stream_get_stream (*stream);
   
-  if (G_IS_SEEKABLE ((*stream)->stream) && 
-      g_seekable_seek (G_SEEKABLE ((*stream)->stream), 0, G_SEEK_SET,
-                       NULL, &err)) {
+  if (G_IS_SEEKABLE (substream) &&
+      g_seekable_seek (G_SEEKABLE (substream), 0, G_SEEK_SET, NULL, &err)) {
     CtplInputStream *new;
     
-    new = ctpl_input_stream_new ((*stream)->stream, (*stream)->name);
+    new = ctpl_input_stream_new (substream,
+                                 ctpl_input_stream_get_name (*stream));
     ctpl_input_stream_unref (*stream);
     *stream = new;
     success = TRUE;

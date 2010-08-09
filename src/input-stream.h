@@ -32,25 +32,6 @@ G_BEGIN_DECLS
 typedef struct _CtplInputStream CtplInputStream;
 
 /**
- * CtplInputStream:
- * 
- * An opaque object representing an input data stream.
- */
-struct _CtplInputStream
-{
-  /*< private >*/
-  gint          ref_count;
-  GInputStream *stream;
-  gchar        *buffer;
-  gsize         buf_size;
-  gsize         buf_pos;
-  /* infos */
-  gchar        *name;
-  guint         line;
-  guint         pos;
-};
-
-/**
  * CTPL_EOF:
  * 
  * End-Of-File constant.
@@ -74,6 +55,10 @@ CtplInputStream  *ctpl_input_stream_new_for_uri         (const gchar   *uri,
                                                          GError       **error);
 CtplInputStream  *ctpl_input_stream_ref                 (CtplInputStream *stream);
 void              ctpl_input_stream_unref               (CtplInputStream *stream);
+GInputStream     *ctpl_input_stream_get_stream          (const CtplInputStream *stream);
+const gchar      *ctpl_input_stream_get_name            (const CtplInputStream *stream);
+guint             ctpl_input_stream_get_line            (const CtplInputStream *stream);
+guint             ctpl_input_stream_get_line_position   (const CtplInputStream *stream);
 void              ctpl_input_stream_set_error           (CtplInputStream  *stream,
                                                          GError          **error,
                                                          GQuark            domain,
@@ -134,7 +119,7 @@ gdouble           ctpl_input_stream_read_double         (CtplInputStream *stream
 glong             ctpl_input_stream_read_long           (CtplInputStream *stream,
                                                          GError         **error);
 
-#define ctpl_input_stream_eof_fast(stream) (stream->buf_size <= 0)
+/*#define ctpl_input_stream_eof_fast(stream) (stream->buf_size <= 0)*/
 
 #if defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
 static inline gchar
@@ -152,10 +137,10 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
 #define ctpl_input_stream_get_c ctpl_input_stream_get_c_inline
 #endif
 
-#define ctpl_input_stream_peek_c(stream, error)            \
+/*#define ctpl_input_stream_peek_c(stream, error)            \
   ((gchar)((! ctpl_input_stream_eof ((stream), (error)))   \
            ? (stream)->buffer[(stream)->buf_pos]           \
-           : CTPL_EOF))
+           : CTPL_EOF))*/
 
 /**
  * ctpl_input_stream_read_symbol:

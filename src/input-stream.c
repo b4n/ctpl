@@ -54,6 +54,25 @@
 #define SKIP_BUF_SIZE           64U
 
 /**
+ * CtplInputStream:
+ * 
+ * An opaque object representing an input data stream.
+ */
+struct _CtplInputStream
+{
+  /*< private >*/
+  gint          ref_count;
+  GInputStream *stream;
+  gchar        *buffer;
+  gsize         buf_size;
+  gsize         buf_pos;
+  /* infos */
+  gchar        *name;
+  guint         line;
+  guint         pos;
+};
+
+/**
  * ctpl_input_stream_new:
  * @stream: A #GInputStream
  * @name: The name of the stream, or %NULL for none. This is used to identify
@@ -241,6 +260,71 @@ ctpl_input_stream_unref (CtplInputStream *stream)
     g_object_unref (stream->stream);
     g_slice_free1 (sizeof *stream, stream);
   }
+}
+
+/**
+ * ctpl_input_stream_get_stream:
+ * @stream: A #CtplInputStream
+ * 
+ * Gets the underlying #GInputStream associated with a #CtplInputStream.
+ * 
+ * Returns: (transfer none): The underlying #GInputStream of @stream.
+ * 
+ * Since: 0.3
+ */
+GInputStream *
+ctpl_input_stream_get_stream (const CtplInputStream *stream)
+{
+  return stream->stream;
+}
+
+/**
+ * ctpl_input_stream_get_name:
+ * @stream: A #CtplInputStream
+ * 
+ * Gets the name associated with a #CtplInputStream.
+ * 
+ * Returns: (allow-none): The name associated with @stream, or %NULL if none.
+ * 
+ * Since: 0.3
+ */
+const gchar *
+ctpl_input_stream_get_name (const CtplInputStream *stream)
+{
+  return stream->name;
+}
+
+/**
+ * ctpl_input_stream_get_line:
+ * @stream: A #CtplInputStream
+ * 
+ * Gets the current line number of a #CtplInputStream.
+ * 
+ * Returns: The current line number associated with @stream.
+ * 
+ * Since: 0.3
+ */
+guint
+ctpl_input_stream_get_line (const CtplInputStream *stream)
+{
+  return stream->line;
+}
+
+/**
+ * ctpl_input_stream_get_line_position:
+ * @stream: A #CtplInputStream
+ * 
+ * Gets the current offset position in the current line, in bytes, in a
+ * #CtplInputStream.
+ * 
+ * Returns: The current offset in the current line.
+ * 
+ * Since: 0.3
+ */
+guint
+ctpl_input_stream_get_line_position (const CtplInputStream *stream)
+{
+  return stream->pos;
 }
 
 /**
