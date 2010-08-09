@@ -21,6 +21,7 @@
 #include "input-stream.h"
 #include "lexer-expr.h"
 #include "token.h"
+#include "token-private.h"
 #include <glib.h>
 #include <string.h>
 

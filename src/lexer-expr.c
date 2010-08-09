@@ -19,6 +19,7 @@
 
 #include "lexer-expr.h"
 #include "token.h"
+#include "token-private.h"
 #include "mathutils.h"
 #include "input-stream.h"
 #include "io.h"

@@ -20,6 +20,7 @@
 #include "parser.h"
 #include "eval.h"
 #include "token.h"
+#include "token-private.h"
 #include "output-stream.h"
 #include <glib.h>
 #include <string.h>

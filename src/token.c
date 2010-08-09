@@ -18,6 +18,7 @@
  */
 
 #include "token.h"
+#include "token-private.h"
 #include "lexer-expr.h"
 #include <string.h>
 #include <glib.h>
@@ -148,28 +149,6 @@ ctpl_token_new_for_expr (CtplTokenExpr  *array,
 }
 
 /**
- * ctpl_token_new_for:
- * @array: String containing the name of the array to iterate over
- * @iterator: String containing the name of the array iterator
- * @children: Sub-tree that should be computed on each loop iteration
- * 
- * Creates a new token holding a for statement.
- * 
- * Returns: A new #CtplToken that should be freed with ctpl_token_free() when no
- *          longer needed.
- * 
- * Deprecated: 0.3: Use ctpl_token_new_for_expr() instead
- */
-CtplToken *
-ctpl_token_new_for (const gchar  *array,
-                    const gchar  *iterator,
-                    CtplToken    *children)
-{
-  return ctpl_token_new_for_expr (ctpl_token_expr_new_symbol (array, -1),
-                                  iterator, children);
-}
-
-/**
  * ctpl_token_new_if:
  * @condition: The expression condition
  * @if_children: Branching if condition evaluate to true
@@ -265,56 +244,6 @@ ctpl_token_expr_new_value (const CtplValue *value)
     token->type = CTPL_TOKEN_EXPR_TYPE_VALUE;
     ctpl_value_copy (value, &token->token.t_value);
   }
-  
-  return token;
-}
-
-/**
- * ctpl_token_expr_new_integer:
- * @integer: The value of the integer token
- * 
- * Creates a new #CtplTokenExpr holding an integer.
- * 
- * Returns: A new #CtplTokenExpr that should be freed with
- *          ctpl_token_expr_free() when no longer needed.
- *
- * Deprecated: 0.3: Use ctpl_token_expr_new_value() instead.
- */
-CtplTokenExpr *
-ctpl_token_expr_new_integer (glong integer)
-{
-  CtplTokenExpr  *token;
-  CtplValue       value;
-  
-  ctpl_value_init (&value);
-  ctpl_value_set_int (&value, integer);
-  token = ctpl_token_expr_new_value (&value);
-  ctpl_value_free_value (&value);
-  
-  return token;
-}
-
-/**
- * ctpl_token_expr_new_float:
- * @real: The value of the floating-point token
- * 
- * Creates a new #CtplTokenExpr holding a floating-point value.
- * 
- * Returns: A new #CtplTokenExpr that should be freed with
- *          ctpl_token_expr_free() when no longer needed.
- *
- * Deprecated: 0.3: Use ctpl_token_expr_new_value() instead.
- */
-CtplTokenExpr *
-ctpl_token_expr_new_float (gdouble real)
-{
-  CtplTokenExpr  *token;
-  CtplValue       value;
-  
-  ctpl_value_init (&value);
-  ctpl_value_set_float (&value, real);
-  token = ctpl_token_expr_new_value (&value);
-  ctpl_value_free_value (&value);
   
   return token;
 }

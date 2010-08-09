@@ -21,6 +21,8 @@
 #include "lexer-expr.h"
 #include "environ.h"
 #include "value.h"
+#include "token.h"
+#include "token-private.h"
 #include "mathutils.h"
 #include <string.h>
 #include <glib.h>

@@ -34,7 +34,8 @@ ctplinclude_HEADERS = ctpl.h \
                       value.h
 
 EXTRA_DIST          = mathutils.h \
-                      stack.h
+                      stack.h \
+                      token-private.h
 
 if BUILD_CTPL
 bin_PROGRAMS += ctpl
