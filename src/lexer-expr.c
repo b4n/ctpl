@@ -33,7 +33,7 @@
 /**
  * SECTION: lexer-expr
  * @short_description: Syntax analyser for mathematical/test expressions
- * @include: ctpl/lexer-expr.h
+ * @include: ctpl/ctpl.h
  * 
  * Syntax analyser for mathematical or test expressions creating a token tree
  * from an expression.

@@ -29,7 +29,7 @@
 /**
  * SECTION: parser
  * @short_description: Token tree parser
- * @include: ctpl/parser.h
+ * @include: ctpl/ctpl.h
  * 
  * Parses a #CtplToken tree against a #CtplEnviron.
  * 

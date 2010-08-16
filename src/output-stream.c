@@ -26,7 +26,7 @@
 /**
  * SECTION: output-stream
  * @short_description: CTPL's data output stream
- * @include: ctpl/output-stream.h
+ * @include: ctpl/ctpl.h
  * 
  * The data output stream used by CTPL; built on top of #GOutputStream.
  * 

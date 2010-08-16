@@ -26,7 +26,7 @@
 /**
  * SECTION:environ
  * @short_description: Environment
- * @include: ctpl/environ.h
+ * @include: ctpl/ctpl.h
  * 
  * A #CtplEnviron represents an environment of symbols used to lookup, push and
  * pop symbols when computing a template.

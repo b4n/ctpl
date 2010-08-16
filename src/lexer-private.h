@@ -25,7 +25,17 @@
 G_BEGIN_DECLS
 
 
-/**
+/*
+ * SECTION: lexer-private
+ * @short_description: Private lexer API
+ * @include: ctpl/lexer.h
+ * @include: ctpl/lexer-private.h
+ * 
+ * Provides a few character categorization macros and functions.
+ */
+
+
+/*
  * CTPL_BLANK_CHARS:
  * 
  * Characters treated as blank, commonly used as separator.
@@ -33,7 +43,7 @@ G_BEGIN_DECLS
 #define CTPL_BLANK_CHARS  " \t\v\r\n"
 /* number of bytes in %CTPL_BLANK_CHARS */
 #define CTPL_BLANK_CHARS_LEN ((sizeof CTPL_BLANK_CHARS) - 1)
-/**
+/*
  * ctpl_is_blank:
  * @c: A character
  * 
@@ -49,7 +59,7 @@ G_BEGIN_DECLS
                           (c) == '\v' || \
                           (c) == '\r' || \
                           (c) == '\n')
-/**
+/*
  * CTPL_SYMBOL_CHARS:
  * 
  * Characters that are valid for a symbol.
@@ -60,7 +70,7 @@ G_BEGIN_DECLS
                           "_"
 /* number of bytes in %CTPL_SYMBOL_CHARS */
 #define CTPL_SYMBOL_CHARS_LEN ((sizeof CTPL_SYMBOL_CHARS) - 1)
-/**
+/*
  * ctpl_is_symbol:
  * @c: A character
  * 
@@ -75,25 +85,25 @@ G_BEGIN_DECLS
                            ((c) >= 'A' && (c) <= 'Z') || \
                            ((c) >= '0' && (c) <= '9') || \
                            (c) == '_')
-/**
+/*
  * CTPL_ESCAPE_CHAR:
  * 
  * Character used to escape a special character.
  */
 #define CTPL_ESCAPE_CHAR  '\\'
-/**
+/*
  * CTPL_STRING_DELIMITER_CHAR:
  * 
  * Character surrounding string literals.
  */
 #define CTPL_STRING_DELIMITER_CHAR '"'
-/**
+/*
  * CTPL_OPERATOR_CHARS:
  * 
  * Characters valid for an operator.
  */
 #define CTPL_OPERATOR_CHARS "+-/*=><%!&|"
-/**
+/*
  * CTPL_OPERAND_CHARS:
  * 
  * Characters valid for an operand
@@ -102,7 +112,7 @@ G_BEGIN_DECLS
                             "+-" /* for signs */ \
                             CTPL_BLANK_CHARS \
                             CTPL_SYMBOL_CHARS
-/**
+/*
  * CTPL_EXPR_CHARS:
  * 
  * Characters valid inside an expression
@@ -110,13 +120,13 @@ G_BEGIN_DECLS
 #define CTPL_EXPR_CHARS     "()" \
                             CTPL_OPERATOR_CHARS \
                             CTPL_OPERAND_CHARS
-/**
+/*
  * CTPL_START_CHAR:
  * 
  * Character delimiting the start of language tokens from raw data.
  */
 #define CTPL_START_CHAR '{'
-/**
+/*
  * CTPL_END_CHAR:
  * 
  * Character delimiting the end of language tokens from raw data.

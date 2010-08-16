@@ -30,7 +30,7 @@
 /**
  * SECTION: lexer
  * @short_description: Syntax analyser
- * @include: ctpl/lexer.h
+ * @include: ctpl/ctpl.h
  * 
  * Syntax analyser creating a <link linkend="ctpl-CtplToken">token tree</link>
  * from an input data in the CTPL language.

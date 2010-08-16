@@ -28,21 +28,16 @@
 /**
  * SECTION: token
  * @short_description: Language token
- * @include: ctpl/token.h
+ * @include: ctpl/ctpl.h
  * 
  * Represents a CTPL language token.
  * 
- * A #CtplToken is created with ctpl_token_new_data(), ctpl_token_new_expr(),
- * ctpl_token_new_for_expr() or ctpl_token_new_if(), and freed with
- * ctpl_token_free().
- * You can append or prepend tokens to others with ctpl_token_append() and
- * ctpl_token_prepend().
- * To dump a #CtplToken, use ctpl_token_dump().
+ * Tokens are created by the lexers,
+ * <link linkend="ctpl-CtplLexer">CtplLexer</link> and
+ * <link linkend="ctpl-CtplLexerExpr">CtplLexerExpr</link>.
  * 
- * A #CtplTokenExpr is created with ctpl_token_expr_new_operator(), 
- * ctpl_token_expr_new_value() or ctpl_token_expr_new_symbol(), and freed with
- * ctpl_token_expr_free().
- * To dump a #CtplTokenExpr, use ctpl_token_expr_dump().
+ * A #CtplToken is freed with ctpl_token_free(), and a #CtplTokenExpr is freed
+ * with ctpl_token_expr_free().
  */
 
 /* returns the length of @s. If @max is >= 0, return it, return the computed
@@ -65,7 +60,7 @@ token_new (void)
   return token;
 }
 
-/**
+/*
  * ctpl_token_new_data:
  * @data: Buffer containing token value (raw data)
  * @len: length of the @data or -1 if 0-terminated
@@ -90,7 +85,7 @@ ctpl_token_new_data (const char *data,
   return token;
 }
 
-/**
+/*
  * ctpl_token_new_expr:
  * @expr: The expression
  * 
@@ -116,7 +111,7 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
   return token;
 }
 
-/**
+/*
  * ctpl_token_new_for_expr:
  * @array: Expression to iterate over (should expand to an iteratable value)
  * @iterator: String containing the name of the array iterator
@@ -148,7 +143,7 @@ ctpl_token_new_for_expr (CtplTokenExpr  *array,
   return token;
 }
 
-/**
+/*
  * ctpl_token_new_if:
  * @condition: The expression condition
  * @if_children: Branching if condition evaluate to true
@@ -194,7 +189,7 @@ ctpl_token_expr_new (void)
   return token;
 }
 
-/**
+/*
  * ctpl_token_expr_new_operator:
  * @operator: A binary operator (one of the
  *            <link linkend="CtplOperator"><code>CTPL_OPERATOR_*</code></link>)
@@ -225,7 +220,7 @@ ctpl_token_expr_new_operator (CtplOperator    operator,
   return token;
 }
 
-/**
+/*
  * ctpl_token_expr_new_value:
  * @value: A #CtplValue
  * 
@@ -248,7 +243,7 @@ ctpl_token_expr_new_value (const CtplValue *value)
   return token;
 }
 
-/**
+/*
  * ctpl_token_expr_new_symbol:
  * @symbol: String holding the symbol name
  * @len: Length to read from @symbol or -1 to read the whole string.
@@ -277,7 +272,8 @@ ctpl_token_expr_new_symbol (const char *symbol,
 /**
  * ctpl_token_expr_free:
  * @token: A #CtplTokenExpr to free
- * @recurse: Whether to free sub-tokens too.
+ * @recurse: Whether to free sub-tokens too. You generally wan to set this to
+ *           %TRUE.
  * 
  * Frees all memory used by a #CtplTokenExpr.
  */
@@ -314,7 +310,8 @@ ctpl_token_expr_free (CtplTokenExpr *token,
 /**
  * ctpl_token_free:
  * @token: A #CtplToken to free
- * @chain: Whether all next tokens should be freed too or not.
+ * @chain: Whether all next tokens should be freed too or not. You generally
+ *         want to set this to %TRUE.
  * 
  * Frees all memory used by a #CtplToken.
  * If @chain is %TRUE, all tokens attached at the right of @token (appended
@@ -367,7 +364,7 @@ ctpl_token_free (CtplToken *token,
   }
 }
 
-/**
+/*
  * ctpl_token_append:
  * @token: A #CtplToken
  * @brother: Another #CtplToken
@@ -391,7 +388,7 @@ ctpl_token_append (CtplToken *token,
   first_tok->last = token->last;
 }
 
-/**
+/*
  * ctpl_token_prepend:
  * @token: A #CtplToken
  * @brother: Another #CtplToken

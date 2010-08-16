@@ -24,7 +24,7 @@
 #include <errno.h>
 
 
-/**
+/*
  * SECTION: mathutils
  * @short_description: Mathematical utilities
  * @include: ctpl/mathutils.h
@@ -34,7 +34,7 @@
  */
 
 
-/**
+/*
  * ctpl_math_string_to_float:
  * @string: A string containing a number
  * @value: A pointer to fill with the result
@@ -53,7 +53,7 @@ ctpl_math_string_to_float (const gchar *string,
   return (*endptr) == 0 && string != endptr && errno != ERANGE;
 }
 
-/**
+/*
  * ctpl_math_string_to_int:
  * @string: A string containing a number
  * @value: A pointer to fill with the result

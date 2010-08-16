@@ -27,7 +27,28 @@
 G_BEGIN_DECLS
 
 
-/**
+/*
+ * SECTION: token-private
+ * @short_description: Language token
+ * @include: ctpl/token.h
+ * @include: ctpl/token-private.h
+ * 
+ * Represents a CTPL language token.
+ * 
+ * A #CtplToken is created with ctpl_token_new_data(), ctpl_token_new_expr(),
+ * ctpl_token_new_for_expr() or ctpl_token_new_if(), and freed with
+ * ctpl_token_free().
+ * You can append or prepend tokens to others with ctpl_token_append() and
+ * ctpl_token_prepend().
+ * To dump a #CtplToken, use ctpl_token_dump().
+ * 
+ * A #CtplTokenExpr is created with ctpl_token_expr_new_operator(), 
+ * ctpl_token_expr_new_value() or ctpl_token_expr_new_symbol(), and freed with
+ * ctpl_token_expr_free().
+ * To dump a #CtplTokenExpr, use ctpl_token_expr_dump().
+ */
+
+/*
  * CtplTokenType:
  * @CTPL_TOKEN_TYPE_DATA: Data flow, not an language token
  * @CTPL_TOKEN_TYPE_FOR: A loop through an array of values
@@ -44,7 +65,7 @@ typedef enum _CtplTokenType
   CTPL_TOKEN_TYPE_EXPR
 } CtplTokenType;
 
-/**
+/*
  * CtplTokenExprType:
  * @CTPL_TOKEN_EXPR_TYPE_OPERATOR:  An operator
  *            (<link linkend="CtplOperator"><code>CTPL_OPERATOR_*</code></link>)
@@ -64,7 +85,7 @@ typedef struct _CtplTokenFor          CtplTokenFor;
 typedef struct _CtplTokenIf           CtplTokenIf;
 typedef struct _CtplTokenExprOperator CtplTokenExprOperator;
 
-/**
+/*
  * CtplTokenFor:
  * @array: The symbol of the array
  * @iter: The symbol of the iterator
@@ -79,7 +100,7 @@ struct _CtplTokenFor
   CtplToken      *children;
 };
 
-/**
+/*
  * CtplTokenIf:
  * @condition: The condition string
  * @if_children: Branching if @condition evaluate to true
@@ -94,7 +115,7 @@ struct _CtplTokenIf
   CtplToken      *else_children;
 };
 
-/**
+/*
  * CtplTokenExprOperator:
  * @operator: The operator
  * @loperand: The left operand
@@ -109,7 +130,7 @@ struct _CtplTokenExprOperator
   CtplTokenExpr  *roperand;
 };
 
-/**
+/*
  * CtplTokenExprValue:
  * @t_operator: The value of an operator token
  * @t_value: The value of an inline value token
@@ -125,14 +146,14 @@ union _CtplTokenExprValue
 };
 typedef union _CtplTokenExprValue CtplTokenExprValue;
 
-/**
+/*
  * CtplTokenExpr:
  * @type: The type of the expression token
  * @token: The value of the token
- * @indexes: A list of #CtplTokenExpr to use to index the token (in-order, LTR)
+ * @indexes: (element-type CtplTokenExpr): A list of #CtplTokenExpr to use to
+ *                                         index the token (in-order, LTR)
  * 
- * Represents an expression token. The fields in this structure should be
- * considered private and are documented only for internal usage.
+ * Represents an expression token.
  */
 struct _CtplTokenExpr
 {
@@ -141,7 +162,7 @@ struct _CtplTokenExpr
   GSList             *indexes;
 };
 
-/**
+/*
  * CtplTokenValue:
  * @t_data: The data of a data token
  * @t_expr: The value of an expression token
@@ -159,15 +180,14 @@ union _CtplTokenValue
 };
 typedef union _CtplTokenValue CtplTokenValue;
 
-/**
+/*
  * CtplToken:
  * @type: Type of the token
  * @token: Union holding the corresponding token (according to @type)
  * @next: Next token
  * @last: Last token
  * 
- * The #CtplToken structure. The fields in this structure should be considered
- * private and are documented only for internal usage.
+ * The #CtplToken opaque structure.
  */
 struct _CtplToken
 {
@@ -212,7 +232,7 @@ void          ctpl_token_prepend            (CtplToken *token,
 /* ctpl_token_dump(): see token.h */
 /* ctpl_token_expr_dump(): see token.h */
 
-/**
+/*
  * ctpl_token_get_type:
  * @token: A #CtplToken
  * 

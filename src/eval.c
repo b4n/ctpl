@@ -31,7 +31,7 @@
 /**
  * SECTION: eval
  * @short_description: Expression evaluation
- * @include: ctpl/eval.h
+ * @include: ctpl/ctpl.h
  * 
  * Computes a #CtplTokenExpr against a #CtplEnviron. It is the equivalent of
  * <link linkend="ctpl-CtplParser">the parser</link> for expressions.

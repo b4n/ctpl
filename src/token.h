@@ -65,7 +65,17 @@ typedef enum {
   CTPL_OPERATOR_NONE
 } CtplOperator;
 
+/**
+ * CtplToken:
+ * 
+ * The #CtplToken opaque structure.
+ */
 typedef struct _CtplToken             CtplToken;
+/**
+ * CtplTokenExpr:
+ * 
+ * Represents an expression token.
+ */
 typedef struct _CtplTokenExpr         CtplTokenExpr;
 
 void          ctpl_token_free               (CtplToken *token,

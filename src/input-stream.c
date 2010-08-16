@@ -32,7 +32,7 @@
 /**
  * SECTION: input-stream
  * @short_description: CTPL's data input stream
- * @include: ctpl/input-stream.h
+ * @include: ctpl/ctpl.h
  * 
  * The data input stream used by CTPL. This is a buffered input stream on top
  * of #GInputStream with current position informations (line and position) and

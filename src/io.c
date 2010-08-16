@@ -24,7 +24,7 @@
 /**
  * SECTION: io
  * @short_description: CTPL's IO layer
- * @include: ctpl/io.h
+ * @include: ctpl/ctpl.h
  * 
  * See the two sub-modules #CtplInputStream and #CtplOutputStream.
  */
