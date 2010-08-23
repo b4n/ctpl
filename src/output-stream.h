@@ -33,12 +33,9 @@ G_BEGIN_DECLS
  */
 typedef GOutputStream           CtplOutputStream;
 
-/*CtplOutputStream *ctpl_output_stream_new            (GOutputStream *stream);
-CtplOutputStream *ctpl_output_stream_ref           (CtplOutputStream *stream);
-void              ctpl_output_stream_unref         (CtplOutputStream *stream);*/
-#define           ctpl_output_stream_new            g_object_ref
-#define           ctpl_output_stream_ref            g_object_ref
-#define           ctpl_output_stream_unref          g_object_unref
+CtplOutputStream *ctpl_output_stream_new            (GOutputStream *stream);
+CtplOutputStream *ctpl_output_stream_ref            (CtplOutputStream *stream);
+void              ctpl_output_stream_unref          (CtplOutputStream *stream);
 gboolean          ctpl_output_stream_write          (CtplOutputStream  *stream,
                                                      const gchar       *data,
                                                      gssize             length,

@@ -46,6 +46,11 @@
  * 
  * Since: 0.2
  */
+CtplOutputStream *
+ctpl_output_stream_new (GOutputStream *stream)
+{
+  return g_object_ref (stream);
+}
 
 /**
  * ctpl_output_stream_ref:
@@ -57,6 +62,11 @@
  * 
  * Since: 0.2
  */
+CtplOutputStream *
+ctpl_output_stream_ref (CtplOutputStream *stream)
+{
+  return g_object_ref (stream);
+}
 
 /**
  * ctpl_output_stream_unref:
@@ -67,6 +77,11 @@
  * 
  * Since: 0.2
  */
+void
+ctpl_output_stream_unref (CtplOutputStream *stream)
+{
+  g_object_unref (stream);
+}
 
 /**
  * ctpl_output_stream_write:
