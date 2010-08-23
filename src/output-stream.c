@@ -35,6 +35,18 @@
  * ctpl_output_stream_unref().
  */
 
+
+/**
+ * CtplOutputStream:
+ * 
+ * An opaque object representing an output data stream.
+ */
+/* It's actually a GOutputStream, the structure is just a wrapper */
+struct _CtplOutputStream
+{
+  GOutputStream parent;
+};
+
 /**
  * ctpl_output_stream_new:
  * @stream: A #GOutputStream
@@ -106,7 +118,8 @@ ctpl_output_stream_write (CtplOutputStream  *stream,
   
   len = (length < 0) ? strlen (data) : (gsize)length;
   
-  return g_output_stream_write (stream, data, len, NULL, error) == (gssize)len;
+  return g_output_stream_write (G_OUTPUT_STREAM (stream), data, len, NULL,
+                                error) == (gssize)len;
 }
 
 #undef ctpl_output_stream_put_c

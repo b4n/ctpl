@@ -26,12 +26,7 @@
 G_BEGIN_DECLS
 
 
-/**
- * CtplOutputStream:
- * 
- * An opaque object representing an output data stream.
- */
-typedef GOutputStream           CtplOutputStream;
+typedef struct _CtplOutputStream CtplOutputStream;
 
 CtplOutputStream *ctpl_output_stream_new            (GOutputStream *stream);
 CtplOutputStream *ctpl_output_stream_ref            (CtplOutputStream *stream);
