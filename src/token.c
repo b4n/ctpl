@@ -272,8 +272,8 @@ ctpl_token_expr_new_symbol (const char *symbol,
 /**
  * ctpl_token_expr_free:
  * @token: A #CtplTokenExpr to free
- * @recurse: Whether to free sub-tokens too. You generally wan to set this to
- *           %TRUE.
+ * @recurse: (default TRUE): Whether to free sub-tokens too. You generally want
+ *                           to set this to %TRUE.
  * 
  * Frees all memory used by a #CtplTokenExpr.
  */
@@ -310,8 +310,8 @@ ctpl_token_expr_free (CtplTokenExpr *token,
 /**
  * ctpl_token_free:
  * @token: A #CtplToken to free
- * @chain: Whether all next tokens should be freed too or not. You generally
- *         want to set this to %TRUE.
+ * @chain: (default TRUE): Whether all next tokens should be freed too or not.
+ *                         You generally want to set this to %TRUE.
  * 
  * Frees all memory used by a #CtplToken.
  * If @chain is %TRUE, all tokens attached at the right of @token (appended
@@ -527,7 +527,7 @@ ctpl_token_expr_dump (const CtplTokenExpr *token)
 /**
  * ctpl_token_dump:
  * @token: A #CtplToken
- * @chain: Whether to dump all next tokens
+ * @chain: (default TRUE): Whether to dump all next tokens
  * 
  * Dumps a token with g_print().
  * If @chain is %TRUE, all next tokens will be dumped too.

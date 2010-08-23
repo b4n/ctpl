@@ -34,6 +34,8 @@ CtplLexerExprError
 ctpl_lexer_expr_lex
 ctpl_lexer_expr_lex_full
 ctpl_lexer_expr_lex_string
+ctpl_lexer_expr_free_tree
+ctpl_lexer_expr_dump_tree
 ctpl_operator_to_string
 ctpl_operator_from_string
 <SUBSECTION Standard>
