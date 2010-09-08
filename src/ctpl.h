@@ -30,5 +30,6 @@
 #include "output-stream.h"
 #include "token.h"
 #include "value.h"
+#include "version.h"
 
 #endif /* guard */

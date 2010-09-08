@@ -18,7 +18,8 @@ libctpl_la_SOURCES  = environ.c \
                       parser.c \
                       stack.c \
                       token.c \
-                      value.c
+                      value.c \
+                      version.c
 
 ctplincludedir = $(includedir)/ctpl
 ctplinclude_HEADERS = ctpl.h \
@@ -31,7 +32,8 @@ ctplinclude_HEADERS = ctpl.h \
                       output-stream.h \
                       parser.h \
                       token.h \
-                      value.h
+                      value.h \
+                      version.h
 
 EXTRA_DIST          = mathutils.h \
                       stack.h
