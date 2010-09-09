@@ -34,18 +34,24 @@
  * ctpl_major_version:
  * 
  * Major version of the CTPL library the application is running with.
+ * 
+ * Since: 0.3
  */
 const guint ctpl_major_version = CTPL_MAJOR_VERSION;
 /**
  * ctpl_minor_version:
  * 
  * Minor version of the CTPL library the application is running with.
+ * 
+ * Since: 0.3
  */
 const guint ctpl_minor_version = CTPL_MINOR_VERSION;
 /**
  * ctpl_micro_version:
  * 
  * Micro version of the CTPL library the application is running with.
+ * 
+ * Since: 0.3
  */
 const guint ctpl_micro_version = CTPL_MICRO_VERSION;
 
@@ -68,6 +74,8 @@ const guint ctpl_micro_version = CTPL_MICRO_VERSION;
  * compile-time check.
  * 
  * Returns: %TRUE if the version is compatible, %FALSE otherwise.
+ * 
+ * Since: 0.3
  */
 gboolean
 ctpl_check_version (guint major,

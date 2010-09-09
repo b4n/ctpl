@@ -29,18 +29,24 @@ G_BEGIN_DECLS
  * CTPL_MAJOR_VERSION:
  * 
  * Major version of the CTPL library the application is compiled against.
+ * 
+ * Since: 0.3
  */
 #define CTPL_MAJOR_VERSION 0
 /**
  * CTPL_MINOR_VERSION:
  * 
  * Minor version of the CTPL library the application is compiled against.
+ * 
+ * Since: 0.3
  */
 #define CTPL_MINOR_VERSION 2
 /**
  * CTPL_MICRO_VERSION:
  * 
  * Micro version of the CTPL library the application is compiled against.
+ * 
+ * Since: 0.3
  */
 #define CTPL_MICRO_VERSION 2
 
@@ -56,6 +62,8 @@ G_BEGIN_DECLS
  * If you want a run-time check, use ctpl_check_version().
  * 
  * Returns: %TRUE if the version is compatible, %FALSE otherwise.
+ * 
+ * Since: 0.3
  */
 #define CTPL_CHECK_VERSION(major, minor, micro) \
   ((CTPL_MAJOR_VERSION > (major)) || \
