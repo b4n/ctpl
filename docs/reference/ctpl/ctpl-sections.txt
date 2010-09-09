@@ -14,8 +14,6 @@ ctpl_check_version
 <SECTION>
 <TITLE>CtplLexer</TITLE>
 <FILE>lexer</FILE>
-CTPL_START_CHAR
-CTPL_END_CHAR
 CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex
@@ -25,55 +23,67 @@ ctpl_lexer_free_tree
 ctpl_lexer_dump_tree
 <SUBSECTION Standard>
 ctpl_lexer_error_quark
+<SUBSECTION Private>
+CTPL_START_CHAR
+CTPL_END_CHAR
+CTPL_BLANK_CHARS
+CTPL_BLANK_CHARS_LEN
+ctpl_is_blank
+CTPL_SYMBOL_CHARS
+CTPL_SYMBOL_CHARS_LEN
+ctpl_is_symbol
+CTPL_ESCAPE_CHAR
+CTPL_STRING_DELIMITER_CHAR
+CTPL_EXPR_CHARS
+CTPL_OPERAND_CHARS
+CTPL_OPERATOR_CHARS
 </SECTION>
 
 <SECTION>
 <TITLE>CtplLexerExpr</TITLE>
 <FILE>lexer-expr</FILE>
-CTPL_EXPR_CHARS
-CTPL_OPERAND_CHARS
-CTPL_OPERATOR_CHARS
 CTPL_LEXER_EXPR_ERROR
 CtplLexerExprError
 ctpl_lexer_expr_lex
 ctpl_lexer_expr_lex_full
 ctpl_lexer_expr_lex_string
+ctpl_lexer_expr_free_tree
+ctpl_lexer_expr_dump_tree
+<SUBSECTION Standard>
 ctpl_operator_to_string
 ctpl_operator_from_string
-<SUBSECTION Standard>
 ctpl_lexer_expr_error_quark
 </SECTION>
 
 <SECTION>
 <TITLE>CtplToken</TITLE>
 <FILE>token</FILE>
-CtplOperator
-CtplTokenType
-CtplTokenValue
 CtplToken
-CtplTokenFor
-CtplTokenIf
+CtplTokenExpr
+ctpl_token_free
+ctpl_token_dump
+ctpl_token_expr_free
+ctpl_token_expr_dump
+<SUBSECTION Private>
+CtplOperator
+CtplTokenExprOperator
 CtplTokenExprType
 CtplTokenExprValue
-CtplTokenExpr
-CtplTokenExprOperator
+CtplTokenFor
+CtplTokenIf
+CtplTokenType
+CtplTokenValue
 ctpl_token_new_data
 ctpl_token_new_expr
 ctpl_token_new_for
 ctpl_token_new_for_expr
 ctpl_token_new_if
-ctpl_token_free
+ctpl_token_expr_new_operator
+ctpl_token_expr_new_symbol
+ctpl_token_expr_new_value
+ctpl_token_get_type
 ctpl_token_append
 ctpl_token_prepend
-ctpl_token_get_type
-ctpl_token_dump
-ctpl_token_expr_new_operator
-ctpl_token_expr_new_value
-ctpl_token_expr_new_integer
-ctpl_token_expr_new_float
-ctpl_token_expr_new_symbol
-ctpl_token_expr_free
-ctpl_token_expr_dump
 </SECTION>
 
 <SECTION>
@@ -180,6 +190,7 @@ ctpl_value_get_held_type_name
 <SECTION>
 <TITLE>CtplStack</TITLE>
 <FILE>stack</FILE>
+<SUBSECTION Private>
 CtplStack
 ctpl_stack_new
 ctpl_stack_free
@@ -193,6 +204,7 @@ ctpl_stack_is_empty
 <SECTION>
 <TITLE>Math utilities</TITLE>
 <FILE>mathutils</FILE>
+<SUBSECTION Private>
 CTPL_MATH_FLOAT_EQ
 ctpl_math_string_to_float
 ctpl_math_string_to_int
@@ -204,12 +216,6 @@ ctpl_math_int_to_string
 <TITLE>CtplInputStream</TITLE>
 <FILE>input-stream</FILE>
 CTPL_EOF
-CTPL_BLANK_CHARS
-ctpl_is_blank
-CTPL_SYMBOL_CHARS
-ctpl_is_symbol
-CTPL_ESCAPE_CHAR
-CTPL_STRING_DELIMITER_CHAR
 CtplInputStream
 ctpl_input_stream_new
 ctpl_input_stream_new_for_gfile
@@ -218,6 +224,10 @@ ctpl_input_stream_new_for_path
 ctpl_input_stream_new_for_uri
 ctpl_input_stream_ref
 ctpl_input_stream_unref
+ctpl_input_stream_get_stream
+ctpl_input_stream_get_name
+ctpl_input_stream_get_line
+ctpl_input_stream_get_line_position
 ctpl_input_stream_set_error
 ctpl_input_stream_read
 ctpl_input_stream_get_c
@@ -247,6 +257,7 @@ CtplOutputStream
 ctpl_output_stream_new
 ctpl_output_stream_ref
 ctpl_output_stream_unref
+ctpl_output_stream_get_stream
 ctpl_output_stream_write
 ctpl_output_stream_put_c
 </SECTION>

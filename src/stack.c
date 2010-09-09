@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 
-/**
+/*
  * SECTION:stack
  * @short_description: Stack
  * @include: ctpl/stack.h
@@ -82,7 +82,7 @@ struct _CtplStackEntry
   CtplStackEntry *parent;
 };
 
-/**
+/*
  * CtplStack:
  * 
  * Opaque object representing a stack.
@@ -175,7 +175,7 @@ ctpl_stack_init (CtplStack   *stack,
   stack->free_stack   = NULL;
 }
 
-/**
+/*
  * ctpl_stack_new:
  * @compare_func: A #GCompareFunc to compare data, or %NULL
  * @free_func: A #GFreeFunc to free pushed data, or %NULL
@@ -198,7 +198,7 @@ ctpl_stack_new (GCompareFunc  compare_func,
   return stack;
 }
 
-/**
+/*
  * ctpl_stack_free:
  * @stack: A #CtplStack
  * 
@@ -226,7 +226,7 @@ _ctpl_stack_push_ref (CtplStack *stack)
   //~ g_debug ("Pushed a reference");
 }
 
-/**
+/*
  * ctpl_stack_push_ref:
  * @stack: A #CtplStack
  * 
@@ -254,7 +254,7 @@ ctpl_stack_push_ref (CtplStack *stack)
   return retv;
 }
 
-/**
+/*
  * ctpl_stack_push:
  * @stack: A #CtplStack into which push @data
  * @data: Some data to push into @stack
@@ -288,7 +288,7 @@ ctpl_stack_push (CtplStack *stack,
   }
 }
 
-/**
+/*
  * ctpl_stack_pop:
  * @stack: A #CtplStack from which pop the last element
  * 
@@ -315,7 +315,7 @@ ctpl_stack_pop (CtplStack *stack)
   return data;
 }
 
-/**
+/*
  * ctpl_stack_peek:
  * @stack: A #CtplStack
  * 
@@ -331,7 +331,7 @@ ctpl_stack_peek (const CtplStack *stack)
   return (stack->last) ? stack->last->data : NULL;
 }
 
-/**
+/*
  * ctpl_stack_is_empty:
  * @stack: A #CtplStack
  * 

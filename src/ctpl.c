@@ -249,7 +249,7 @@ get_output_stream (void)
       printerr ("Failed to open output: %s\n", err->message);
       g_error_free (err);
     } else {
-      stream = ctpl_output_stream_new (gfostream);
+      stream = ctpl_output_stream_new (G_OUTPUT_STREAM (gfostream));
       g_object_unref (gfostream);
     }
   } else {

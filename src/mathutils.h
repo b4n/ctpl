@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 
-/**
+/*
  * CTPL_MATH_FLOAT_EQ:
  * @a: A floating-point value
  * @b: Another floating-point value
@@ -54,7 +54,7 @@ G_GNUC_INTERNAL
 gboolean    ctpl_math_string_to_int     (const gchar *string,
                                          glong       *value);
 
-/**
+/*
  * ctpl_math_float_to_string:
  * @f: A floating-point number (C's double)
  * 
@@ -68,7 +68,7 @@ gboolean    ctpl_math_string_to_int     (const gchar *string,
   (g_ascii_dtostr (g_malloc (G_ASCII_DTOSTR_BUF_SIZE), \
                    G_ASCII_DTOSTR_BUF_SIZE, \
                    (f)))
-/**
+/*
  * ctpl_math_int_to_string:
  * @i: An integer number (C's long int)
  * 

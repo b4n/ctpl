@@ -386,15 +386,6 @@ procede_template (CtplInputStream  *input,
     <xi:include href="xml/input-stream.xml"/>
     <xi:include href="xml/output-stream.xml"/>
   </chapter>
-  <chapter>
-    <title>Private API reference</title>
-    <para>
-      This is the private API used to implement CTPL and accessible only from
-      inside the library. It makes sense only when hacking CTPL.
-    </para>
-    <xi:include href="xml/stack.xml"/>
-    <xi:include href="xml/mathutils.xml"/>
-  </chapter>
   <!--chapter id="object-tree">
     <title>Object Hierarchy</title>
      <xi:include href="xml/tree_index.sgml"/>

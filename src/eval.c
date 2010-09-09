@@ -18,9 +18,11 @@
  */
 
 #include "eval.h"
-#include "lexer-expr.h"
+#include "lexer-private.h"
 #include "environ.h"
 #include "value.h"
+#include "token.h"
+#include "token-private.h"
 #include "mathutils.h"
 #include <string.h>
 #include <glib.h>
@@ -29,7 +31,7 @@
 /**
  * SECTION: eval
  * @short_description: Expression evaluation
- * @include: ctpl/eval.h
+ * @include: ctpl/ctpl.h
  * 
  * Computes a #CtplTokenExpr against a #CtplEnviron. It is the equivalent of
  * <link linkend="ctpl-CtplParser">the parser</link> for expressions.

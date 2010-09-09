@@ -26,7 +26,7 @@
 /**
  * SECTION:environ
  * @short_description: Environment
- * @include: ctpl/environ.h
+ * @include: ctpl/ctpl.h
  * 
  * A #CtplEnviron represents an environment of symbols used to lookup, push and
  * pop symbols when computing a template.
@@ -71,6 +71,18 @@
  *   </programlisting>
  * </example>
  */
+
+
+/**
+ * CtplEnviron:
+ * 
+ * Represents an environment.
+ */
+struct _CtplEnviron
+{
+  /*<private>*/
+  GHashTable     *symbol_table; /* hash table containing stacks of symbols */
+};
 
 
 /*<standard>*/
@@ -411,7 +423,7 @@ ctpl_environ_merge (CtplEnviron        *env,
 #include <string.h>
 #include "input-stream.h"
 #include "mathutils.h"
-#include "lexer.h"      /* for CTPL_SYMBOL_CHARS */
+#include "lexer-private.h"      /* for CTPL_*_CHARS */
 
 
 /* syntax characters */

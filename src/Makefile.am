@@ -35,8 +35,10 @@ ctplinclude_HEADERS = ctpl.h \
                       value.h \
                       version.h
 
-EXTRA_DIST          = mathutils.h \
-                      stack.h
+EXTRA_DIST          = lexer-private.h \
+                      mathutils.h \
+                      stack.h \
+                      token-private.h
 
 if BUILD_CTPL
 bin_PROGRAMS += ctpl

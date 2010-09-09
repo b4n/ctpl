@@ -27,242 +27,25 @@ G_BEGIN_DECLS
 
 
 /**
- * CtplTokenType:
- * @CTPL_TOKEN_TYPE_DATA: Data flow, not an language token
- * @CTPL_TOKEN_TYPE_FOR: A loop through an array of values
- * @CTPL_TOKEN_TYPE_IF: A conditional branching
- * @CTPL_TOKEN_TYPE_EXPR: An expression
+ * CtplToken:
  * 
- * Possible types of a token.
+ * The #CtplToken opaque structure.
  */
-typedef enum _CtplTokenType
-{
-  CTPL_TOKEN_TYPE_DATA,
-  CTPL_TOKEN_TYPE_FOR,
-  CTPL_TOKEN_TYPE_IF,
-  CTPL_TOKEN_TYPE_EXPR
-} CtplTokenType;
-
-/**
- * CtplTokenExprType:
- * @CTPL_TOKEN_EXPR_TYPE_OPERATOR:  An operator
- *            (<link linkend="CtplOperator"><code>CTPL_OPERATOR_*</code></link>)
- * @CTPL_TOKEN_EXPR_TYPE_VALUE:     An inline value value
- * @CTPL_TOKEN_EXPR_TYPE_SYMBOL:    A symbol (a name to be found in the environ)
- * 
- * Possibles types of an expression token.
- */
-typedef enum _CtplTokenExprType
-{
-  CTPL_TOKEN_EXPR_TYPE_OPERATOR,
-  CTPL_TOKEN_EXPR_TYPE_VALUE,
-  CTPL_TOKEN_EXPR_TYPE_SYMBOL
-} CtplTokenExprType;
-
-/**
- * CtplOperator:
- * @CTPL_OPERATOR_PLUS:   Addition operator
- * @CTPL_OPERATOR_MINUS:  Subtraction operator
- * @CTPL_OPERATOR_DIV:    Division operator
- * @CTPL_OPERATOR_MUL:    Multiplication operator
- * @CTPL_OPERATOR_EQUAL:  Equality test operator
- * @CTPL_OPERATOR_INF:    Inferiority test operator
- * @CTPL_OPERATOR_SUP:    Superiority test operator
- * @CTPL_OPERATOR_MODULO: Modulo operator
- * @CTPL_OPERATOR_SUPEQ:  @CTPL_OPERATOR_SUP || @CTPL_OPERATOR_EQUAL
- * @CTPL_OPERATOR_INFEQ:  @CTPL_OPERATOR_INF || @CTPL_OPERATOR_EQUAL
- * @CTPL_OPERATOR_NEQ:    Non-equality test operator (! @CTPL_OPERATOR_EQUAL)
- * @CTPL_OPERATOR_AND:    Boolean AND operator
- * @CTPL_OPERATOR_OR:     Boolean OR operator
- * @CTPL_OPERATOR_NONE:   Not an operator, denoting no operator
- * 
- * Operators constants.
- * 
- * See also ctpl_operator_to_string() and ctpl_operator_from_string().
- */
-typedef enum {
-  CTPL_OPERATOR_PLUS,
-  CTPL_OPERATOR_MINUS,
-  CTPL_OPERATOR_DIV,
-  CTPL_OPERATOR_MUL,
-  CTPL_OPERATOR_EQUAL,
-  CTPL_OPERATOR_INF,
-  CTPL_OPERATOR_SUP,
-  CTPL_OPERATOR_MODULO,
-  CTPL_OPERATOR_SUPEQ,
-  CTPL_OPERATOR_INFEQ,
-  CTPL_OPERATOR_NEQ,
-  CTPL_OPERATOR_AND,
-  CTPL_OPERATOR_OR,
-  /* must be last */
-  CTPL_OPERATOR_NONE
-} CtplOperator;
-
 typedef struct _CtplToken             CtplToken;
-typedef struct _CtplTokenFor          CtplTokenFor;
-typedef struct _CtplTokenIf           CtplTokenIf;
-typedef struct _CtplTokenExpr         CtplTokenExpr;
-typedef struct _CtplTokenExprOperator CtplTokenExprOperator;
-
-/**
- * CtplTokenFor:
- * @array: The symbol of the array
- * @iter: The symbol of the iterator
- * @children: Tree to repeat on iterations
- * 
- * Holds information about a <code>for</code> statement.
- */
-struct _CtplTokenFor
-{
-  CtplTokenExpr  *array;
-  gchar          *iter;
-  CtplToken      *children;
-};
-
-/**
- * CtplTokenIf:
- * @condition: The condition string
- * @if_children: Branching if @condition evaluate to true
- * @else_children: Branching if @condition evaluate to false
- * 
- * Holds information about an <code>if</code> statement.
- */
-struct _CtplTokenIf
-{
-  CtplTokenExpr  *condition;
-  CtplToken      *if_children;
-  CtplToken      *else_children;
-};
-
-/**
- * CtplTokenExprOperator:
- * @operator: The operator
- * @loperand: The left operand
- * @roperand: The right operand
- * 
- * Represents a operator token in an expression.
- */
-struct _CtplTokenExprOperator
-{
-  CtplOperator    operator;
-  CtplTokenExpr  *loperand;
-  CtplTokenExpr  *roperand;
-};
-
-/**
- * CtplTokenExprValue:
- * @t_operator: The value of an operator token
- * @t_value: The value of an inline value token
- * @t_symbol: The name of a symbol token
- * 
- * Represents the possible values of an expression token (see #CtplTokenExpr).
- */
-union _CtplTokenExprValue
-{
-  CtplTokenExprOperator  *t_operator;
-  CtplValue               t_value;
-  gchar                  *t_symbol;
-};
-typedef union _CtplTokenExprValue CtplTokenExprValue;
-
 /**
  * CtplTokenExpr:
- * @type: The type of the expression token
- * @token: The value of the token
- * @indexes: A list of #CtplTokenExpr to use to index the token (in-order, LTR)
  * 
- * Represents an expression token. The fields in this structure should be
- * considered private and are documented only for internal usage.
+ * Represents an expression token.
  */
-struct _CtplTokenExpr
-{
-  CtplTokenExprType   type;
-  CtplTokenExprValue  token;
-  GSList             *indexes;
-};
+typedef struct _CtplTokenExpr         CtplTokenExpr;
 
-/**
- * CtplTokenValue:
- * @t_data: The data of a data token
- * @t_expr: The value of an expression token
- * @t_for: The value of a for token
- * @t_if: The value of an if token
- * 
- * Represents the possible values of a token (see #CtplToken).
- */
-union _CtplTokenValue
-{
-  gchar          *t_data;
-  CtplTokenExpr  *t_expr;
-  CtplTokenFor   *t_for;
-  CtplTokenIf    *t_if;
-};
-typedef union _CtplTokenValue CtplTokenValue;
-
-/**
- * CtplToken:
- * @type: Type of the token
- * @token: Union holding the corresponding token (according to @type)
- * @next: Next token
- * @last: Last token
- * 
- * The #CtplToken structure. The fields in this structure should be considered
- * private and are documented only for internal usage.
- */
-struct _CtplToken
-{
-  CtplTokenType   type;
-  CtplTokenValue  token;
-  CtplToken      *next;
-  CtplToken      *last;
-};
-
-
-CtplToken    *ctpl_token_new_data           (const gchar *data,
-                                             gssize       len);
-CtplToken    *ctpl_token_new_expr           (CtplTokenExpr *expr);
-#ifndef CTPL_DISABLE_DEPRECATED
-CtplToken    *ctpl_token_new_for            (const gchar   *array,
-                                             const gchar   *iterator,
-                                             CtplToken     *children) G_GNUC_DEPRECATED;
-#endif /* CTPL_DISABLE_DEPRECATED */
-CtplToken    *ctpl_token_new_for_expr       (CtplTokenExpr *array,
-                                             const gchar   *iterator,
-                                             CtplToken     *children);
-CtplToken    *ctpl_token_new_if             (CtplTokenExpr *condition,
-                                             CtplToken     *if_children,
-                                             CtplToken     *else_children);
-CtplTokenExpr *ctpl_token_expr_new_operator (CtplOperator    operator,
-                                             CtplTokenExpr  *loperand,
-                                             CtplTokenExpr  *roperand);
-CtplTokenExpr *ctpl_token_expr_new_value    (const CtplValue *value);
-CtplTokenExpr *ctpl_token_expr_new_symbol   (const gchar *symbol,
-                                             gssize       len);
 void          ctpl_token_free               (CtplToken *token,
                                              gboolean   chain);
 void          ctpl_token_expr_free          (CtplTokenExpr *token,
                                              gboolean       recurse);
-void          ctpl_token_append             (CtplToken *token,
-                                             CtplToken *brother);
-void          ctpl_token_prepend            (CtplToken *token,
-                                             CtplToken *brother);
 void          ctpl_token_dump               (const CtplToken *token,
                                              gboolean         chain);
 void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
-/**
- * ctpl_token_get_type:
- * @token: A #CtplToken
- * 
- * Gets the type of a #CtplToken.
- * 
- * Returns: The <link linkend="CtplTokenType">type</link> of @token.
- */
-#define ctpl_token_get_type(token) ((token)->type)
-
-#ifndef CTPL_DISABLE_DEPRECATED
-CtplTokenExpr *ctpl_token_expr_new_integer  (glong integer) G_GNUC_DEPRECATED;
-CtplTokenExpr *ctpl_token_expr_new_float    (gdouble real) G_GNUC_DEPRECATED;
-#endif /* CTPL_DISABLE_DEPRECATED */
 
 
 G_END_DECLS

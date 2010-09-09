@@ -71,17 +71,6 @@ typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
                                              const CtplValue *value,
                                              gpointer         user_data);
 
-/**
- * CtplEnviron:
- * 
- * Represents an environment.
- */
-struct _CtplEnviron
-{
-  /*<private>*/
-  GHashTable     *symbol_table; /* hash table containing stacks of symbols */
-};
-
 
 GQuark            ctpl_environ_error_quark      (void) G_GNUC_CONST;
 CtplEnviron      *ctpl_environ_new              (void);

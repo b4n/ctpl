@@ -26,7 +26,7 @@
 /**
  * SECTION: output-stream
  * @short_description: CTPL's data output stream
- * @include: ctpl/output-stream.h
+ * @include: ctpl/ctpl.h
  * 
  * The data output stream used by CTPL; built on top of #GOutputStream.
  * 
@@ -34,6 +34,18 @@
  * #GObject<!-- -->-like refcounting, through ctpl_output_stream_ref() and
  * ctpl_output_stream_unref().
  */
+
+
+/**
+ * CtplOutputStream:
+ * 
+ * An opaque object representing an output data stream.
+ */
+/* It's actually a GOutputStream, the structure is just a wrapper */
+struct _CtplOutputStream
+{
+  GOutputStream parent;
+};
 
 /**
  * ctpl_output_stream_new:
@@ -46,6 +58,11 @@
  * 
  * Since: 0.2
  */
+CtplOutputStream *
+ctpl_output_stream_new (GOutputStream *stream)
+{
+  return g_object_ref (stream);
+}
 
 /**
  * ctpl_output_stream_ref:
@@ -57,6 +74,11 @@
  * 
  * Since: 0.2
  */
+CtplOutputStream *
+ctpl_output_stream_ref (CtplOutputStream *stream)
+{
+  return g_object_ref (stream);
+}
 
 /**
  * ctpl_output_stream_unref:
@@ -67,6 +89,27 @@
  * 
  * Since: 0.2
  */
+void
+ctpl_output_stream_unref (CtplOutputStream *stream)
+{
+  g_object_unref (stream);
+}
+
+/**
+ * ctpl_output_stream_get_stream:
+ * @stream: A #CtplOutputStream
+ * 
+ * Gets the underlying #GOutputStream associated with a #CtplOutputStream.
+ * 
+ * Returns: (transfer none): The underlying #GOutputStream of @stream.
+ * 
+ * Since: 0.3
+ */
+GOutputStream *
+ctpl_output_stream_get_stream (CtplOutputStream *stream)
+{
+  return &stream->parent;
+}
 
 /**
  * ctpl_output_stream_write:
@@ -91,7 +134,8 @@ ctpl_output_stream_write (CtplOutputStream  *stream,
   
   len = (length < 0) ? strlen (data) : (gsize)length;
   
-  return g_output_stream_write (stream, data, len, NULL, error) == (gssize)len;
+  return g_output_stream_write (G_OUTPUT_STREAM (stream), data, len, NULL,
+                                error) == (gssize)len;
 }
 
 #undef ctpl_output_stream_put_c

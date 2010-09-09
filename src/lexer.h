@@ -28,19 +28,6 @@ G_BEGIN_DECLS
 
 
 /**
- * CTPL_START_CHAR:
- * 
- * Character delimiting the start of language tokens from raw data.
- */
-#define CTPL_START_CHAR '{'
-/**
- * CTPL_END_CHAR:
- * 
- * Character delimiting the end of language tokens from raw data.
- */
-#define CTPL_END_CHAR   '}'
-
-/**
  * CTPL_LEXER_ERROR:
  * 
  * Domain of CtplLexer errors.
