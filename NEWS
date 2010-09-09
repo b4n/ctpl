@@ -1,3 +1,47 @@
+# 0.3
+
+  The version 0.3 is an API and ABI break from the previous 0.2 branch.
+  
+  ## Changes summary
+  
+  * Heavy API cleanup;
+  * Array expressions can now be indexed;
+  * The `for` loop now iterates over an expression;
+  * Bug fixes:
+    * ctpl_value_copy(), ctpl_value_set_string() and ctpl_value_set_array*() can
+      now take a part of itself as the value to set/copy;
+    * Fix internal handling of an error which may lead to wrong error detection;
+  * Some internal refactoring.
+  
+  Yes, it is the second API break since the library's birth, less than one year
+  ago. I know it and I apologize for the inconvenience (packagers will hate me).
+  
+  But even if it's an API break, if you make normal usage of the library, you
+  shouldn't be affected by it. Many functions and data structures have been
+  removed or made private, but the API that was meant to be used by final users
+  hasn't changed.
+  You will probably only need to recompile your application against the new
+  version without modifying your code.
+  
+  I will also justify this new break, at least for you to understand the
+  original motivations for it:
+  * There was way to many symbols exposed, and many of them wasn't supposed to
+    be used by library's users;
+  * Exposing data structures (as well as of other internals) makes working on
+    the core harder, because any change to one of this data structure means an
+    API break.
+  Then this new break is here to -- hopefully -- ease future improvements of
+  CTPL, as well as preventing more API breaks.
+  
+  ## The dark side of the cleanup
+  
+  Apart the inconvenience of an API break, some "functionality" of the library
+  may be gone -- yes, having many internal exposed may allow unwanted
+  "features". First, know that these functionality weren't planned. Then, feel
+  free to contact me, explaining what functionality you miss and why, and I'll
+  probably be happy to re-introduce it cleanly for you.
+
+
 # 0.2.2
 
   The version 0.2.2 is a bugfix release for the 0.2 branch.
