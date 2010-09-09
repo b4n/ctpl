@@ -42,7 +42,7 @@
   probably be happy to re-introduce it cleanly for you.
 
 
-# 0.2.2
+# 0.2.2 (25/05/2010)
 
   The version 0.2.2 is a bugfix release for the 0.2 branch.
   
@@ -56,7 +56,7 @@
   * New alternative build system: Waf (from a work by Enrico Tröger, thanks).
 
 
-# 0.2.1
+# 0.2.1 (27/04/2010)
 
   The version 0.2.1 is a bugfix release for the 0.2 branch.
   
@@ -66,7 +66,7 @@
   * Little cleaning of the build system.
 
 
-# 0.2
+# 0.2 (15/04/2010)
   
   The version 0.2 is an API and ABI break from the previous 0.1 branch.
   
@@ -133,7 +133,7 @@
       so on). But with I/O, results moves from +18.66% to -3.59% slower.
 
 
-# 0.1.90
+# 0.1.90 (06/04/2010)
   
   The version 0.1.90 is the last of the 0.1.x branch. It is the 0.2-minus-one
   release, with a part of the 0.1-compatible improvements that will come in the
@@ -147,7 +147,7 @@
   * Fix missing inclusion of readutils.h in the global header.
 
 
-# 0.1.1
+# 0.1.1 (15/03/2010)
   
   The version 0.1.1 is a bugfix release for the 0.1 branch.
   
@@ -157,7 +157,7 @@
   * Great speed improvement with large token trees.
 
 
-# 0.1
+# 0.1 (30/11/2009)
   
   The version 0.1 is the first release of CTPL. CTPL is a template engine
   library aiming to easily allow template parsing from C programs.
