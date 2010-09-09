@@ -31,6 +31,7 @@ typedef struct _CtplOutputStream CtplOutputStream;
 CtplOutputStream *ctpl_output_stream_new            (GOutputStream *stream);
 CtplOutputStream *ctpl_output_stream_ref            (CtplOutputStream *stream);
 void              ctpl_output_stream_unref          (CtplOutputStream *stream);
+GOutputStream    *ctpl_output_stream_get_stream     (CtplOutputStream *stream);
 gboolean          ctpl_output_stream_write          (CtplOutputStream  *stream,
                                                      const gchar       *data,
                                                      gssize             length,

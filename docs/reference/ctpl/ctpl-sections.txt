@@ -244,6 +244,7 @@ CtplOutputStream
 ctpl_output_stream_new
 ctpl_output_stream_ref
 ctpl_output_stream_unref
+ctpl_output_stream_get_stream
 ctpl_output_stream_write
 ctpl_output_stream_put_c
 </SECTION>

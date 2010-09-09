@@ -96,6 +96,22 @@ ctpl_output_stream_unref (CtplOutputStream *stream)
 }
 
 /**
+ * ctpl_output_stream_get_stream:
+ * @stream: A #CtplOutputStream
+ * 
+ * Gets the underlying #GOutputStream associated with a #CtplOutputStream.
+ * 
+ * Returns: (transfer none): The underlying #GOutputStream of @stream.
+ * 
+ * Since: 0.3
+ */
+GOutputStream *
+ctpl_output_stream_get_stream (CtplOutputStream *stream)
+{
+  return &stream->parent;
+}
+
+/**
  * ctpl_output_stream_write:
  * @stream: A #CtplOutputStream
  * @data: The data to write
