@@ -374,6 +374,7 @@ procede_template (CtplInputStream  *input,
 
   <chapter>
     <title>API reference</title>
+    <xi:include href="xml/version.xml"/>
     <xi:include href="xml/value.xml"/>
     <xi:include href="xml/environ.xml"/>
     <xi:include href="xml/token.xml"/>

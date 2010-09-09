@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <locale.h>
 #include <unistd.h> /* for STDOUT_FILENO */
 #include <glib.h>
 #include <gio/gio.h>
@@ -270,6 +271,7 @@ int main (int     argc,
   int     err   = 1;
   GError *error = NULL;
   
+  setlocale (LC_ALL, "");
   g_type_init ();
   
   if (! parse_options (&argc, &argv, &error)) {

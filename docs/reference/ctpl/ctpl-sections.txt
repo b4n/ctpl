@@ -1,4 +1,17 @@
 <SECTION>
+<TITLE>Version information</TITLE>
+<FILE>version</FILE>
+CTPL_MAJOR_VERSION
+CTPL_MINOR_VERSION
+CTPL_MICRO_VERSION
+CTPL_CHECK_VERSION
+ctpl_major_version
+ctpl_minor_version
+ctpl_micro_version
+ctpl_check_version
+</SECTION>
+
+<SECTION>
 <TITLE>CtplLexer</TITLE>
 <FILE>lexer</FILE>
 CTPL_START_CHAR

@@ -141,7 +141,7 @@ void              ctpl_input_stream_set_error           (CtplInputStream  *strea
                                                          GQuark            domain,
                                                          gint              code,
                                                          const gchar      *format,
-                                                         ...);
+                                                         ...) G_GNUC_PRINTF (5, 6);
 gboolean          ctpl_input_stream_eof                 (CtplInputStream *stream,
                                                          GError         **error);
 gboolean          ctpl_input_stream_eof_fast            (CtplInputStream *stream);
@@ -238,8 +238,8 @@ ctpl_input_stream_get_c_inline (CtplInputStream *stream,
 /**
  * ctpl_input_stream_peek_symbol:
  * @stream: A #CtplInputStream
- * @max_len: The maximum number of bytes to peek, even if they still matches,
- *           or -1 for no limit
+ * @max_len: (default -1): The maximum number of bytes to peek, even if they
+ *                         still matches, or -1 for no limit
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Peeks a symbol from a #CtplInputStream. See ctpl_input_stream_peek_word() and

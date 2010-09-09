@@ -746,7 +746,8 @@ ctpl_eval_bool_value (const CtplValue *value)
  * ctpl_eval_bool:
  * @expr: The #CtplTokenExpr to evaluate
  * @env: The expression's environment, where lookup symbols
- * @result: Return location for the expression result, or %NULL
+ * @result: (out) (allow-none): Return location for the expression result,
+ *                              or %NULL
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Computes the given expression to a boolean.
