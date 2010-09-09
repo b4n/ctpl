@@ -18,7 +18,7 @@
  */
 
 #include "eval.h"
-#include "lexer-expr.h"
+#include "lexer-private.h"
 #include "environ.h"
 #include "value.h"
 #include "token.h"

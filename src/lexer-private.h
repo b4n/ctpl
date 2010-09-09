@@ -21,6 +21,7 @@
 #define H_CTPL_LEXER_PRIVATE_H
 
 #include <glib.h>
+#include "token-private.h"
 
 G_BEGIN_DECLS
 
@@ -132,6 +133,13 @@ G_BEGIN_DECLS
  * Character delimiting the end of language tokens from raw data.
  */
 #define CTPL_END_CHAR   '}'
+
+G_GNUC_INTERNAL
+const gchar    *ctpl_operator_to_string     (CtplOperator op);
+G_GNUC_INTERNAL
+CtplOperator    ctpl_operator_from_string   (const gchar *str,
+                                             gssize       len,
+                                             gsize       *operator_len);
 
 
 G_END_DECLS

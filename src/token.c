@@ -19,7 +19,7 @@
 
 #include "token.h"
 #include "token-private.h"
-#include "lexer-expr.h"
+#include "lexer-private.h"
 #include <string.h>
 #include <glib.h>
 #include <glib/gprintf.h>

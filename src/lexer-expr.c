@@ -267,7 +267,7 @@ static const gsize operators_array_length = G_N_ELEMENTS (operators_array) - 1;
 #define            OPERATORS_STR_MAXLEN     (2)
 
 
-/**
+/*
  * ctpl_operator_to_string:
  * @op: A #CtplOperator
  * 
@@ -293,7 +293,7 @@ ctpl_operator_to_string (CtplOperator op)
   return operators_array[i].str;
 }
 
-/**
+/*
  * ctpl_operator_from_string:
  * @str: A string starting with an operator
  * @len: length to read from @str, or -1 to read the whole string.

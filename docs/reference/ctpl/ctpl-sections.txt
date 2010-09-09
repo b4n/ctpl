@@ -36,16 +36,15 @@ ctpl_lexer_expr_lex_full
 ctpl_lexer_expr_lex_string
 ctpl_lexer_expr_free_tree
 ctpl_lexer_expr_dump_tree
+<SUBSECTION Standard>
 ctpl_operator_to_string
 ctpl_operator_from_string
-<SUBSECTION Standard>
 ctpl_lexer_expr_error_quark
 </SECTION>
 
 <SECTION>
 <TITLE>CtplToken</TITLE>
 <FILE>token</FILE>
-CtplOperator
 CtplToken
 CtplTokenExpr
 ctpl_token_free
@@ -53,6 +52,7 @@ ctpl_token_dump
 ctpl_token_expr_free
 ctpl_token_expr_dump
 <SUBSECTION Private>
+CtplOperator
 CtplTokenExprOperator
 CtplTokenExprType
 CtplTokenExprValue

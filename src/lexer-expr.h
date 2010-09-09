@@ -65,10 +65,6 @@ CtplTokenExpr  *ctpl_lexer_expr_lex_string  (const gchar *expr,
                                              GError     **error);
 void            ctpl_lexer_expr_free_tree   (CtplTokenExpr *expr);
 void            ctpl_lexer_expr_dump_tree   (const CtplTokenExpr *expr);
-const gchar    *ctpl_operator_to_string     (CtplOperator op);
-CtplOperator    ctpl_operator_from_string   (const gchar *str,
-                                             gssize       len,
-                                             gsize       *operator_len);
 
 
 G_END_DECLS
