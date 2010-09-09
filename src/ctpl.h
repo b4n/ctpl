@@ -20,6 +20,8 @@
 #ifndef H_CTPL_H
 #define H_CTPL_H
 
+#define H_CTPL_H_INSIDE
+
 #include "ctpl-environ.h"
 #include "ctpl-eval.h"
 #include "ctpl-lexer-expr.h"
@@ -31,5 +33,7 @@
 #include "ctpl-token.h"
 #include "ctpl-value.h"
 #include "ctpl-version.h"
+
+#undef H_CTPL_H_INSIDE
 
 #endif /* guard */

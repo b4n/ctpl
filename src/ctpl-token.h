@@ -17,6 +17,10 @@
  * 
  */
 
+#if ! defined (H_CTPL_H_INSIDE) && ! defined (CTPL_COMPILATION)
+# error "Only <ctpl/ctpl.h> can be included directly."
+#endif
+
 #ifndef H_CTPL_TOKEN_H
 #define H_CTPL_TOKEN_H
 
