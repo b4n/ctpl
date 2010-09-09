@@ -17,7 +17,7 @@
  * 
  */
 
-#include "version.h"
+#include "ctpl-version.h"
 #include <glib.h>
 
 

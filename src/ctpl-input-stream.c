@@ -17,16 +17,16 @@
  * 
  */
 
-#include "input-stream.h"
+#include "ctpl-input-stream.h"
 #include <stdlib.h>
 #include <glib.h>
 #include <gio/gio.h>
 #include <string.h>
 #include <errno.h>
 #include <stdarg.h>
-#include "io.h"
-#include "lexer-private.h"
-#include "value.h"
+#include "ctpl-io.h"
+#include "ctpl-lexer-private.h"
+#include "ctpl-value.h"
 
 
 /**

@@ -17,14 +17,14 @@
  * 
  */
 
-#include "lexer.h"
-#include "lexer-private.h"
-#include "input-stream.h"
-#include "lexer-expr.h"
-#include "token.h"
-#include "token-private.h"
+#include "ctpl-lexer.h"
 #include <glib.h>
 #include <string.h>
+#include "ctpl-lexer-private.h"
+#include "ctpl-input-stream.h"
+#include "ctpl-lexer-expr.h"
+#include "ctpl-token.h"
+#include "ctpl-token-private.h"
 
 
 /**

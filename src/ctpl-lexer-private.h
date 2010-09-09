@@ -21,7 +21,7 @@
 #define H_CTPL_LEXER_PRIVATE_H
 
 #include <glib.h>
-#include "token-private.h"
+#include "ctpl-token-private.h"
 
 G_BEGIN_DECLS
 

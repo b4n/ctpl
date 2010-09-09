@@ -7,7 +7,7 @@ AC_INIT([CTPL],
         [ban@herbesfolles.org],
         [ctpl],
         [http://ctpl.tuxfamily.org])
-AC_CONFIG_SRCDIR([src/stack.c])
+AC_CONFIG_SRCDIR([src/ctpl.h])
 AC_CONFIG_AUX_DIR([build/aux])
 AC_CONFIG_MACRO_DIR([build/m4])
 AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign])

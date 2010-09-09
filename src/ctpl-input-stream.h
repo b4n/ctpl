@@ -24,7 +24,7 @@
 #include <string.h>
 #include <glib.h>
 #include <gio/gio.h>
-#include "value.h"
+#include "ctpl-value.h"
 
 G_BEGIN_DECLS
 

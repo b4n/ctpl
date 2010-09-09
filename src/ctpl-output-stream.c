@@ -17,7 +17,7 @@
  * 
  */
 
-#include "output-stream.h"
+#include "ctpl-output-stream.h"
 #include <glib.h>
 #include <gio/gio.h>
 #include <string.h>

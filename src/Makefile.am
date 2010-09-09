@@ -7,38 +7,38 @@ libctpl_la_CPPFLAGS = -DG_LOG_DOMAIN=\"CTPL\"
 libctpl_la_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@
 libctpl_la_LDFLAGS  = -version-info @CTPL_LTVERSION@
 libctpl_la_LIBADD   = @GLIB_LIBS@ @GIO_LIBS@ -lm
-libctpl_la_SOURCES  = environ.c \
-                      eval.c \
-                      io.c \
-                      input-stream.c \
-                      lexer.c \
-                      lexer-expr.c \
-                      mathutils.c \
-                      output-stream.c \
-                      parser.c \
-                      stack.c \
-                      token.c \
-                      value.c \
-                      version.c
+libctpl_la_SOURCES  = ctpl-environ.c \
+                      ctpl-eval.c \
+                      ctpl-io.c \
+                      ctpl-input-stream.c \
+                      ctpl-lexer.c \
+                      ctpl-lexer-expr.c \
+                      ctpl-mathutils.c \
+                      ctpl-output-stream.c \
+                      ctpl-parser.c \
+                      ctpl-stack.c \
+                      ctpl-token.c \
+                      ctpl-value.c \
+                      ctpl-version.c
 
 ctplincludedir = $(includedir)/ctpl
 ctplinclude_HEADERS = ctpl.h \
-                      environ.h \
-                      eval.h \
-                      io.h \
-                      input-stream.h \
-                      lexer.h \
-                      lexer-expr.h \
-                      output-stream.h \
-                      parser.h \
-                      token.h \
-                      value.h \
-                      version.h
+                      ctpl-environ.h \
+                      ctpl-eval.h \
+                      ctpl-io.h \
+                      ctpl-input-stream.h \
+                      ctpl-lexer.h \
+                      ctpl-lexer-expr.h \
+                      ctpl-output-stream.h \
+                      ctpl-parser.h \
+                      ctpl-token.h \
+                      ctpl-value.h \
+                      ctpl-version.h
 
-EXTRA_DIST          = lexer-private.h \
-                      mathutils.h \
-                      stack.h \
-                      token-private.h
+EXTRA_DIST          = ctpl-lexer-private.h \
+                      ctpl-mathutils.h \
+                      ctpl-stack.h \
+                      ctpl-token-private.h
 
 if BUILD_CTPL
 bin_PROGRAMS += ctpl

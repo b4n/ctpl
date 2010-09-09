@@ -17,8 +17,8 @@
  * 
  */
 
-#include "value.h"
-#include "mathutils.h"
+#include "ctpl-value.h"
+#include "ctpl-mathutils.h"
 #include <glib.h>
 #include <stdarg.h>
 

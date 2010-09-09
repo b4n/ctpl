@@ -20,10 +20,10 @@
 #ifndef H_CTPL_PARSER_H
 #define H_CTPL_PARSER_H
 
-#include "token.h"
-#include "environ.h"
-#include "output-stream.h"
 #include <glib.h>
+#include "ctpl-token.h"
+#include "ctpl-environ.h"
+#include "ctpl-output-stream.h"
 
 G_BEGIN_DECLS
 

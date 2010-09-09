@@ -20,9 +20,9 @@
 #ifndef H_CTPL_TOKEN_PRIVATE_H
 #define H_CTPL_TOKEN_PRIVATE_H
 
-#include "value.h"
 #include <glib.h>
-#include "token.h"
+#include "ctpl-value.h"
+#include "ctpl-token.h"
 
 G_BEGIN_DECLS
 

@@ -17,7 +17,7 @@
  * 
  */
 
-#include "stack.h"
+#include "ctpl-stack.h"
 #include <glib.h>
 #include <stdlib.h>
 

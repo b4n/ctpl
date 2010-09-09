@@ -18,7 +18,7 @@
  */
 
 
-#include "mathutils.h"
+#include "ctpl-mathutils.h"
 #include <stdlib.h>
 #include <glib.h>
 #include <errno.h>

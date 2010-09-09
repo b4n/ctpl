@@ -20,9 +20,9 @@
 #ifndef H_CTPL_ENVIRON_H
 #define H_CTPL_ENVIRON_H
 
-#include "value.h"
 #include <glib.h>
-#include "input-stream.h"
+#include "ctpl-value.h"
+#include "ctpl-input-stream.h"
 
 G_BEGIN_DECLS
 

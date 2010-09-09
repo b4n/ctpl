@@ -20,8 +20,8 @@
 #ifndef H_CTPL_TOKEN_H
 #define H_CTPL_TOKEN_H
 
-#include "value.h"
 #include <glib.h>
+#include "ctpl-value.h"
 
 G_BEGIN_DECLS
 

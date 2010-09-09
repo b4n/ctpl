@@ -17,9 +17,9 @@
  * 
  */
 
-#include "token.h"
-#include "token-private.h"
-#include "lexer-private.h"
+#include "ctpl-token.h"
+#include "ctpl-token-private.h"
+#include "ctpl-lexer-private.h"
 #include <string.h>
 #include <glib.h>
 #include <glib/gprintf.h>

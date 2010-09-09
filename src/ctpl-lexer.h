@@ -20,9 +20,9 @@
 #ifndef H_CTPL_LEXER_H
 #define H_CTPL_LEXER_H
 
-#include "token.h"
+#include "ctpl-token.h"
 #include <glib.h>
-#include "input-stream.h"
+#include "ctpl-input-stream.h"
 
 G_BEGIN_DECLS
 

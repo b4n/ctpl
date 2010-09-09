@@ -20,9 +20,9 @@
 #ifndef H_CTPL_LEXER_EXPR_H
 #define H_CTPL_LEXER_EXPR_H
 
-#include "lexer.h"
-#include "token.h"
 #include <glib.h>
+#include "ctpl-lexer.h"
+#include "ctpl-token.h"
 
 G_BEGIN_DECLS
 

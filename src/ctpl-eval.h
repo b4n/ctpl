@@ -20,10 +20,10 @@
 #ifndef H_CTPL_EVAL_H
 #define H_CTPL_EVAL_H
 
-#include "environ.h"
-#include "value.h"
-#include "token.h"
 #include <glib.h>
+#include "ctpl-environ.h"
+#include "ctpl-value.h"
+#include "ctpl-token.h"
 
 G_BEGIN_DECLS
 

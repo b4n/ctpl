@@ -7,7 +7,7 @@ It is not complete for now, but still useful though.
 You first need to add a new constant CTPL_OPERATOR_<NAME> on the
 CtplOperator enum. Then, add the new operator constant and its
 representation in the template on the `operators_array` array in
-src/lexer-expr.c.
+src/ctpl-lexer-expr.c.
 Also update the CTPL_OPERATOR_CHARS if needed: it should list all
 characters that may be part of an operator, then if your operator
 introduces new operator characters, you must add them here.
@@ -22,5 +22,5 @@ The parsing part is not really more complicated. Go to eval.c, and:
    call your evaluation function.
 
 Last but not least, remember to add it in the documentation (on top of
-lexer-expr.c).
+ctpl-lexer-expr.c).
 That's it, your new operator is ready!

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include "stack.h"
+#include "ctpl-stack.h"
 
 
 static void

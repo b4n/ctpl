@@ -23,8 +23,8 @@
 #include <glib.h>
 #include <gio/gio.h>
 /* allow include of this file to get the full I/O layer */
-#include "input-stream.h"
-#include "output-stream.h"
+#include "ctpl-input-stream.h"
+#include "ctpl-output-stream.h"
 
 G_BEGIN_DECLS
 

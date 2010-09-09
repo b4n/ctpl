@@ -17,10 +17,10 @@
  * 
  */
 
-#include "environ.h"
-#include "stack.h"
-#include "value.h"
+#include "ctpl-environ.h"
 #include <glib.h>
+#include "ctpl-stack.h"
+#include "ctpl-value.h"
 
 
 /**
@@ -421,9 +421,9 @@ ctpl_environ_merge (CtplEnviron        *env,
 /*============================ environment loader ============================*/
 
 #include <string.h>
-#include "input-stream.h"
-#include "mathutils.h"
-#include "lexer-private.h"      /* for CTPL_*_CHARS */
+#include "ctpl-input-stream.h"
+#include "ctpl-mathutils.h"
+#include "ctpl-lexer-private.h"     /* for CTPL_*_CHARS */
 
 
 /* syntax characters */

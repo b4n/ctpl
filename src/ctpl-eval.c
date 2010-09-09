@@ -17,15 +17,15 @@
  * 
  */
 
-#include "eval.h"
-#include "lexer-private.h"
-#include "environ.h"
-#include "value.h"
-#include "token.h"
-#include "token-private.h"
-#include "mathutils.h"
+#include "ctpl-eval.h"
 #include <string.h>
 #include <glib.h>
+#include "ctpl-lexer-private.h"
+#include "ctpl-environ.h"
+#include "ctpl-value.h"
+#include "ctpl-token.h"
+#include "ctpl-token-private.h"
+#include "ctpl-mathutils.h"
 
 
 /**

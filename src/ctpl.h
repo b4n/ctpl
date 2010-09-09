@@ -20,16 +20,16 @@
 #ifndef H_CTPL_H
 #define H_CTPL_H
 
-#include "environ.h"
-#include "eval.h"
-#include "lexer-expr.h"
-#include "lexer.h"
-#include "parser.h"
-#include "io.h"
-#include "input-stream.h"
-#include "output-stream.h"
-#include "token.h"
-#include "value.h"
-#include "version.h"
+#include "ctpl-environ.h"
+#include "ctpl-eval.h"
+#include "ctpl-lexer-expr.h"
+#include "ctpl-lexer.h"
+#include "ctpl-parser.h"
+#include "ctpl-io.h"
+#include "ctpl-input-stream.h"
+#include "ctpl-output-stream.h"
+#include "ctpl-token.h"
+#include "ctpl-value.h"
+#include "ctpl-version.h"
 
 #endif /* guard */

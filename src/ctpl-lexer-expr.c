@@ -17,17 +17,17 @@
  * 
  */
 
-#include "lexer-expr.h"
-#include "lexer-private.h"
-#include "token.h"
-#include "token-private.h"
-#include "mathutils.h"
-#include "input-stream.h"
-#include "io.h"
-#include <glib.h>
+#include "ctpl-lexer-expr.h"
 #include <string.h>
 #include <errno.h>
-#include "value.h"
+#include <glib.h>
+#include "ctpl-lexer-private.h"
+#include "ctpl-token.h"
+#include "ctpl-token-private.h"
+#include "ctpl-mathutils.h"
+#include "ctpl-input-stream.h"
+#include "ctpl-io.h"
+#include "ctpl-value.h"
 
 
 /**

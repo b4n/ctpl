@@ -17,13 +17,13 @@
  * 
  */
 
-#include "parser.h"
-#include "eval.h"
-#include "token.h"
-#include "token-private.h"
-#include "output-stream.h"
+#include "ctpl-parser.h"
 #include <glib.h>
 #include <string.h>
+#include "ctpl-eval.h"
+#include "ctpl-token.h"
+#include "ctpl-token-private.h"
+#include "ctpl-output-stream.h"
 
 
 /**
