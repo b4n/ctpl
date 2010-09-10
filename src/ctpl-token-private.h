@@ -261,7 +261,10 @@ G_GNUC_INTERNAL
 CtplTokenExpr *ctpl_token_expr_new_symbol   (const gchar *symbol,
                                              gssize       len);
 /* ctpl_token_free(): see token.h */
-/* ctpl_token__expr_free(): see token.h */
+G_GNUC_INTERNAL
+void          ctpl_token_expr_free_full     (CtplTokenExpr *token,
+                                             gboolean       recurse);
+/* ctpl_token_expr_free(): see token.h */
 G_GNUC_INTERNAL
 void          ctpl_token_append             (CtplToken *token,
                                              CtplToken *brother);

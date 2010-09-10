@@ -201,7 +201,7 @@ parse_template (const gchar      *filename,
     if (tree) {
       rv = ctpl_parser_parse (tree, env, output, error);
     }
-    ctpl_lexer_free_tree (tree);
+    ctpl_token_free (tree);
   }
   
   return rv;

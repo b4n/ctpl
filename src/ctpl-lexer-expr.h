@@ -67,8 +67,6 @@ CtplTokenExpr  *ctpl_lexer_expr_lex_full    (CtplInputStream *stream,
 CtplTokenExpr  *ctpl_lexer_expr_lex_string  (const gchar *expr,
                                              gssize       len,
                                              GError     **error);
-void            ctpl_lexer_expr_free_tree   (CtplTokenExpr *expr);
-void            ctpl_lexer_expr_dump_tree   (const CtplTokenExpr *expr);
 
 
 G_END_DECLS

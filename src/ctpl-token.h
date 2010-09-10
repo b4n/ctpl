@@ -43,12 +43,9 @@ typedef struct _CtplToken             CtplToken;
  */
 typedef struct _CtplTokenExpr         CtplTokenExpr;
 
-void          ctpl_token_free               (CtplToken *token,
-                                             gboolean   chain);
-void          ctpl_token_expr_free          (CtplTokenExpr *token,
-                                             gboolean       recurse);
-void          ctpl_token_dump               (const CtplToken *token,
-                                             gboolean         chain);
+void          ctpl_token_free               (CtplToken *token);
+void          ctpl_token_expr_free          (CtplTokenExpr *token);
+void          ctpl_token_dump               (const CtplToken *token);
 void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
 
 

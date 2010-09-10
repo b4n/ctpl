@@ -19,8 +19,6 @@ CtplLexerError
 ctpl_lexer_lex
 ctpl_lexer_lex_string
 ctpl_lexer_lex_path
-ctpl_lexer_free_tree
-ctpl_lexer_dump_tree
 <SUBSECTION Standard>
 ctpl_lexer_error_quark
 <SUBSECTION Private>
@@ -47,8 +45,6 @@ CtplLexerExprError
 ctpl_lexer_expr_lex
 ctpl_lexer_expr_lex_full
 ctpl_lexer_expr_lex_string
-ctpl_lexer_expr_free_tree
-ctpl_lexer_expr_dump_tree
 <SUBSECTION Standard>
 ctpl_operator_to_string
 ctpl_operator_from_string

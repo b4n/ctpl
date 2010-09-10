@@ -180,7 +180,7 @@ main (int    argc,
       GOutputStream    *gostream;
       CtplEnviron      *env;
       
-      ctpl_lexer_dump_tree (root);
+      ctpl_token_dump (root);
       
       env = build_env ();
       gostream = g_memory_output_stream_new (NULL, 0, realloc, free);
@@ -198,7 +198,7 @@ main (int    argc,
       ctpl_output_stream_unref (output);
       ctpl_environ_free (env);
     }
-    ctpl_lexer_free_tree (root);
+    ctpl_token_free (root);
     
     if (rewind_ctpl_input_stream (&stream)) {
       CtplTokenExpr *expr;
@@ -209,7 +209,7 @@ main (int    argc,
         g_clear_error (&err);
       } else {
         ctpl_token_expr_dump (expr);
-        ctpl_token_expr_free (expr, TRUE);
+        ctpl_token_expr_free (expr);
       }
     }
     
@@ -251,7 +251,7 @@ main (int    argc,
       fprintf (stderr, "err is not set but return value is NULL!\n");
     
     ctpl_token_expr_dump (texpr);
-    ctpl_token_expr_free (texpr, TRUE);
+    ctpl_token_expr_free (texpr);
   }
   #endif
   

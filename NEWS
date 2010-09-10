@@ -16,12 +16,10 @@
   Yes, it is the second API break since the library's birth, less than one year
   ago. I know it and I apologize for the inconvenience (packagers will hate me).
   
-  But even if it's an API break, if you make normal usage of the library, you
-  shouldn't be affected by it. Many functions and data structures have been
-  removed or made private, but the API that was meant to be used by final users
-  hasn't changed.
-  You will probably only need to recompile your application against the new
-  version without modifying your code.
+  But even if it's an API break, if you make normal usage of the library, it
+  shouldn't be too painful for you to upgrade to the new version (see below).
+  Many functions and data structures have been removed or made private, but the
+  API that was meant to be used by final users had only small changes.
   
   I will also justify this new break, at least for you to understand the
   original motivations for it:
@@ -32,6 +30,17 @@
     API break.
   Then this new break is here to -- hopefully -- ease future improvements of
   CTPL, as well as preventing more API breaks.
+  
+  ## What to change in your code
+  
+  The three functions ctpl_token_free(), ctpl_token_expr_free() and
+  ctpl_token_dump() lost their second (boolean) argument. If you passed TRUE
+  here, simply remove that second argument. Otherwise, you did strange things
+  and you're screwed (but see the next section).
+  
+  ctpl_lexer_free_tree() and ctpl_lexer_dump_tree() have also been removed. Use
+  respectively ctpl_token_free() and ctpl_token_dump() instead (the semantic is
+  exactly the same).
   
   ## The dark side of the cleanup
   
