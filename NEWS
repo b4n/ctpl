@@ -7,6 +7,7 @@
   * Heavy API cleanup;
   * Array expressions can now be indexed;
   * The `for` loop now iterates over an expression;
+  * CtplEnviron now uses reference counting;
   * Bug fixes:
     * ctpl_value_copy(), ctpl_value_set_string() and ctpl_value_set_array*() can
       now take a part of itself as the value to set/copy;
@@ -41,6 +42,11 @@
   ctpl_lexer_free_tree() and ctpl_lexer_dump_tree() have also been removed. Use
   respectively ctpl_token_free() and ctpl_token_dump() instead (the semantic is
   exactly the same).
+  
+  CtplEnviron now uses reference counting. It means that you get all the good
+  of reference counting, but you also have to replace calls to
+  ctpl_environ_free() with ctpl_environ_unref(). Note that ctpl_environ_unref()
+  does not support NULL argument.
   
   The environment to pass to ctpl_eval_*() is not constant anymore. This will
   probably not change anything for you, but it's a subtle change. This is to

@@ -196,7 +196,7 @@ main (int    argc,
       }
       g_object_unref (gostream);
       ctpl_output_stream_unref (output);
-      ctpl_environ_free (env);
+      ctpl_environ_unref (env);
     }
     ctpl_token_free (root);
     
@@ -299,7 +299,7 @@ main (int    argc,
       g_print ("foo: %s\n", ctpl_value_get_string (pval));
     
     ctpl_value_free_value (&val);
-    ctpl_environ_free (env);
+    ctpl_environ_unref (env);
   }
   
   {

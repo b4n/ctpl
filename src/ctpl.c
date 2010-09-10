@@ -175,7 +175,7 @@ build_environ (void)
     }
   }
   if (! success) {
-    ctpl_environ_free (env);
+    ctpl_environ_unref (env);
     env = NULL;
   }
   
@@ -293,8 +293,8 @@ int main (int     argc,
         }
         ctpl_output_stream_unref (ostream);
       }
+      ctpl_environ_unref (env);
     }
-    ctpl_environ_free (env);
   }
   
   return err;

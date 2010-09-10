@@ -78,7 +78,8 @@ typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
 
 GQuark            ctpl_environ_error_quark      (void) G_GNUC_CONST;
 CtplEnviron      *ctpl_environ_new              (void);
-void              ctpl_environ_free             (CtplEnviron *env);
+CtplEnviron      *ctpl_environ_ref              (CtplEnviron *env);
+void              ctpl_environ_unref            (CtplEnviron *env);
 const CtplValue  *ctpl_environ_lookup           (const CtplEnviron *env,
                                                  const gchar       *symbol);
 void              ctpl_environ_push             (CtplEnviron     *env,

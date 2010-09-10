@@ -111,7 +111,8 @@ CtplEnvironError
 CtplEnviron
 CtplEnvironForeachFunc
 ctpl_environ_new
-ctpl_environ_free
+ctpl_environ_ref
+ctpl_environ_unref
 ctpl_environ_lookup
 ctpl_environ_push
 ctpl_environ_push_int

@@ -33,8 +33,10 @@
  * 
  * Use ctpl_environ_new() to create a new environment; and then
  * ctpl_environ_push(), ctpl_environ_push_int(), ctpl_environ_push_float() and
- * ctpl_environ_push_string() to fill it. Finally, free it with
- * ctpl_environ_free().
+ * ctpl_environ_push_string() to fill it.
+ * 
+ * #CtplEnviron uses a #GObject<!-- -->-style refcounting, via
+ * ctpl_environ_ref() and ctpl_environ_unref().
  * 
  * <example>
  *   <title>Creating and filling a environment</title>
@@ -47,7 +49,7 @@
  * 
  * /<!-- -->* ... *<!-- -->/
  * 
- * ctpl_environ_free (env);
+ * ctpl_environ_unref (env);
  *   </programlisting>
  * </example>
  * 
@@ -81,6 +83,7 @@
 struct _CtplEnviron
 {
   /*<private>*/
+  gint            ref_count;
   GHashTable     *symbol_table; /* hash table containing stacks of symbols */
 };
 
@@ -107,6 +110,7 @@ ctpl_environ_error_quark (void)
 static void
 ctpl_environ_init (CtplEnviron *env)
 {
+  env->ref_count = 1;
   env->symbol_table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                              g_free,
                                              (GDestroyNotify)ctpl_stack_free);
@@ -133,15 +137,36 @@ ctpl_environ_new (void)
 }
 
 /**
- * ctpl_environ_free:
+ * ctpl_environ_ref:
  * @env: a #CtplEnviron
  * 
- * Frees a #CtplEnviron and all its allocated resources.
+ * Adds a reference to a #CtplEnviron.
+ * 
+ * Returns: The environ
+ * 
+ * Since: 0.3
+ */
+CtplEnviron *
+ctpl_environ_ref (CtplEnviron *env)
+{
+  g_atomic_int_inc (&env->ref_count);
+  
+  return env;
+}
+
+/**
+ * ctpl_environ_unref:
+ * @env: a #CtplEnviron
+ * 
+ * Removes a reference from a #CtplEnviron. If the reference count drops to 0,
+ * frees the environ and all its allocated resources.
+ * 
+ * Since: 0.3
  */
 void
-ctpl_environ_free (CtplEnviron *env)
+ctpl_environ_unref (CtplEnviron *env)
 {
-  if (env) {
+  if (g_atomic_int_dec_and_test (&env->ref_count)) {
     g_hash_table_destroy (env->symbol_table);
     g_slice_free1 (sizeof *env, env);
   }
