@@ -23,7 +23,7 @@
 
 /**
  * SECTION: version
- * @short_description: Varaibles and functions to check the CTPL version
+ * @short_description: Variables and functions to check the CTPL version
  * @include: ctpl/ctpl.h
  * 
  * Provides CTPL version checks.

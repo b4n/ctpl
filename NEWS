@@ -27,7 +27,7 @@
   original motivations for it:
   * There was way to many symbols exposed, and many of them wasn't supposed to
     be used by library's users;
-  * Exposing data structures (as well as of other internals) makes working on
+  * Exposing data structures (as well as some other internals) makes working on
     the core harder, because any change to one of this data structure means an
     API break.
   Then this new break is here to -- hopefully -- ease future improvements of

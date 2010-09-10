@@ -95,9 +95,9 @@
           <itemizedlist>
             <listitem>
               <para>
-                Since the input is first completely load as a token tree in
-                memory - which is also one of the advantages - , it consumes a
-                little more memory than the input template.
+                Since the input is first completely loaded as a token tree in
+                memory -- which is also one of the advantages -- , it may
+                consume a little more memory than the input template size.
               </para>
             </listitem>
           </itemizedlist>
@@ -179,7 +179,7 @@ procede_template (CtplInputStream  *input,
     <section>
       <title>Syntax</title>
       <para>
-        CTPL supports 2 kind of data:
+        CTPL supports 2 kinds of data:
         <variablelist>
           <varlistentry>
             <term><link linkend="raw-data">Raw data</link></term>
@@ -229,7 +229,7 @@ procede_template (CtplInputStream  *input,
           brackets is template instructions.
         </para>
         <para>
-          There is 3 instruction types:
+          There are 3 instruction types:
           <variablelist>
             <varlistentry>
               <term>The <code>for</code> loop</term>
