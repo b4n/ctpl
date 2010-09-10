@@ -593,7 +593,7 @@ ctpl_eval_operator_internal (CtplOperator operator,
  */
 static gboolean
 ctpl_eval_operator (const CtplTokenExpr  *operator,
-                    const CtplEnviron    *env,
+                    CtplEnviron          *env,
                     CtplValue            *value,
                     GError              **error)
 {
@@ -635,7 +635,7 @@ ctpl_eval_operator (const CtplTokenExpr  *operator,
  */
 gboolean
 ctpl_eval_value (const CtplTokenExpr  *expr,
-                 const CtplEnviron    *env,
+                 CtplEnviron          *env,
                  CtplValue            *value,
                  GError              **error)
 {
@@ -762,7 +762,7 @@ ctpl_eval_bool_value (const CtplValue *value)
  */
 gboolean
 ctpl_eval_bool (const CtplTokenExpr  *expr,
-                const CtplEnviron    *env,
+                CtplEnviron          *env,
                 gboolean             *result,
                 GError              **error)
 {

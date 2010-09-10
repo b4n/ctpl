@@ -42,6 +42,11 @@
   respectively ctpl_token_free() and ctpl_token_dump() instead (the semantic is
   exactly the same).
   
+  The environment to pass to ctpl_eval_*() is not constant anymore. This will
+  probably not change anything for you, but it's a subtle change. This is to
+  allow future operators to affect the environment if needed (this isn't the
+  case yet).
+  
   ## The dark side of the cleanup
   
   Apart the inconvenience of an API break, some "functionality" of the library
