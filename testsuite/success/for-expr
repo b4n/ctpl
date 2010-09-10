@@ -1,0 +1,10 @@
+{for e in array3}
+  == 1 ==
+  {for se in e}
+    : {se}
+  {end}
+  == 2 ==
+  {for se in e[1]}
+    : {se}
+  {end}
+{end}

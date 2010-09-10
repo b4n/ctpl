@@ -22,3 +22,7 @@ array2 # haha
 #bon, on va arreter les conneries
 5] # un dernier pour la route
 ; # fini
+
+array3 = [[["lol"], [2]],
+          [[1], [1.1, 1.2, 1.3], [2], [3], [3.14, 3.5], [4]],
+          [["oh"], ["ah"]]];
