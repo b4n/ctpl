@@ -157,11 +157,15 @@ ctpl_input_stream_new_for_gfile (GFile    *file,
   
   gfstream = g_file_read (file, NULL, error);
   if (gfstream) {
-    gchar *name;
+    GFileInfo *finfo;
     
-    name = g_file_get_basename (file);
-    stream = ctpl_input_stream_new (G_INPUT_STREAM (gfstream), NULL);
-    stream->name = name; /* set the name ourselves not to copy it */
+    finfo = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                               G_FILE_QUERY_INFO_NONE, NULL, error);
+    if (finfo) {
+      stream = ctpl_input_stream_new (G_INPUT_STREAM (gfstream),
+                                      g_file_info_get_display_name (finfo));
+      g_object_unref (finfo);
+    }
     g_object_unref (gfstream);
   }
   
