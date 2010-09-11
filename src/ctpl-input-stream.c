@@ -170,7 +170,7 @@ ctpl_input_stream_new_for_gfile (GFile    *file,
 
 /**
  * ctpl_input_stream_new_for_path:
- * @path: A path
+ * @path: A local or absolute path to pass to g_file_new_for_path()
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Creates a new #CtplInputStream for a path. This is a wrapper for
@@ -197,7 +197,7 @@ ctpl_input_stream_new_for_path (const gchar *path,
 
 /**
  * ctpl_input_stream_new_for_uri:
- * @uri: An URI
+ * @uri: A URI to pass to g_file_new_for_uri().
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Creates a new #CtplInputStream for an URI. This is a wrapper for
