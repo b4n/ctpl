@@ -45,8 +45,6 @@ typedef struct _CtplTokenExpr         CtplTokenExpr;
 
 void          ctpl_token_free               (CtplToken *token);
 void          ctpl_token_expr_free          (CtplTokenExpr *token);
-void          ctpl_token_dump               (const CtplToken *token);
-void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
 
 
 G_END_DECLS

@@ -23,6 +23,7 @@
 #include <string.h>
 #include <errno.h>
 #include "ctpl-stack.h"
+#include "ctpl-token-private.h" /* for ctpl_token*_dump() */
 
 
 static void

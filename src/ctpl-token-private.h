@@ -271,8 +271,10 @@ void          ctpl_token_append             (CtplToken *token,
 G_GNUC_INTERNAL
 void          ctpl_token_prepend            (CtplToken *token,
                                              CtplToken *brother);
-/* ctpl_token_dump(): see token.h */
-/* ctpl_token_expr_dump(): see token.h */
+G_GNUC_INTERNAL
+void          ctpl_token_dump               (const CtplToken *token);
+G_GNUC_INTERNAL
+void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
 
 /*
  * ctpl_token_get_type:
