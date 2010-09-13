@@ -207,13 +207,13 @@ ctpl_stack_new (GCompareFunc  compare_func,
 void
 ctpl_stack_free (CtplStack *stack)
 {
-  GSList *tmp;
-  
-  for (tmp = stack->free_stack; tmp; tmp = tmp->next) {
-    ctpl_stack_entry_free (tmp->data, stack->free_func);
+  while (stack->free_stack) {
+    GSList *next = stack->free_stack->next;
+    
+    ctpl_stack_entry_free (stack->free_stack->data, stack->free_func);
+    g_slist_free_1 (stack->free_stack);
+    stack->free_stack = next;
   }
-  g_slist_free (stack->free_stack);
-  stack->free_stack = NULL;
   stack->last = NULL;
   g_slice_free1 (sizeof *stack, stack);
 }
@@ -282,7 +282,7 @@ ctpl_stack_push (CtplStack *stack,
     entry = ctpl_stack_entry_new (stack, data);
     if (entry) {
       stack->last       = ctpl_stack_entry_ref (entry);
-      stack->free_stack = g_slist_append (stack->free_stack, entry);
+      stack->free_stack = g_slist_prepend (stack->free_stack, entry);
       //~ g_debug ("Pushed an entry");
     }
   }

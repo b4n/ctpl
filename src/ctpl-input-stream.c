@@ -157,11 +157,15 @@ ctpl_input_stream_new_for_gfile (GFile    *file,
   
   gfstream = g_file_read (file, NULL, error);
   if (gfstream) {
-    gchar *name;
+    GFileInfo *finfo;
     
-    name = g_file_get_basename (file);
-    stream = ctpl_input_stream_new (G_INPUT_STREAM (gfstream), NULL);
-    stream->name = name; /* set the name ourselves not to copy it */
+    finfo = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME,
+                               G_FILE_QUERY_INFO_NONE, NULL, error);
+    if (finfo) {
+      stream = ctpl_input_stream_new (G_INPUT_STREAM (gfstream),
+                                      g_file_info_get_display_name (finfo));
+      g_object_unref (finfo);
+    }
     g_object_unref (gfstream);
   }
   
@@ -170,7 +174,7 @@ ctpl_input_stream_new_for_gfile (GFile    *file,
 
 /**
  * ctpl_input_stream_new_for_path:
- * @path: A path
+ * @path: A local or absolute path to pass to g_file_new_for_path()
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Creates a new #CtplInputStream for a path. This is a wrapper for
@@ -197,7 +201,7 @@ ctpl_input_stream_new_for_path (const gchar *path,
 
 /**
  * ctpl_input_stream_new_for_uri:
- * @uri: An URI
+ * @uri: A URI to pass to g_file_new_for_uri().
  * @error: Return location for errors, or %NULL to ignore them
  * 
  * Creates a new #CtplInputStream for an URI. This is a wrapper for
