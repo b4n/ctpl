@@ -101,6 +101,12 @@ ctpl_environ_error_quark (void)
   return error_quark;
 }
 
+static void
+free_stack (void *stack)
+{
+  ctpl_stack_free (stack, (GFreeFunc) ctpl_value_free);
+}
+
 /*
  * ctpl_environ_init:
  * @env: A #CtplEnviron
@@ -112,8 +118,7 @@ ctpl_environ_init (CtplEnviron *env)
 {
   env->ref_count = 1;
   env->symbol_table = g_hash_table_new_full (g_str_hash, g_str_equal,
-                                             g_free,
-                                             (GDestroyNotify)ctpl_stack_free);
+                                             g_free, free_stack);
 }
 
 /**
@@ -237,7 +242,7 @@ ctpl_environ_push (CtplEnviron     *env,
    *        or if the overriding value is not of the same type? */
   stack = g_hash_table_lookup (env->symbol_table, symbol);
   if (! stack) {
-    stack = ctpl_stack_new (NULL, NULL);
+    stack = ctpl_stack_new ();
     if (stack) {
       g_hash_table_insert (env->symbol_table, g_strdup (symbol), stack);
     }

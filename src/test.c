@@ -269,10 +269,6 @@ main (int    argc,
     ctpl_stack_push (stack, g_strdup ("foo"));
     ctpl_stack_push (stack, g_strdup ("foo"));
     ctpl_stack_push (stack, g_strdup ("foo"));
-    /*ctpl_stack_push_ref (stack);
-    ctpl_stack_push_ref (stack);
-    ctpl_stack_push_ref (stack);
-    ctpl_stack_push_ref (stack);*/
 
 
     while (! ctpl_stack_is_empty (stack)) {
