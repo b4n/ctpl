@@ -129,7 +129,7 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
       for (; rv && array_items; array_items = array_items->next) {
         ctpl_environ_push (env, token->iter, array_items->data);
         rv = ctpl_parser_parse (token->children, env, output, error);
-        ctpl_environ_pop (env, token->iter);
+        ctpl_environ_pop (env, token->iter, NULL);
       }
     }
   }

@@ -237,7 +237,7 @@ ctpl_environ_push (CtplEnviron     *env,
    *        or if the overriding value is not of the same type? */
   stack = g_hash_table_lookup (env->symbol_table, symbol);
   if (! stack) {
-    stack = ctpl_stack_new (NULL, (GFreeFunc)ctpl_value_free);
+    stack = ctpl_stack_new (NULL, NULL);
     if (stack) {
       g_hash_table_insert (env->symbol_table, g_strdup (symbol), stack);
     }
@@ -314,18 +314,22 @@ ctpl_environ_push_string (CtplEnviron  *env,
  * ctpl_environ_pop:
  * @env: A #CtplEnviron
  * @symbol: A symbol name
+ * @poped_value: (out) (allow-none): Return location for the poped value, or
+ *               %NULL. You must free this value with ctpl_value_free() when you
+ *               no longer need it. This is set only if poping succeeded, so if
+ *               this function returned %TRUE.
  * 
- * Pops a symbol from a #CtplEnviron. See ctpl_environ_push() for details on
- * pushing and poping.
+ * Tries to pop a symbol from a #CtplEnviron. See ctpl_environ_push() for
+ * details on pushing and poping.
  * Use ctpl_environ_lookup() if you want to get the symbol's value without
  * poping it from the environ.
  * 
- * Returns: The #CtplValue holding the symbol's value, or %NULL if the symbol
- *          can't be found. This value should not be modified or freed.
+ * Returns: Whether a value has been poped.
  */
-const CtplValue *
+gboolean
 ctpl_environ_pop (CtplEnviron *env,
-                  const gchar *symbol)
+                  const gchar *symbol,
+                  CtplValue  **poped_value)
 {
   CtplStack  *stack;
   CtplValue  *value = NULL;
@@ -333,9 +337,14 @@ ctpl_environ_pop (CtplEnviron *env,
   stack = ctpl_environ_lookup_stack (env, symbol);
   if (stack) {
     value = ctpl_stack_pop (stack);
+    if (poped_value) {
+      *poped_value = value;
+    } else {
+      ctpl_value_free (value);
+    }
   }
   
-  return value;
+  return value != NULL;
 }
 
 /* data for ctpl_environ_foreach() */

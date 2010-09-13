@@ -294,11 +294,12 @@ main (int    argc,
     ctpl_value_set_string (&val, "coucou");
     ctpl_environ_push (env, "foo", &val);
     ctpl_value_set_array (&val, CTPL_VTYPE_STRING, 2, "foo", "bar", NULL);
-    pval = ctpl_environ_pop (env, "foo");
+    ctpl_environ_pop (env, "foo", &pval);
     g_assert (memcmp (&val, pval, sizeof val));
     if (CTPL_VALUE_HOLDS_STRING (pval))
       g_print ("foo: %s\n", ctpl_value_get_string (pval));
     
+    ctpl_value_free (pval);
     ctpl_value_free_value (&val);
     ctpl_environ_unref (env);
   }

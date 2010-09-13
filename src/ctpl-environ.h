@@ -94,8 +94,9 @@ void              ctpl_environ_push_float       (CtplEnviron     *env,
 void              ctpl_environ_push_string      (CtplEnviron     *env,
                                                  const gchar     *symbol,
                                                  const gchar     *value);
-const CtplValue  *ctpl_environ_pop              (CtplEnviron *env,
-                                                 const gchar *symbol);
+gboolean          ctpl_environ_pop              (CtplEnviron *env,
+                                                 const gchar *symbol,
+                                                 CtplValue  **poped_value);
 void              ctpl_environ_foreach          (CtplEnviron           *env,
                                                  CtplEnvironForeachFunc func,
                                                  gpointer               user_data);

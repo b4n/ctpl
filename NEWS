@@ -34,6 +34,8 @@
   
   ## What to change in your code
   
+  ### Token-related functions
+  
   The functions ctpl_token_free() and ctpl_token_expr_free() lost their second
   (boolean) argument. If you passed TRUE here, simply remove that second
   argument. Otherwise, you did strange things and you're screwed (but see the
@@ -43,10 +45,18 @@
   respectively ctpl_token_free() and ctpl_token_dump() instead (the semantic is
   exactly the same).
   
+  ### Environments
+  
   CtplEnviron now uses reference counting. It means that you get all the good
   of reference counting, but you also have to replace calls to
   ctpl_environ_free() with ctpl_environ_unref(). Note that ctpl_environ_unref()
   does not support NULL argument.
+  
+  ctpl_environ_pop() has changed. It now takes an third argument to get the
+  poped value and returns a boolean (see the documentation for more details).
+  Anyway you should probably not need ctpl_environ_pop() at all.
+  
+  ### Others
   
   The environment to pass to ctpl_eval_*() is not constant anymore. This will
   probably not change anything for you, but it's a subtle change. This is to
