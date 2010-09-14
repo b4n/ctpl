@@ -11,6 +11,8 @@
     * ctpl_value_copy(), ctpl_value_set_string() and ctpl_value_set_array*() can
       now take a part of itself as the value to set/copy;
     * Fix internal handling of an error which may lead to wrong error detection;
+    * Fix wrong name of streams built from GFiles;
+    * Fix dramatic slowness when a symbol gets pushed many times;
   * Some internal refactoring.
   
   Yes, it is the second API break since the library's birth, less than one year
