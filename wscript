@@ -44,30 +44,30 @@ blddir = '_build_'
 
 HEADERS = [
 'src/ctpl.h',
-'src/environ.h',
-'src/eval.h',
-'src/io.h',
-'src/input-stream.h',
-'src/lexer.h',
-'src/lexer-expr.h',
-'src/output-stream.h',
-'src/parser.h',
-'src/token.h',
-'src/value.h']
+'src/ctpl-environ.h',
+'src/ctpl-eval.h',
+'src/ctpl-io.h',
+'src/ctpl-input-stream.h',
+'src/ctpl-lexer.h',
+'src/ctpl-lexer-expr.h',
+'src/ctpl-output-stream.h',
+'src/ctpl-parser.h',
+'src/ctpl-token.h',
+'src/ctpl-value.h']
 
 LIBRARY_SOURCES = '''
-src/environ.c
-src/eval.c
-src/io.c
-src/input-stream.c
-src/lexer.c
-src/lexer-expr.c
-src/mathutils.c
-src/output-stream.c
-src/parser.c
-src/stack.c
-src/token.c
-src/value.c'''
+src/ctpl-environ.c
+src/ctpl-eval.c
+src/ctpl-io.c
+src/ctpl-input-stream.c
+src/ctpl-lexer.c
+src/ctpl-lexer-expr.c
+src/ctpl-mathutils.c
+src/ctpl-output-stream.c
+src/ctpl-parser.c
+src/ctpl-stack.c
+src/ctpl-token.c
+src/ctpl-value.c'''
 
 
 CTPL_SOURCES = ['src/ctpl.c']
@@ -131,6 +131,9 @@ def configure(conf):
 
 	Utils.pprint('BLUE', 'Summary:')
 	print_message(conf, 'Install CTPL ' + VERSION + ' in', conf.env['PREFIX'])
+
+	# FIXME: this one should not be defined for the ctpl program
+	conf.env.append_value('CCFLAGS', '-DCTPL_COMPILATION')
 
 	conf.env.append_value('CCFLAGS', '-DHAVE_CONFIG_H')
 	conf.env.append_value('CCFLAGS', '-Wall')
