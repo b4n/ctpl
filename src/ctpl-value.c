@@ -32,8 +32,8 @@
  * 
  * Dynamically allocated #CtplValue are created with ctpl_value_new() and freed
  * with ctpl_value_free().
- * Statically allocated ones are initialised with ctpl_value_init() and
- * uninitialised with ctpl_value_free_value().
+ * Statically allocated ones are initialized with ctpl_value_init() and
+ * uninitialized with ctpl_value_free_value().
  * 
  * You can set the data they holds with ctpl_value_set_int(),
  * ctpl_value_set_float(), ctpl_value_set_string() and ctpl_value_set_array();
@@ -47,35 +47,36 @@
  * ctpl_value_get_float(), ctpl_value_get_string(), ctpl_value_get_array_int(),
  * ctpl_value_get_array_float() or ctpl_value_get_array_string() depending on
  * the type of the value.
- * For array value, yo can also use ctpl_value_get_array() to get the list that
- * holds the different values.
+ * For array value, yo can also use ctpl_value_get_array() to get the list of
+ * the different values in that array.
  * You can get the type held by a value with ctpl_value_get_held_type().
  * 
  * Value may be converted to other types with ctpl_value_convert(), and to a
  * string representation using ctpl_value_to_string().
  * 
  * <example>
- * <title>Simple usage of allocated generic values</title>
+ * <title>Simple usage of dynamically allocated generic values</title>
  * <programlisting>
  * CtplValue *val;
  * 
  * val = ctpl_value_new ();
  * ctpl_value_set_int (val, 42);
  * 
- * /<!-- -->* Free all data allocated for value and the held data *<!-- -->/
+ * /<!-- -->* Free all data allocated for the value and the held data *<!-- -->/
  * ctpl_value_free (val);
  * </programlisting>
  * </example>
  * 
  * <example>
- * <title>Simple usage of static generic values</title>
+ * <title>Simple usage of statically allocated generic values</title>
  * <programlisting>
  * CtplValue val;
  * 
  * ctpl_value_init (&val);
  * ctpl_value_set_int (&val, 42);
  * 
- * /<!-- -->* Free all data allocated for the held data *<!-- -->/
+ * /<!-- -->* Free all memory that might have been allocated for the held
+ *  * data *<!-- -->/
  * ctpl_value_free_value (&val);
  * </programlisting>
  * </example>
@@ -88,9 +89,9 @@ static void   ctpl_value_set_array_internal   (CtplValue     *value,
 
 /**
  * ctpl_value_init:
- * @value: An uninitialised #CtplValue
+ * @value: An uninitialized #CtplValue
  * 
- * Initialises a #CtplValue.
+ * Initializes a #CtplValue.
  * This function is useful for statically allocated values, and is not required
  * for dynamically allocated values created by ctpl_value_new().
  */
@@ -215,9 +216,9 @@ ctpl_value_free_value (CtplValue *value)
  * @value: A #CtplValue
  * 
  * Frees all resources used by a #CtplValue.
- * This function can't be used with statically allocated values since it frees
- * the value itself and not only its content. If you want to free a statically
- * allocated value, use ctpl_value_free_value().
+ * This function can't be used with statically allocated values since it also
+ * frees the value itself and not only its content. If you want to free a
+ * statically allocated value, use ctpl_value_free_value().
  */
 void
 ctpl_value_free (CtplValue *value)
@@ -302,7 +303,7 @@ ctpl_value_new_string (const gchar *val)
  * As this function takes a variadic argument, there is no control on the values
  * neither on their type nor on any other of their properties. Then, you have to
  * take care to pass strictly right data to it if you won't see your program
- * crash in the better case.
+ * crash -- in the better case.
  * </para></warning>
  * 
  * Returns: A newly allocated #CtplValue holding given values.
@@ -333,7 +334,7 @@ ctpl_value_new_arrayv (CtplValueType type,
  * As this function takes a variadic argument, there is no control on the values
  * neither on their type nor on any other of their properties. Then, you have to
  * take care to pass strictly right data to it if you won't see your program
- * crash in the better case.
+ * crash -- in the better case.
  * </para></warning>
  * 
  * Returns: A newly allocated #CtplValue holding given values.
@@ -441,7 +442,7 @@ ctpl_value_set_array_internal (CtplValue     *value,
  * As this function takes a variadic argument, there is no control on the values
  * neither on their type nor on any other of their properties. Then, you have to
  * take care to pass strictly right data to it if you won't see your program
- * crash in the better case.
+ * crash -- in the better case.
  * </para></warning>
  */
 void
@@ -506,7 +507,7 @@ ctpl_value_set_arrayv (CtplValue     *value,
  * As this function takes a variadic argument, there is no control on the values
  * neither on their type nor on any other of their properties. Then, you have to
  * take care to pass strictly right data to it if you won't see your program
- * crash in the better case.
+ * crash -- in the better case.
  * </para></warning>
  */
 void
@@ -891,7 +892,7 @@ ctpl_value_get_int (const CtplValue *value)
 gdouble
 ctpl_value_get_float (const CtplValue *value)
 {
-  g_return_val_if_fail (CTPL_VALUE_HOLDS_FLOAT (value), 0.0f);
+  g_return_val_if_fail (CTPL_VALUE_HOLDS_FLOAT (value), 0.0);
   
   return value->value.v_float;
 }
@@ -955,7 +956,7 @@ ctpl_value_get_array_int (const CtplValue *value,
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
-  /* cast is because g_slits_length() takes a non-const pointer, see
+  /* cast is because g_slist_length() takes a non-const pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
   array = g_new0 (glong, len);
@@ -1000,7 +1001,7 @@ ctpl_value_get_array_float (const CtplValue *value,
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
-  /* cast is because g_slits_length() takes a non-const pointer, see
+  /* cast is because g_slist_length() takes a non-const pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
   array = g_new0 (gdouble, len);
@@ -1047,7 +1048,7 @@ ctpl_value_get_array_string (const CtplValue *value,
   
   values = ctpl_value_get_array (value);
   g_return_val_if_fail (values != NULL, NULL);
-  /* cast is because g_slits_length() takes a non-const pointer, see
+  /* cast is because g_slist_length() takes a non-const pointer, see
    * http://bugzilla.gnome.org/show_bug.cgi?id=50953 */
   len = g_slist_length ((GSList *)values);
   array = g_new0 (gchar*, len + 1);
