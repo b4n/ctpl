@@ -189,35 +189,42 @@ open_input_stream (const gchar *arg,
 {
   GFile            *file;
   CtplInputStream  *stream = NULL;
+  GInputStream     *gstream = NULL;
+  GFileInputStream *gfstream;
   
   file = g_file_new_for_commandline_arg (arg);
-  if (! OPT_encoding || encoding_is_ascii_compatible (OPT_encoding)) {
-    stream = ctpl_input_stream_new_for_gfile (file, error);
-#if HAVE_CHARSET_CONVERSION
-  } else {
-    GFileInputStream *gfstream;
+  gfstream = g_file_read (file, NULL, error);
+  if (gfstream) {
+    gstream = G_INPUT_STREAM (gfstream);
     
-    gfstream = g_file_read (file, NULL, error);
-    if (gfstream) {
+#if HAVE_CHARSET_CONVERSION
+    if (OPT_encoding && ! encoding_is_ascii_compatible (OPT_encoding)) {
       GCharsetConverter *converter;
       
       converter = g_charset_converter_new ("utf8", OPT_encoding, error);
-      if (converter) {
+      if (! converter) {
+        g_object_unref (gstream);
+        gstream = NULL;
+      } else {
         GInputStream *gcstream;
-        gchar        *name = g_filename_display_basename (arg);
         
-        gcstream = g_converter_input_stream_new (G_INPUT_STREAM (gfstream),
+        gcstream = g_converter_input_stream_new (G_INPUT_STREAM (gstream),
                                                  G_CONVERTER (converter));
-        stream = ctpl_input_stream_new (gcstream, name);
-        g_object_unref (gcstream);
-        g_free (name);
+        g_object_unref (gstream);
+        gstream = gcstream;
         g_object_unref (converter);
       }
-      g_object_unref (gfstream);
     }
-#endif /* HAVE_CHARSET_CONVERSION */
+#endif
   }
   g_object_unref (file);
+  if (gstream) {
+    gchar *name = g_filename_display_basename (arg);
+    
+    stream = ctpl_input_stream_new (gstream, name);
+    g_free (name);
+    g_object_unref (gstream);
+  }
   
   return stream;
 }
