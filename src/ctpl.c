@@ -103,14 +103,14 @@ encoding_needs_conversion (const gchar *encoding)
     
     /* TODO: check current encodings and add more */
     re = g_regex_new ("^("
-                      "(US-|cs)?ASCII([-_ ]?[78])"                "|"
-                      "US"                                        "|"
-                      "ANSI[-_ ]X3.4[-_ ]19(68|86)"               "|"
-                      "ISO[-_ ]?646([-_ ]?US|\\.irv[-_ :]?1991)"  "|"
-                      "ISO[-_ ]IR[-_ ]6"                          "|"
-                      "(IBM|CP)[-_ ]?367"                         "|"
-                      "utf[-_ ]?8"                                "|"
-                      "iso(/cei)?[-_ ]?8859.*"                    "|"
+                      "(US-|cs)?ASCII([-_ ]?[78])"                           "|"
+                      "US"                                                   "|"
+                      "ANSI[-_ ]X3.4[-_ ]19(68|86)"                          "|"
+                      "ISO[-_ ]?646([-_ ]?US|\\.irv[-_ :]?1991)"             "|"
+                      "ISO[-_ ]IR[-_ ]6"                                     "|"
+                      "(IBM|CP|OEM)[-_ ]?(367|437|737|850|858|869)"          "|"
+                      "utf[-_ ]?8"                                           "|"
+                      "iso(/cei)?[-_ ]?8859.*"                               "|"
                       "(windows|CP)[-_ ]1252"
                       ")$",
                       G_REGEX_CASELESS | G_REGEX_NO_AUTO_CAPTURE, 0, &err);
