@@ -244,14 +244,16 @@ build_environ (void)
       GError *err = NULL;
       
       if (! encoding_needs_conversion (OPT_encoding)) {
-        /* conversion won't fail since the original was in the target encoding */
-        chunk = g_locale_from_utf8 (OPT_env_chunks[i], -1, NULL, NULL, NULL);
+        /* convert chunk to the requested encoding from utf8 (GLib converted the
+         * argumlent to utf8) */
+        chunk = g_convert (OPT_env_chunks[i], -1, OPT_encoding, "utf8",
+                           NULL, NULL, &err);
       } else {
         /* no conversion needed, it's already in utf8 */
         chunk = g_strdup (OPT_env_chunks[i]);
       }
       printv ("Loading environment chunk '%s'...\n", chunk);
-      if (! ctpl_environ_add_from_string (env, chunk, &err)) {
+      if (! chunk || ! ctpl_environ_add_from_string (env, chunk, &err)) {
         printerr ("Failed to load environment from chunk '%s': %s\n",
                   chunk, err->message);
         g_error_free (err);
