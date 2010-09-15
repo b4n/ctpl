@@ -370,6 +370,40 @@ procede_template (CtplInputStream  *input,
         </example>
       </section>
     </section>
+    
+    <section>
+      <title>Input and output encoding</title>
+      <para>
+        CTPL does no encoding conversion magic for you. The main reason for this
+        is that it's a complex task to handle encodings properly, and it has a
+        cost in performances. Moreover, CTPL can (should) work with any
+        US-ASCII-compatible encoding, which includes UTF-8, ISO-8859-*, and many
+        others &mdash; but not UTF-16, UTF-32 and a few others.
+      </para>
+      <para>
+        Since CTPL will not convert anything for you, you must take care that
+        the encoding of the input template and the environment are the same not
+        to have mixed encodings in the output.
+      </para>
+      <para>
+        To convert the input data, you can use a
+        <link linkend="GConverterInputStream">GConverterInputStream</link>
+        and/or
+        a <link linkend="GConverterOutputStream">GConverterOutputStream</link>
+        together with a
+        <link linkend="GCharsetConverter">GCharsetConverter</link> as the input
+        or output source to do an implicit charset conversion directly on reads
+        and/or writes.
+        You can of course also do a manual conversion, with
+        <link linkend="g-convert">g_convert()</link> or
+        <link linkend="g-iconv">g_iconv()</link> for example.
+      </para>
+      <para>
+        The recommended encoding for the data to pass to CTPL is UTF-8, but, as
+        said above, any US-ASCII-compatible encoding should work perfectly
+        fine.
+      </para>
+    </section>
   </chapter>
 
   <chapter>
