@@ -269,15 +269,15 @@ build_environ (void)
       
       if (! OPT_encoding || encoding_is_ascii_compatible (OPT_encoding)) {
         /* conversion won't fail since the original was in the target encoding */
-        chunk = g_locale_from_utf8 (OPT_env_chunks[i], -1, NULL, NULL, &err);
+        chunk = g_locale_from_utf8 (OPT_env_chunks[i], -1, NULL, NULL, NULL);
 #if HAVE_CHARSET_CONVERSION
       } else {
-        chunk = g_convert (OPT_env_chunks[i], -1, "utf8", OPT_encoding,
-                           NULL, NULL, &err);
+        /* no conversion needed, it's already in utf8 */
+        chunk = g_strdup (OPT_env_chunks[i]);
 #endif /* HAVE_CHARSET_CONVERSION */
       }
       printv ("Loading environment chunk '%s'...\n", chunk);
-      if (! chunk || ! ctpl_environ_add_from_string (env, chunk, &err)) {
+      if (! ctpl_environ_add_from_string (env, chunk, &err)) {
         printerr ("Failed to load environment from chunk '%s': %s\n",
                   chunk, err->message);
         g_error_free (err);
