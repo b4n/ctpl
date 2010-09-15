@@ -46,7 +46,12 @@ PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0],
                   [HAVE_GIO_UNIX="yes"],
                   [HAVE_GIO_UNIX="no"
                    AC_MSG_WARN([The ctpl command-line utility will not be built because of the following error: ${GIO_UNIX_PKG_ERRORS}])])
-AM_CONDITIONAL([BUILD_CTPL], [test x$HAVE_GIO_UNIX = xyes])
+HAVE_GIO_2_24="no"
+PKG_CHECK_MODULES([GIO_2_24], [gio-2.0 >= 2.24],
+                  [HAVE_GIO_2_24="yes"],
+                  [HAVE_GIO_2_24="no"
+                   AC_MSG_WARN([The ctpl command-line utility will not be built because of the following error: ${GIO_2_24_PKG_ERRORS}])])
+AM_CONDITIONAL([BUILD_CTPL], [test x$HAVE_GIO_UNIX = xyes -a x$HAVE_GIO_2_24 = xyes])
 
 # needed for the math functions checks to work
 AC_CHECK_LIB([m], [acos])

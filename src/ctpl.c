@@ -31,11 +31,6 @@
 #include "ctpl.h"
 
 
-#ifndef HAVE_CHARSET_CONVERSION
-# define HAVE_CHARSET_CONVERSION (GLIB_CHECK_VERSION (2, 24, 0))
-#endif
-
-
 #define GETTEXT_PACKAGE NULL /* FIXME: */
 
 
@@ -62,12 +57,7 @@ static GOptionEntry option_entries[] = {
   { "version", 0, 0, G_OPTION_ARG_NONE, &OPT_print_version,
     "Print the version information and exit.", NULL },
   { "encoding", 0, 0, G_OPTION_ARG_STRING, &OPT_encoding,
-#if HAVE_CHARSET_CONVERSION
-    "Encoding of the input files",
-#else
-    "Encodings are supported only when built against GIO >= 2.24",
-#endif
-    "ENCODING" },
+    "Specify the encoding of the input and output files.", "ENCODING" },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &OPT_input_files,
     "Input files", "INPUTFILE[...]" },
   { NULL }
@@ -101,19 +91,17 @@ printerr (const gchar *fmt,
 }
 
 /* checks whether an encoding is compatible with the ASCII charset, so whether
- * a conversion is needed */
+ * a conversion is needed. return %TRUE if conversion is needed, %FALSE
+ * otherwise */
 static gboolean
-encoding_is_ascii_compatible (const gchar *encoding)
+encoding_needs_conversion (const gchar *encoding)
 {
-#if ! HAVE_CHARSET_CONVERSION
-  /* if encoding conversion isn't suppored, just hope it's OK */
-  return TRUE;
-#else
   static GRegex *re = NULL;
   
   if (! re) {
     GError *err = NULL;
     
+    /* TODO: check current encodings and add more */
     re = g_regex_new ("^("
                       "(US-|cs)?ASCII([-_ ]?[78])"                "|"
                       "US"                                        "|"
@@ -134,8 +122,7 @@ encoding_is_ascii_compatible (const gchar *encoding)
     }
   }
   
-  return g_regex_match (re, encoding, 0, NULL);
-#endif /* HAVE_CHARSET_CONVERSION */
+  return ! g_regex_match (re, encoding, 0, NULL);
 }
 
 /* parses the options and fills OPT_* */
@@ -156,24 +143,15 @@ parse_options (gint    *argc,
     } else if (OPT_input_files == NULL) {
       g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE,
                    "Missing input file(s)");
-#if ! HAVE_CHARSET_CONVERSION
-    } else if (OPT_encoding != NULL) {
-      g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_FAILED,
-                   "Encodings are supported only when built against GIO >= 2.24");
-#endif /* ! HAVE_CHARSET_CONVERSION */
     } else {
-#if HAVE_CHARSET_CONVERSION
       if (! OPT_encoding) {
         const gchar *local_charset;
         
         /* if no encoding was given, assume it is the syetem one, so setup the
          * encoding to convert if needed */
-        if (! g_get_charset (&local_charset) &&
-            ! encoding_is_ascii_compatible (local_charset)) {
-          OPT_encoding = g_strdup (local_charset);
-        }
+        g_get_charset (&local_charset);
+        OPT_encoding = g_strdup (local_charset);
       }
-#endif /* HAVE_CHARSET_CONVERSION */
       success = TRUE;
     }
   }
@@ -197,8 +175,7 @@ open_input_stream (const gchar *arg,
   if (gfstream) {
     gstream = G_INPUT_STREAM (gfstream);
     
-#if HAVE_CHARSET_CONVERSION
-    if (OPT_encoding && ! encoding_is_ascii_compatible (OPT_encoding)) {
+    if (encoding_needs_conversion (OPT_encoding)) {
       GCharsetConverter *converter;
       
       converter = g_charset_converter_new ("utf8", OPT_encoding, error);
@@ -215,7 +192,6 @@ open_input_stream (const gchar *arg,
         g_object_unref (converter);
       }
     }
-#endif
   }
   g_object_unref (file);
   if (gstream) {
@@ -267,14 +243,12 @@ build_environ (void)
       gchar  *chunk;
       GError *err = NULL;
       
-      if (! OPT_encoding || encoding_is_ascii_compatible (OPT_encoding)) {
+      if (! encoding_needs_conversion (OPT_encoding)) {
         /* conversion won't fail since the original was in the target encoding */
         chunk = g_locale_from_utf8 (OPT_env_chunks[i], -1, NULL, NULL, NULL);
-#if HAVE_CHARSET_CONVERSION
       } else {
         /* no conversion needed, it's already in utf8 */
         chunk = g_strdup (OPT_env_chunks[i]);
-#endif /* HAVE_CHARSET_CONVERSION */
       }
       printv ("Loading environment chunk '%s'...\n", chunk);
       if (! ctpl_environ_add_from_string (env, chunk, &err)) {
@@ -369,8 +343,7 @@ get_output_stream (void)
     gostream = g_unix_output_stream_new (STDOUT_FILENO, FALSE);
   }
   if (gostream) {
-#if HAVE_CHARSET_CONVERSION
-    if (OPT_encoding && ! encoding_is_ascii_compatible (OPT_encoding)) {
+    if (encoding_needs_conversion (OPT_encoding)) {
       GCharsetConverter *converter;
       GError            *err = NULL;
       
@@ -388,7 +361,6 @@ get_output_stream (void)
         g_object_unref (converter);
       }
     }
-#endif /* HAVE_CHARSET_CONVERSION */
     stream = ctpl_output_stream_new (gostream);
     g_object_unref (gostream);
   }
