@@ -430,16 +430,25 @@ resize_cache (CtplInputStream *stream,
            stream->buf_size, new_size);*/
   if (new_size > stream->buf_size) {
     gssize read_size;
+    gchar *new_buffer;
     
-    stream->buffer = g_realloc (stream->buffer, new_size);
-    read_size = g_input_stream_read (stream->stream,
-                                     &stream->buffer[stream->buf_size],
-                                     new_size - stream->buf_size,
-                                     NULL, error);
-    if (read_size < 0) {
+    new_buffer = g_try_realloc (stream->buffer, new_size);
+    if (G_UNLIKELY (! new_buffer)) {
+      g_set_error (error, CTPL_IO_ERROR, CTPL_IO_ERROR_NOMEM,
+                   "Not enough memory to cache %"G_GSIZE_FORMAT" bytes "
+                   "from input", new_size);
       success = FALSE;
     } else {
-      stream->buf_size += (gsize)read_size;
+      stream->buffer = new_buffer;
+      read_size = g_input_stream_read (stream->stream,
+                                       &stream->buffer[stream->buf_size],
+                                       new_size - stream->buf_size,
+                                       NULL, error);
+      if (read_size < 0) {
+        success = FALSE;
+      } else {
+        stream->buf_size += (gsize)read_size;
+      }
     }
   } else if (new_size < stream->buf_size) {
     if (stream->buf_pos >= stream->buf_size) {
