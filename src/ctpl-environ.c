@@ -330,6 +330,8 @@ ctpl_environ_push_string (CtplEnviron  *env,
  * poping it from the environ.
  * 
  * Returns: Whether a value has been poped.
+ * 
+ * Since: 0.3
  */
 gboolean
 ctpl_environ_pop (CtplEnviron *env,

@@ -43,9 +43,8 @@
   argument. Otherwise, you did strange things and you're screwed (but see the
   next section).
   
-  ctpl_lexer_free_tree() and ctpl_lexer_dump_tree() have also been removed. Use
-  respectively ctpl_token_free() and ctpl_token_dump() instead (the semantic is
-  exactly the same).
+  ctpl_lexer_free_tree() has also been removed, use ctpl_token_free() instead
+  (the semantic is exactly the same).
   
   ### Environments
   
