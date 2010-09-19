@@ -516,7 +516,8 @@ ctpl_input_stream_eof (CtplInputStream *stream,
  * ctpl_input_stream_read:
  * @stream: A #CtplInputStream
  * @buffer: buffer to fill with the read data
- * @count: number of bytes to read
+ * @count: number of bytes to read (must be less than or qual to %G_MAXSSIZE, or
+ *         a %CTPL_IO_ERROR_INVALID_ARGUMENT will be thrown)
  * @error: return location for errors, or %NULL to ignore them
  * 
  * Reads data from a #CtplInputStream.
@@ -533,7 +534,12 @@ ctpl_input_stream_read (CtplInputStream *stream,
 {
   gssize read_size;
   
-  g_return_val_if_fail (count <= G_MAXSSIZE, -1);
+  if (G_UNLIKELY (count > G_MAXSSIZE)) {
+    g_set_error (error, CTPL_IO_ERROR, CTPL_IO_ERROR_INVALID_ARGUMENT,
+                 "Too large count value passed to %s: %"G_GSIZE_FORMAT,
+                 G_STRFUNC, count);
+    return -1;
+  }
   
   for (read_size = 0; count > 0; read_size ++) {
     if (! ensure_cache_filled (stream, error)) {
@@ -568,7 +574,8 @@ ctpl_input_stream_read (CtplInputStream *stream,
  * ctpl_input_stream_peek:
  * @stream: A #CtplInputStream
  * @buffer: buffer to fill with the peeked data
- * @count: number of bytes to peek
+ * @count: number of bytes to peek (must be less than or qual to %G_MAXSSIZE, or
+ *         a %CTPL_IO_ERROR_INVALID_ARGUMENT will be thrown)
  * @error: return location for errors, or %NULL to ignore them
  * 
  * Peeks data from a #CtplInputStream. Peeking data is like reading, but it
@@ -593,7 +600,12 @@ ctpl_input_stream_peek (CtplInputStream *stream,
 {
   gssize read_size;
   
-  g_return_val_if_fail (count <= G_MAXSSIZE, -1);
+  if (G_UNLIKELY (count > G_MAXSSIZE)) {
+    g_set_error (error, CTPL_IO_ERROR, CTPL_IO_ERROR_INVALID_ARGUMENT,
+                 "Too large count value passed to %s: %"G_GSIZE_FORMAT,
+                 G_STRFUNC, count);
+    return -1;
+  }
   
   if ((stream->buf_size - stream->buf_pos) < count &&
       ! resize_cache (stream, stream->buf_pos + count, error)) {
