@@ -33,6 +33,9 @@
  * A #CtplOutputStream is created with ctpl_output_stream_new(). It uses a
  * #GObject<!-- -->-like refcounting, through ctpl_output_stream_ref() and
  * ctpl_output_stream_unref().
+ * 
+ * The errors that the functions in this module can throw comes from the
+ * %G_IO_ERROR or %CTPL_IO_ERROR domains unless otherwise mentioned.
  */
 
 

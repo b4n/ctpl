@@ -41,7 +41,6 @@ G_BEGIN_DECLS
  * @CTPL_IO_ERROR_INVALID_STRING: The stream doesn't contain a valid string
  *                                literal
  * @CTPL_IO_ERROR_RANGE:          A numeric conversion would overflow
- * @CTPL_IO_ERROR_NOMEM:          Not enough memory to complete the operation
  * @CTPL_IO_ERROR_FAILED:         Something went wrong
  * 
  * Errors that can be thrown by I/O functions (#CtplInputStream and
@@ -53,7 +52,6 @@ typedef enum _CtplIOError
   CTPL_IO_ERROR_INVALID_NUMBER,
   CTPL_IO_ERROR_INVALID_STRING,
   CTPL_IO_ERROR_RANGE,
-  CTPL_IO_ERROR_NOMEM,
   CTPL_IO_ERROR_FAILED
 } CtplIOError;
 

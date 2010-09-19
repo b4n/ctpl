@@ -35,7 +35,7 @@
  * @include: ctpl/ctpl.h
  * 
  * The data input stream used by CTPL. This is a buffered input stream on top
- * of #GInputStream with current position informations (line and position) and
+ * of #GInputStream with current position information (line and position) and
  * some read scheme facilities (words (ctpl_input_stream_read_word()), string
  * literals (ctpl_input_stream_read_string_literal()), ...).
  * 
@@ -47,6 +47,9 @@
  * (ctpl_input_stream_new_for_uri()).
  * #CtplInputStream object uses a #GObject<!-- -->-like refcounting, via
  * ctpl_input_stream_ref() and ctpl_input_stream_unref().
+ * 
+ * The errors that the functions in this module can throw comes from the
+ * %G_IO_ERROR or %CTPL_IO_ERROR domains unless otherwise mentioned.
  */
 
 #define INPUT_STREAM_BUF_SIZE   4096U
@@ -434,7 +437,7 @@ resize_cache (CtplInputStream *stream,
     
     new_buffer = g_try_realloc (stream->buffer, new_size);
     if (G_UNLIKELY (! new_buffer)) {
-      g_set_error (error, CTPL_IO_ERROR, CTPL_IO_ERROR_NOMEM,
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
                    "Not enough memory to cache %"G_GSIZE_FORMAT" bytes "
                    "from input", new_size);
       success = FALSE;
@@ -517,7 +520,7 @@ ctpl_input_stream_eof (CtplInputStream *stream,
  * @stream: A #CtplInputStream
  * @buffer: buffer to fill with the read data
  * @count: number of bytes to read (must be less than or qual to %G_MAXSSIZE, or
- *         a %CTPL_IO_ERROR_INVALID_ARGUMENT will be thrown)
+ *         a %G_IO_ERROR_INVALID_ARGUMENT will be thrown)
  * @error: return location for errors, or %NULL to ignore them
  * 
  * Reads data from a #CtplInputStream.
@@ -535,7 +538,7 @@ ctpl_input_stream_read (CtplInputStream *stream,
   gssize read_size;
   
   if (G_UNLIKELY (count > G_MAXSSIZE)) {
-    g_set_error (error, CTPL_IO_ERROR, CTPL_IO_ERROR_INVALID_ARGUMENT,
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                  "Too large count value passed to %s: %"G_GSIZE_FORMAT,
                  G_STRFUNC, count);
     return -1;
@@ -575,7 +578,7 @@ ctpl_input_stream_read (CtplInputStream *stream,
  * @stream: A #CtplInputStream
  * @buffer: buffer to fill with the peeked data
  * @count: number of bytes to peek (must be less than or qual to %G_MAXSSIZE, or
- *         a %CTPL_IO_ERROR_INVALID_ARGUMENT will be thrown)
+ *         a %G_IO_ERROR_INVALID_ARGUMENT will be thrown)
  * @error: return location for errors, or %NULL to ignore them
  * 
  * Peeks data from a #CtplInputStream. Peeking data is like reading, but it
@@ -601,7 +604,7 @@ ctpl_input_stream_peek (CtplInputStream *stream,
   gssize read_size;
   
   if (G_UNLIKELY (count > G_MAXSSIZE)) {
-    g_set_error (error, CTPL_IO_ERROR, CTPL_IO_ERROR_INVALID_ARGUMENT,
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                  "Too large count value passed to %s: %"G_GSIZE_FORMAT,
                  G_STRFUNC, count);
     return -1;
