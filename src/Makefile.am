@@ -48,6 +48,10 @@ ctpl_LDADD    = libctpl.la @GLIB_LIBS@ @GIO_LIBS@ @GIO_UNIX_LIBS@
 ctpl_SOURCES  = ctpl.c
 endif
 
-test_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@
-test_LDADD    = libctpl.la @GLIB_LIBS@ @GIO_LIBS@
-test_SOURCES  = test.c
+# test may use internal symbols (debuging and friends), so don't use the real
+# library but only the object files
+test_CPPFLAGS = $(libctpl_la_CPPFLAGS)
+test_CFLAGS   = $(libctpl_la_CFLAGS)
+test_LDADD    = $(libctpl_la_LIBADD)
+test_SOURCES  = test.c \
+                $(libctpl_la_SOURCES)

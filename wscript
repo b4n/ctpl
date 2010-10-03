@@ -94,6 +94,7 @@ def configure(conf):
 	conf.check_cfg(package='glib-2.0', atleast_version='2.10.0', uselib_store='GLIB',
 		mandatory=True, args='--cflags --libs')
 	conf.check_cfg(package='gio-2.0', uselib_store='GIO', args='--cflags --libs', mandatory=True)
+	conf.check_cfg(package='gio-2.0', atleast_version='2.24.0', uselib_store='GIO_2_24', args='--cflags --libs', mandatory=False)
 	conf.check_cfg(package='gio-unix-2.0', uselib_store='GIO_UNIX', args='--cflags --libs', mandatory=False)
 
 	# Windows specials
@@ -177,7 +178,7 @@ def build(bld):
 			target			= 'ctpl',
 			source			= CTPL_SOURCES,
 			includes		= '. src',
-			uselib			= 'GTK GIO GIO_UNIX',
+			uselib			= 'GLIB GIO_2_24 GIO_UNIX',
 			uselib_local	= 'ctpl_lib'
 		)
 

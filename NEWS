@@ -7,23 +7,23 @@
   * Heavy API cleanup;
   * Array expressions can now be indexed;
   * The `for` loop now iterates over an expression;
+  * CtplEnviron now uses reference counting;
+  * Improvements of CtplEnviron memory usage;
   * Bug fixes:
     * ctpl_value_copy(), ctpl_value_set_string() and ctpl_value_set_array*() can
       now take a part of itself as the value to set/copy;
     * Fix internal handling of an error which may lead to wrong error detection;
-    * Fix wrong name of streams built from GFiles;
+    * Fix wrong name of streams built from GFiles (then also paths and URIs);
     * Fix dramatic slowness when a symbol gets pushed many times;
   * Some internal refactoring.
   
   Yes, it is the second API break since the library's birth, less than one year
   ago. I know it and I apologize for the inconvenience (packagers will hate me).
   
-  But even if it's an API break, if you make normal usage of the library, you
-  shouldn't be affected by it. Many functions and data structures have been
-  removed or made private, but the API that was meant to be used by final users
-  hasn't changed.
-  You will probably only need to recompile your application against the new
-  version without modifying your code.
+  But even if it's an API break, if you make normal usage of the library, it
+  shouldn't be too painful for you to upgrade to the new version (see below).
+  Many functions and data structures have been removed or made private, but the
+  API that was meant to be used by final users had only small changes.
   
   I will also justify this new break, at least for you to understand the
   original motivations for it:
@@ -35,6 +35,36 @@
   Then this new break is here to -- hopefully -- ease future improvements of
   CTPL, as well as preventing more API breaks.
   
+  ## What to change in your code
+  
+  ### Token-related functions
+  
+  The functions ctpl_token_free() and ctpl_token_expr_free() lost their second
+  (boolean) argument. If you passed TRUE here, simply remove that second
+  argument. Otherwise, you did strange things and you're screwed (but see the
+  next section).
+  
+  ctpl_lexer_free_tree() has also been removed, use ctpl_token_free() instead
+  (the semantic is exactly the same).
+  
+  ### Environments
+  
+  CtplEnviron now uses reference counting. It means that you get all the good
+  of reference counting, but you also have to replace calls to
+  ctpl_environ_free() with ctpl_environ_unref(). Note that ctpl_environ_unref()
+  does not support NULL argument.
+  
+  ctpl_environ_pop() has changed. It now takes an third argument to get the
+  poped value and returns a boolean (see the documentation for more details).
+  Anyway you should probably not need ctpl_environ_pop() at all.
+  
+  ### Others
+  
+  The environment to pass to ctpl_eval_*() is not constant anymore. This will
+  probably not change anything for you, but it's a subtle change. This is to
+  allow future operators to affect the environment if needed (this isn't the
+  case yet).
+  
   ## The dark side of the cleanup
   
   Apart the inconvenience of an API break, some "functionality" of the library
@@ -42,6 +72,13 @@
   "features". First, know that these functionality weren't planned. Then, feel
   free to contact me, explaining what functionality you miss and why, and I'll
   probably be happy to re-introduce it cleanly for you.
+  
+  ## CLI tool changes
+  
+  The CLI tool, apart then new features of the template engine, gained support
+  for encodings. This brings a new `--encoding` option allowing to specify the
+  encoding of the input and output files. The default encoding is the system's
+  one.
 
 
 # 0.2.2 (25/05/2010)

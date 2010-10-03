@@ -61,8 +61,6 @@ CtplToken  *ctpl_lexer_lex_string   (const gchar *template,
                                      GError     **error);
 CtplToken  *ctpl_lexer_lex_path     (const gchar *path,
                                      GError     **error);
-void        ctpl_lexer_free_tree    (CtplToken *root);
-void        ctpl_lexer_dump_tree    (const CtplToken *root);
 
 
 G_END_DECLS

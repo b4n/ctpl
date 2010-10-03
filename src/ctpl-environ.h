@@ -78,7 +78,8 @@ typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
 
 GQuark            ctpl_environ_error_quark      (void) G_GNUC_CONST;
 CtplEnviron      *ctpl_environ_new              (void);
-void              ctpl_environ_free             (CtplEnviron *env);
+CtplEnviron      *ctpl_environ_ref              (CtplEnviron *env);
+void              ctpl_environ_unref            (CtplEnviron *env);
 const CtplValue  *ctpl_environ_lookup           (const CtplEnviron *env,
                                                  const gchar       *symbol);
 void              ctpl_environ_push             (CtplEnviron     *env,
@@ -93,8 +94,9 @@ void              ctpl_environ_push_float       (CtplEnviron     *env,
 void              ctpl_environ_push_string      (CtplEnviron     *env,
                                                  const gchar     *symbol,
                                                  const gchar     *value);
-const CtplValue  *ctpl_environ_pop              (CtplEnviron *env,
-                                                 const gchar *symbol);
+gboolean          ctpl_environ_pop              (CtplEnviron *env,
+                                                 const gchar *symbol,
+                                                 CtplValue  **poped_value);
 void              ctpl_environ_foreach          (CtplEnviron           *env,
                                                  CtplEnvironForeachFunc func,
                                                  gpointer               user_data);

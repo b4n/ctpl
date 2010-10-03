@@ -23,6 +23,7 @@
 #include <string.h>
 #include <errno.h>
 #include "ctpl-stack.h"
+#include "ctpl-token-private.h" /* for ctpl_token*_dump() */
 
 
 static void
@@ -180,7 +181,7 @@ main (int    argc,
       GOutputStream    *gostream;
       CtplEnviron      *env;
       
-      ctpl_lexer_dump_tree (root);
+      ctpl_token_dump (root);
       
       env = build_env ();
       gostream = g_memory_output_stream_new (NULL, 0, realloc, free);
@@ -196,9 +197,9 @@ main (int    argc,
       }
       g_object_unref (gostream);
       ctpl_output_stream_unref (output);
-      ctpl_environ_free (env);
+      ctpl_environ_unref (env);
     }
-    ctpl_lexer_free_tree (root);
+    ctpl_token_free (root);
     
     if (rewind_ctpl_input_stream (&stream)) {
       CtplTokenExpr *expr;
@@ -209,7 +210,7 @@ main (int    argc,
         g_clear_error (&err);
       } else {
         ctpl_token_expr_dump (expr);
-        ctpl_token_expr_free (expr, TRUE);
+        ctpl_token_expr_free (expr);
       }
     }
     
@@ -251,7 +252,7 @@ main (int    argc,
       fprintf (stderr, "err is not set but return value is NULL!\n");
     
     ctpl_token_expr_dump (texpr);
-    ctpl_token_expr_free (texpr, TRUE);
+    ctpl_token_expr_free (texpr);
   }
   #endif
   
@@ -268,10 +269,6 @@ main (int    argc,
     ctpl_stack_push (stack, g_strdup ("foo"));
     ctpl_stack_push (stack, g_strdup ("foo"));
     ctpl_stack_push (stack, g_strdup ("foo"));
-    /*ctpl_stack_push_ref (stack);
-    ctpl_stack_push_ref (stack);
-    ctpl_stack_push_ref (stack);
-    ctpl_stack_push_ref (stack);*/
 
 
     while (! ctpl_stack_is_empty (stack)) {
@@ -293,13 +290,14 @@ main (int    argc,
     ctpl_value_set_string (&val, "coucou");
     ctpl_environ_push (env, "foo", &val);
     ctpl_value_set_array (&val, CTPL_VTYPE_STRING, 2, "foo", "bar", NULL);
-    pval = ctpl_environ_pop (env, "foo");
+    ctpl_environ_pop (env, "foo", &pval);
     g_assert (memcmp (&val, pval, sizeof val));
     if (CTPL_VALUE_HOLDS_STRING (pval))
       g_print ("foo: %s\n", ctpl_value_get_string (pval));
     
+    ctpl_value_free (pval);
     ctpl_value_free_value (&val);
-    ctpl_environ_free (env);
+    ctpl_environ_unref (env);
   }
   
   {

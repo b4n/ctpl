@@ -19,8 +19,6 @@ CtplLexerError
 ctpl_lexer_lex
 ctpl_lexer_lex_string
 ctpl_lexer_lex_path
-ctpl_lexer_free_tree
-ctpl_lexer_dump_tree
 <SUBSECTION Standard>
 ctpl_lexer_error_quark
 <SUBSECTION Private>
@@ -47,8 +45,6 @@ CtplLexerExprError
 ctpl_lexer_expr_lex
 ctpl_lexer_expr_lex_full
 ctpl_lexer_expr_lex_string
-ctpl_lexer_expr_free_tree
-ctpl_lexer_expr_dump_tree
 <SUBSECTION Standard>
 ctpl_operator_to_string
 ctpl_operator_from_string
@@ -61,9 +57,7 @@ ctpl_lexer_expr_error_quark
 CtplToken
 CtplTokenExpr
 ctpl_token_free
-ctpl_token_dump
 ctpl_token_expr_free
-ctpl_token_expr_dump
 <SUBSECTION Private>
 CtplOperator
 CtplTokenExprOperator
@@ -78,9 +72,11 @@ ctpl_token_new_expr
 ctpl_token_new_for
 ctpl_token_new_for_expr
 ctpl_token_new_if
+ctpl_token_dump
 ctpl_token_expr_new_operator
 ctpl_token_expr_new_symbol
 ctpl_token_expr_new_value
+ctpl_token_expr_dump
 ctpl_token_get_type
 ctpl_token_append
 ctpl_token_prepend
@@ -115,7 +111,8 @@ CtplEnvironError
 CtplEnviron
 CtplEnvironForeachFunc
 ctpl_environ_new
-ctpl_environ_free
+ctpl_environ_ref
+ctpl_environ_unref
 ctpl_environ_lookup
 ctpl_environ_push
 ctpl_environ_push_int

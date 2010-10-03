@@ -269,24 +269,24 @@ ctpl_token_expr_new_symbol (const char *symbol,
 }
 
 
-/**
- * ctpl_token_expr_free:
+/*
+ * ctpl_token_expr_free_full:
  * @token: A #CtplTokenExpr to free
  * @recurse: (default TRUE): Whether to free sub-tokens too. You generally want
  *                           to set this to %TRUE.
  * 
- * Frees all memory used by a #CtplTokenExpr.
+ * Frees all memory used by a #CtplTokenExpr. See also ctpl_token_expr_free().
  */
 void
-ctpl_token_expr_free (CtplTokenExpr *token,
-                      gboolean       recurse)
+ctpl_token_expr_free_full (CtplTokenExpr *token,
+                           gboolean       recurse)
 {
   if (token) {
     switch (token->type) {
       case CTPL_TOKEN_EXPR_TYPE_OPERATOR:
         if (recurse) {
-          ctpl_token_expr_free (token->token.t_operator->loperand, recurse);
-          ctpl_token_expr_free (token->token.t_operator->roperand, recurse);
+          ctpl_token_expr_free (token->token.t_operator->loperand);
+          ctpl_token_expr_free (token->token.t_operator->roperand);
         }
         g_slice_free1 (sizeof *token->token.t_operator, token->token.t_operator);
         break;
@@ -300,7 +300,7 @@ ctpl_token_expr_free (CtplTokenExpr *token,
         break;
     }
     while (token->indexes) {
-      ctpl_token_expr_free (token->indexes->data, TRUE);
+      ctpl_token_expr_free (token->indexes->data);
       token->indexes = token->indexes->next;
     }
     g_slice_free1 (sizeof *token, token);
@@ -308,21 +308,25 @@ ctpl_token_expr_free (CtplTokenExpr *token,
 }
 
 /**
- * ctpl_token_free:
- * @token: A #CtplToken to free
- * @chain: (default TRUE): Whether all next tokens should be freed too or not.
- *                         You generally want to set this to %TRUE.
+ * ctpl_token_expr_free:
+ * @token: A #CtplTokenExpr to free
  * 
- * Frees all memory used by a #CtplToken.
- * If @chain is %TRUE, all tokens attached at the right of @token (appended
- * ones) will be freed too. Then, if this function is called with @chain set to
- * %TRUE on the root token of a tree, all the tree will be freed.
- * Otherwise, if @chain is %FALSE, @token is freed and detached from its
- * neighbours.
+ * Frees all memory used by a #CtplTokenExpr.
  */
 void
-ctpl_token_free (CtplToken *token,
-                 gboolean   chain)
+ctpl_token_expr_free (CtplTokenExpr *token)
+{
+  ctpl_token_expr_free_full (token, TRUE);
+}
+
+/**
+ * ctpl_token_free:
+ * @token: A #CtplToken to free
+ * 
+ * Frees all memory used by a #CtplToken.
+ */
+void
+ctpl_token_free (CtplToken *token)
 {
   while (token) {
     CtplToken *next;
@@ -333,34 +337,30 @@ ctpl_token_free (CtplToken *token,
         break;
       
       case CTPL_TOKEN_TYPE_EXPR:
-        ctpl_token_expr_free (token->token.t_expr, TRUE);
+        ctpl_token_expr_free (token->token.t_expr);
         break;
       
       case CTPL_TOKEN_TYPE_FOR:
-        ctpl_token_expr_free (token->token.t_for->array, TRUE);
+        ctpl_token_expr_free (token->token.t_for->array);
         g_free (token->token.t_for->iter);
         
-        ctpl_token_free (token->token.t_for->children, TRUE);
+        ctpl_token_free (token->token.t_for->children);
         
         g_slice_free1 (sizeof *token->token.t_for, token->token.t_for);
         break;
       
       case CTPL_TOKEN_TYPE_IF:
-        ctpl_token_expr_free (token->token.t_if->condition, TRUE);
+        ctpl_token_expr_free (token->token.t_if->condition);
         
-        ctpl_token_free (token->token.t_if->if_children, TRUE);
-        ctpl_token_free (token->token.t_if->else_children, TRUE);
+        ctpl_token_free (token->token.t_if->if_children);
+        ctpl_token_free (token->token.t_if->else_children);
         
         g_slice_free1 (sizeof *token->token.t_if, token->token.t_if);
         break;
     }
     next = token->next;
     g_slice_free1 (sizeof *token, token);
-    token = NULL;
-    if (chain) {
-      /* free next token */
-      token = next;
-    }
+    token = next;
   }
 }
 
@@ -527,14 +527,11 @@ ctpl_token_expr_dump (const CtplTokenExpr *token)
 /**
  * ctpl_token_dump:
  * @token: A #CtplToken
- * @chain: (default TRUE): Whether to dump all next tokens
  * 
  * Dumps a token with g_print().
- * If @chain is %TRUE, all next tokens will be dumped too.
  */
 void
-ctpl_token_dump (const CtplToken *token,
-                 gboolean         chain)
+ctpl_token_dump (const CtplToken *token)
 {
-  ctpl_token_dump_internal (token, chain, 0);
+  ctpl_token_dump_internal (token, TRUE, 0);
 }
