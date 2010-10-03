@@ -424,6 +424,7 @@ ctpl_lexer_read_token_tpl (CtplInputStream *stream,
       first_word = ctpl_input_stream_peek_symbol_full (stream, 5,
                                                        &first_word_len, error);
       if (first_word) {
+        /* FIXME: there is lot of duplicates */
         if (strcmp (first_word, "if") == 0) {
           /* an if condition:
            * if expr */

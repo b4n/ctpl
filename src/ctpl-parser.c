@@ -212,7 +212,6 @@ ctpl_parser_parse_token (const CtplToken   *token,
       break;
     
     default:
-      /* FIXME: what to do with the error? */
       g_critical ("Invalid/unknown token type %d", ctpl_token_get_type (token));
       g_assert_not_reached ();
   }

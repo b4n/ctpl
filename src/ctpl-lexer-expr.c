@@ -212,7 +212,6 @@ read_symbol (CtplInputStream *stream,
 
 /* Gets whether op1 has priority over op2.
  * If both operators have the same priority, returns %TRUE */
-/* FIXME: the prior op must be the left one if they have the same priority */
 static gboolean
 operator_is_prior (CtplOperator op1,
                    CtplOperator op2)
