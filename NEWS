@@ -72,6 +72,13 @@
   "features". First, know that these functionality weren't planned. Then, feel
   free to contact me, explaining what functionality you miss and why, and I'll
   probably be happy to re-introduce it cleanly for you.
+  
+  ## CLI tool changes
+  
+  The CLI tool, apart then new features of the template engine, gained support
+  for encodings. This brings a new `--encoding` option allowing to specify the
+  encoding of the input and output files. The default encoding is the system's
+  one.
 
 
 # 0.2.2 (25/05/2010)

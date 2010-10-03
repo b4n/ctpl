@@ -41,6 +41,7 @@ static gchar      **OPT_input_files   = NULL;
 static gchar       *OPT_output_file   = NULL;
 static gboolean     OPT_verbose       = FALSE;
 static gboolean     OPT_print_version = FALSE;
+static gchar       *OPT_encoding      = NULL;
 
 static GOptionEntry option_entries[] = {
   { "output", 'o', 0, G_OPTION_ARG_FILENAME, &OPT_output_file,
@@ -55,37 +56,13 @@ static GOptionEntry option_entries[] = {
     "Be verbose.", NULL },
   { "version", 0, 0, G_OPTION_ARG_NONE, &OPT_print_version,
     "Print the version information and exit.", NULL },
+  { "encoding", 0, 0, G_OPTION_ARG_STRING, &OPT_encoding,
+    "Specify the encoding of the input and output files.", "ENCODING" },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &OPT_input_files,
     "Input files", "INPUTFILE[...]" },
   { NULL }
 };
 
-/* parses the options and fills OPT_* */
-static gboolean
-parse_options (gint    *argc,
-               gchar ***argv,
-               GError **error)
-{
-  gboolean        success = FALSE;
-  GOptionContext *context;
-  
-  context = g_option_context_new ("- CTPL template parser");
-  g_option_context_add_main_entries (context, option_entries, GETTEXT_PACKAGE);
-  if (g_option_context_parse (context, argc, argv, error)) {
-    if (OPT_print_version) {
-      printf ("CTPL %s\n", VERSION);
-      exit (0);
-    } else if (OPT_input_files == NULL) {
-      g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE,
-                   "Missing input file(s)");
-    } else {
-      success = TRUE;
-    }
-  }
-  g_option_context_free (context);
-  
-  return success;
-}
 
 /* prints verbose messages */
 static void G_GNUC_PRINTF(1, 2)
@@ -113,6 +90,76 @@ printerr (const gchar *fmt,
   va_end (ap);
 }
 
+/* checks whether an encoding is compatible with the ASCII charset, so whether
+ * a conversion is needed. return %TRUE if conversion is needed, %FALSE
+ * otherwise */
+static gboolean
+encoding_needs_conversion (const gchar *encoding)
+{
+  static GRegex *re = NULL;
+  
+  if (! re) {
+    GError *err = NULL;
+    
+    /* TODO: check current encodings and add more */
+    re = g_regex_new ("^("
+                      "(US-|cs)?ASCII([-_ ]?[78])"                           "|"
+                      "US"                                                   "|"
+                      "ANSI[-_ ]X3.4[-_ ]19(68|86)"                          "|"
+                      "ISO[-_ ]?646([-_ ]?US|\\.irv[-_ :]?1991)"             "|"
+                      "ISO[-_ ]IR[-_ ]6"                                     "|"
+                      "(IBM|CP|OEM)[-_ ]?(367|437|737|850|858|869)"          "|"
+                      "utf[-_ ]?8"                                           "|"
+                      "iso(/cei)?[-_ ]?8859.*"                               "|"
+                      "(windows|CP)[-_ ]1252"
+                      ")$",
+                      G_REGEX_CASELESS | G_REGEX_NO_AUTO_CAPTURE, 0, &err);
+    /* should never happen, means that the code is wrong */
+    if (err) {
+      g_critical ("Internal error: failed to build regular expression for "
+                  "matching encoding: %s", err->message);
+      g_error_free (err);
+    }
+  }
+  
+  return ! g_regex_match (re, encoding, 0, NULL);
+}
+
+/* parses the options and fills OPT_* */
+static gboolean
+parse_options (gint    *argc,
+               gchar ***argv,
+               GError **error)
+{
+  gboolean        success = FALSE;
+  GOptionContext *context;
+  
+  context = g_option_context_new ("- CTPL template parser");
+  g_option_context_add_main_entries (context, option_entries, GETTEXT_PACKAGE);
+  if (g_option_context_parse (context, argc, argv, error)) {
+    if (OPT_print_version) {
+      printf ("CTPL %s\n", VERSION);
+      exit (0);
+    } else if (OPT_input_files == NULL) {
+      g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE,
+                   "Missing input file(s)");
+    } else {
+      if (! OPT_encoding) {
+        const gchar *local_charset;
+        
+        /* if no encoding was given, assume it is the syetem one, so setup the
+         * encoding to convert if needed */
+        g_get_charset (&local_charset);
+        OPT_encoding = g_strdup (local_charset);
+      }
+      success = TRUE;
+    }
+  }
+  g_option_context_free (context);
+  
+  return success;
+}
+
 /* Creates a CtplInputStream from a command-line argument */
 static CtplInputStream *
 open_input_stream (const gchar *arg,
@@ -120,10 +167,40 @@ open_input_stream (const gchar *arg,
 {
   GFile            *file;
   CtplInputStream  *stream = NULL;
+  GInputStream     *gstream = NULL;
+  GFileInputStream *gfstream;
   
   file = g_file_new_for_commandline_arg (arg);
-  stream = ctpl_input_stream_new_for_gfile (file, error);
+  gfstream = g_file_read (file, NULL, error);
+  if (gfstream) {
+    gstream = G_INPUT_STREAM (gfstream);
+    
+    if (encoding_needs_conversion (OPT_encoding)) {
+      GCharsetConverter *converter;
+      
+      converter = g_charset_converter_new ("utf8", OPT_encoding, error);
+      if (! converter) {
+        g_object_unref (gstream);
+        gstream = NULL;
+      } else {
+        GInputStream *gcstream;
+        
+        gcstream = g_converter_input_stream_new (G_INPUT_STREAM (gstream),
+                                                 G_CONVERTER (converter));
+        g_object_unref (gstream);
+        gstream = gcstream;
+        g_object_unref (converter);
+      }
+    }
+  }
   g_object_unref (file);
+  if (gstream) {
+    gchar *name = g_filename_display_basename (arg);
+    
+    stream = ctpl_input_stream_new (gstream, name);
+    g_free (name);
+    g_object_unref (gstream);
+  }
   
   return stream;
 }
@@ -166,10 +243,17 @@ build_environ (void)
       gchar  *chunk;
       GError *err = NULL;
       
-      /* conversion won't fail since the original was in the target encoding */
-      chunk = g_locale_from_utf8 (OPT_env_chunks[i], -1, NULL, NULL, NULL);
+      if (! encoding_needs_conversion (OPT_encoding)) {
+        /* convert chunk to the requested encoding from utf8 (GLib converted the
+         * argumlent to utf8) */
+        chunk = g_convert (OPT_env_chunks[i], -1, OPT_encoding, "utf8",
+                           NULL, NULL, &err);
+      } else {
+        /* no conversion needed, it's already in utf8 */
+        chunk = g_strdup (OPT_env_chunks[i]);
+      }
       printv ("Loading environment chunk '%s'...\n", chunk);
-      if (! ctpl_environ_add_from_string (env, chunk, &err)) {
+      if (! chunk || ! ctpl_environ_add_from_string (env, chunk, &err)) {
         printerr ("Failed to load environment from chunk '%s': %s\n",
                   chunk, err->message);
         g_error_free (err);
@@ -240,6 +324,7 @@ parse_templates (CtplEnviron       *env,
 static CtplOutputStream *
 get_output_stream (void)
 {
+  GOutputStream    *gostream = NULL;
   CtplOutputStream *stream = NULL;
   
   if (OPT_output_file) {
@@ -253,14 +338,31 @@ get_output_stream (void)
       printerr ("Failed to open output: %s\n", err->message);
       g_error_free (err);
     } else {
-      stream = ctpl_output_stream_new (G_OUTPUT_STREAM (gfostream));
-      g_object_unref (gfostream);
+      gostream = G_OUTPUT_STREAM (gfostream);
     }
   } else {
-    GOutputStream *gostream;
-    
     /* FIXME: how to get rid of GIOUnix for that? */
     gostream = g_unix_output_stream_new (STDOUT_FILENO, FALSE);
+  }
+  if (gostream) {
+    if (encoding_needs_conversion (OPT_encoding)) {
+      GCharsetConverter *converter;
+      GError            *err = NULL;
+      
+      converter = g_charset_converter_new (OPT_encoding, "utf8", &err);
+      if (! converter) {
+        printerr ("Failed to create encoding converter: %s\n", err->message);
+        g_error_free (err);
+      } else {
+        GOutputStream *gcostream;
+        
+        gcostream = g_converter_output_stream_new (gostream,
+                                                   G_CONVERTER (converter));
+        g_object_unref (gostream);
+        gostream = gcostream;
+        g_object_unref (converter);
+      }
+    }
     stream = ctpl_output_stream_new (gostream);
     g_object_unref (gostream);
   }
