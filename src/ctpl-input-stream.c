@@ -1251,6 +1251,7 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
         gchar  *endptr;
         gdouble dblval = 0.0;
         glong   longval = 0;
+        gint    errno_save = errno;
         
         /*g_debug ("trying to convert '%s'", nptr);*/
         errno = 0;
@@ -1275,6 +1276,7 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
             ctpl_value_set_float (value, dblval);
           }
         }
+        errno = errno_save;
       }
     }
   }
@@ -1322,12 +1324,6 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
  * -0x88fe.2p8
  *   </programlisting>
  * </example>
- * 
- * <warning>
- *   <para>
- *     This function may modify @errno.
- *   </para>
- * </warning>
  * 
  * Returns: %TRUE on success, %FALSE otherwise.
  * 
