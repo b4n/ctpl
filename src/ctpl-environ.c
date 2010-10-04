@@ -58,20 +58,10 @@
  * ctpl_environ_add_from_path(). Environment descriptions are of the form
  * <code>SYMBOL = VALUE;</code> and can contain comments. Comments starts with a
  * <code>#</code> (number sign) and ends at the next line ending.
- * Some examples below:
- * <example>
- *   <title>An environment description</title>
- *   <programlisting>
- * foo            = "string value";
- * # This is a comment
- * bar            = 42; # An important number!
- * str            = "a more
- *                   complex\" string";
- * array          = [1, 2, "hello", ["world", "dolly"]];
- * complex_number = 2.12e-9;
- * hex_number     = 0xffe2;
- *   </programlisting>
- * </example>
+ * 
+ * For more details, see the
+ * <link linkend="environment-description-syntax">environment dscription
+ * syntax</link>.
  */
 
 

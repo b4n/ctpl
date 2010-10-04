@@ -177,7 +177,7 @@ procede_template (CtplInputStream  *input,
     </section>
     
     <section>
-      <title>Syntax</title>
+      <title>Templates syntax</title>
       <para>
         CTPL supports 2 kinds of data:
         <variablelist>
@@ -369,6 +369,126 @@ procede_template (CtplInputStream  *input,
           </para>
         </example>
       </section>
+    </section>
+      
+    <section id="environment-description-syntax">
+      <title>Environment description syntax</title>
+      <para>
+        The environment descriptions (that can be read by
+        <link linkend="ctpl-environ-add-from-stream">ctpl_environ_add_from_stream()</link>
+        and friends) contains any number of symbol-value pairs that have the
+        following syntax:
+        <informalexample>
+          <programlisting>
+            &lt;symbol&gt; = &lt;value&gt;;
+          </programlisting>
+        </informalexample>
+        where <code>&lt;symbol&gt;</code> is a
+        <link linkend="environment-description-syntax-symbol">valid
+        symbol</link> and <code>&lt;value&gt;</code> is a
+        <link linkend="environment-description-syntax-value">valid value</link>.
+        Apart the four required parts (symbol, equal sign, value, semicolon),
+        there can be any number of
+        <link linkend="environment-description-syntax-blank">blank
+        characters</link> and
+        <link linkend="environment-description-syntax-comment">comments</link>
+        before, between and after them.
+      </para>
+      
+      <section id="environment-description-syntax-symbol">
+        <title>Symbol</title>
+        <para>
+          The symbol part is composed of any alphanumeric characters and
+          underscore, repeated any number of times.
+        </para>
+      </section>
+      
+      <section id="environment-description-syntax-value">
+        <title>Value</title>
+        <para>
+          There is 3 supported value types:
+          <itemizedlist>
+            <listitem>
+              <para>
+                Numbers, as read by
+                <link linkend="ctpl-input-stream-read-number">ctpl_input_stream_read_number()</link>.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Strings, as read by
+                <link linkend="ctpl-input-stream-read-string-literal">ctpl_input_stream_read_string_literal()</link>.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Arrays of any of these 3 types of values. Arrays starts with an
+                opening square bracket (<code>[</code>) and ends with a closing
+                square bracket (<code>]</code>). The values in the array are
+                separated with a comma (<code>,</code>).
+                There can be any number of values (but at least one), and they
+                don't need to be all of the same type, and can include arrays as
+                well.
+              </para>
+              <example>
+                <title>An array for the example</title>
+                <programlisting>
+                  [1, 2, 3, "more", [42, 84]]
+                </programlisting>
+              </example>
+            </listitem>
+          </itemizedlist>
+        </para>
+      </section>
+      
+      <section id="environment-description-syntax-blank">
+        <title>Blanks</title>
+        <para>
+          Blank characters are not interpreted and may appear anywhere
+          nothing is expected, e.g. between the identifier and the equal sign.
+          The blank characters are space, tab, vertical tab, newline and
+          carriage return.
+        </para>
+      </section>
+      
+      <section id="environment-description-syntax-comment">
+        <title>Comments</title>
+        <para>
+          Comments are special segments that don't get interpreted. Such
+          segment starts with a number sign (<code>#</code>) that is not part
+          of any other construct (such as a string literal), and ends at the
+          following end of line.
+        </para>
+        <para>
+          Comments can be useful to add extra information to explain an element,
+          to separate different parts or to disable a part of the description
+          without actually removing it.
+        </para>
+        <example>
+          <title>A small comment</title>
+          <programlisting>
+            # This is a comment
+          </programlisting>
+        </example>
+      </section>
+      
+      <example>
+        <title>An environment description example</title>
+        <programlisting>
+# This is an example that shows some environment description syntax.
+# It does not show everything (there is more supported numeric constructs for
+# example), but it covers a pretty good part of it.
+
+foo            = "string value";
+# This is a comment
+bar            = 42; # An important number!
+str            = "a more
+                  complex\" string";
+array          = [1, 2, "hello", ["world", "dolly"]];
+complex_number = 2.12e-9;
+hex_number     = 0xffe2; # 65506
+        </programlisting>
+      </example>
     </section>
     
     <section>
