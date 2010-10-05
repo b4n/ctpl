@@ -197,7 +197,8 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
  */
 static gchar *
 do_multiply_string (const gchar  *str,
-                    glong         n)
+                    glong         n,
+                    GError      **error)
 {
   gchar *buf = NULL;
   
@@ -211,14 +212,30 @@ do_multiply_string (const gchar  *str,
     gsize       i, j;
     
     str_len = strlen (str);
-    buf_len = str_len * (gsize)n;
-    buf = g_malloc (buf_len + 1);
-    for (i = 0; i < (gsize)n; i++) {
-      for (j = 0; j < str_len; j++) {
-        buf[str_len * i + j] = str[j];
+    /* detect possible integer overflow. last check is because we allocate one
+     * more byte (string termination) */
+    if (G_UNLIKELY ((str_len > 0 && (gsize)n > G_MAXSIZE / str_len) ||
+                    str_len * (gsize)n >= G_MAXSIZE)) {
+      g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
+                   "String multiplication would overflow allocating "
+                   "%"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT"+1 bytes",
+                   (gsize)n, str_len);
+    } else {
+      buf_len = str_len * (gsize)n;
+      buf = g_try_malloc (buf_len + 1);
+      if (G_UNLIKELY (! buf)) {
+        g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
+                     "Cannot allocate %"G_GSIZE_FORMAT" bytes for string "
+                     "multiplication", buf_len + 1);
+      } else {
+        for (i = 0; i < (gsize)n; i++) {
+          for (j = 0; j < str_len; j++) {
+            buf[str_len * i + j] = str[j];
+          }
+        }
+        buf[buf_len] = 0;
       }
     }
-    buf[buf_len] = 0;
   }
   //~ g_debug ("mutiplied string: '%s'", buf);
   
@@ -316,9 +333,14 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
           
           /* hum, may we optimise for 1 and < 1 multiplications? */
           str = do_multiply_string (ctpl_value_get_string (str_val),
-                                    ctpl_value_get_int (num_val));
-          ctpl_value_set_string (value, str);
-          g_free (str);
+                                    ctpl_value_get_int (num_val),
+                                    error);
+          if (! str) {
+            rv = FALSE;
+          } else {
+            ctpl_value_set_string (value, str);
+            g_free (str);
+          }
         }
         break;
       }
