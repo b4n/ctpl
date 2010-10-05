@@ -56,11 +56,11 @@
  * Environments can also be loaded from #CtplInputStream<!-- -->s, strings or
  * files using ctpl_environ_add_from_stream(), ctpl_environ_add_from_string() or
  * ctpl_environ_add_from_path(). Environment descriptions are of the form
- * <code>SYMBOL = VALUE;</code> and can contain comments. Comments starts with a
- * <code>#</code> (number sign) and ends at the next line ending.
+ * <code>SYMBOL = VALUE;</code> and can contain comments. Comments start with a
+ * <code>#</code> (number sign) and end at the next line ending.
  * 
  * For more details, see the
- * <link linkend="environment-description-syntax">environment dscription
+ * <link linkend="environment-description-syntax">environment description
  * syntax</link>.
  */
 

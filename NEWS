@@ -6,14 +6,14 @@
   
   * Heavy API cleanup;
   * Array expressions can now be indexed;
-  * The `for` loop now iterates over an expression;
+  * The `for` loop now iterates over an expression rather than a symbol name;
   * CtplEnviron now uses reference counting;
-  * Improvements of CtplEnviron memory usage;
+  * Improvements of CtplEnviron's memory usage;
   * Bug fixes:
     * ctpl_value_copy(), ctpl_value_set_string() and ctpl_value_set_array*() can
       now take a part of itself as the value to set/copy;
     * Fix internal handling of an error which may lead to wrong error detection;
-    * Fix wrong name of streams built from GFiles (then also paths and URIs);
+    * Fix wrong name of streams built from GFiles, paths and URIs;
     * Fix dramatic slowness when a symbol gets pushed many times;
   * Some internal refactoring.
   
@@ -27,7 +27,7 @@
   
   I will also justify this new break, at least for you to understand the
   original motivations for it:
-  * There was way to many symbols exposed, and many of them wasn't supposed to
+  * There was way too many symbols exposed, and a lot of them wasn't supposed to
     be used by library's users;
   * Exposing data structures (as well as some other internals) makes working on
     the core harder, because any change to one of this data structure means an

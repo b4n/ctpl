@@ -406,7 +406,7 @@ procede_template (CtplInputStream  *input,
       <section id="environment-description-syntax-value">
         <title>Value</title>
         <para>
-          There is 3 supported value types:
+          There are 3 supported value types:
           <itemizedlist>
             <listitem>
               <para>
@@ -422,18 +422,17 @@ procede_template (CtplInputStream  *input,
             </listitem>
             <listitem>
               <para>
-                Arrays of any of these 3 types of values. Arrays starts with an
-                opening square bracket (<code>[</code>) and ends with a closing
+                Arrays of any of these 3 types of values. Arrays start with an
+                opening square bracket (<code>[</code>) and end with a closing
                 square bracket (<code>]</code>). The values in the array are
-                separated with a comma (<code>,</code>).
-                There can be any number of values (but at least one), and they
-                don't need to be all of the same type, and can include arrays as
-                well.
+                separated by a comma (<code>,</code>).
+                There can be any number of values (but at least one), which may
+                be of any type, including arrays as well.
               </para>
               <example>
-                <title>An array for the example</title>
+                <title>A sample array</title>
                 <programlisting>
-                  [1, 2, 3, "more", [42, 84]]
+                  [1, 2, 3, "more", [42, 84, 126]]
                 </programlisting>
               </example>
             </listitem>
@@ -455,7 +454,7 @@ procede_template (CtplInputStream  *input,
         <title>Comments</title>
         <para>
           Comments are special segments that don't get interpreted. Such
-          segment starts with a number sign (<code>#</code>) that is not part
+          segments start with a number sign (<code>#</code>) that is not part
           of any other construct (such as a string literal), and ends at the
           following end of line.
         </para>
@@ -476,17 +475,17 @@ procede_template (CtplInputStream  *input,
         <title>An environment description example</title>
         <programlisting>
 # This is an example that shows some environment description syntax.
-# It does not show everything (there is more supported numeric constructs for
+# It does not show everything (there are more supported numeric constructs for
 # example), but it covers a pretty good part of it.
 
-foo            = "string value";
+foo         = "string value";
 # This is a comment
-bar            = 42; # An important number!
-str            = "a more
-                  complex\" string";
-array          = [1, 2, "hello", ["world", "dolly"]];
-complex_number = 2.12e-9;
-hex_number     = 0xffe2; # 65506
+bar         = 42; # An important number!
+str         = "a more
+               complex\" string";
+array       = [1, 2, "hello", ["world", "dolly"]];
+real_number = 2.12e-9;
+hex_number  = 0xffe2; # 65506
         </programlisting>
       </example>
     </section>
@@ -501,9 +500,9 @@ hex_number     = 0xffe2; # 65506
         others &mdash; but not UTF-16, UTF-32 and a few others.
       </para>
       <para>
-        Since CTPL will not convert anything for you, you must take care that
-        the encoding of the input template and the environment are the same not
-        to have mixed encodings in the output.
+        Since CTPL will not convert anything for you, you must ensure that
+        the encoding of the input template and the environment are the same to
+        avoid mixed encodings in the output.
       </para>
       <para>
         To convert the input data, you can use a
