@@ -1339,7 +1339,7 @@ ctpl_input_stream_read_number (CtplInputStream *stream,
 }
 
 /**
- * ctpl_input_stream_read_double:
+ * ctpl_input_stream_read_float:
  * @stream: A #CtplInputStream
  * @error: Return location for errors, or %NULL to ignore them
  * 
@@ -1351,8 +1351,8 @@ ctpl_input_stream_read_number (CtplInputStream *stream,
  * Since: 0.2
  */
 gdouble
-ctpl_input_stream_read_double (CtplInputStream *stream,
-                               GError         **error)
+ctpl_input_stream_read_float (CtplInputStream *stream,
+                              GError         **error)
 {
 #if 1
   CtplValue value;
@@ -1513,7 +1513,7 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
 }
 
 /**
- * ctpl_input_stream_read_long:
+ * ctpl_input_stream_read_int:
  * @stream: A #CtplInputStream
  * @error: Return location for errors, or %NULL to ignore them
  * 
@@ -1525,8 +1525,8 @@ ctpl_input_stream_read_double (CtplInputStream *stream,
  * Since: 0.2
  */
 glong
-ctpl_input_stream_read_long (CtplInputStream *stream,
-                             GError         **error)
+ctpl_input_stream_read_int (CtplInputStream *stream,
+                            GError         **error)
 {
   CtplValue value;
   glong     v = 0l;

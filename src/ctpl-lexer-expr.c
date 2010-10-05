@@ -161,7 +161,7 @@ ctpl_lexer_expr_error_quark (void)
 /* @stream: #CtplInputStream holding the number.
  * @state: Lexer state
  * @error: return location for errors, or %NULL to ignore them
- * See ctpl_input_stream_read_double()
+ * See ctpl_input_stream_read_number()
  * Returns: A new #CtplTokenExpr or %NULL if the input doesn't contain any valid
  *          number.
  */

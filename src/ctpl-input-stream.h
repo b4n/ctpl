@@ -118,9 +118,9 @@ gchar            *ctpl_input_stream_read_string_literal (CtplInputStream *stream
 gboolean          ctpl_input_stream_read_number         (CtplInputStream *stream,
                                                          CtplValue       *value,
                                                          GError         **error);
-gdouble           ctpl_input_stream_read_double         (CtplInputStream *stream,
+gdouble           ctpl_input_stream_read_float          (CtplInputStream *stream,
                                                          GError         **error);
-glong             ctpl_input_stream_read_long           (CtplInputStream *stream,
+glong             ctpl_input_stream_read_int            (CtplInputStream *stream,
                                                          GError         **error);
 
 /*#define ctpl_input_stream_eof_fast(stream) (stream->buf_size <= 0)*/

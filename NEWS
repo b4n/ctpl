@@ -58,6 +58,12 @@
   poped value and returns a boolean (see the documentation for more details).
   Anyway you should probably not need ctpl_environ_pop() at all.
   
+  ### Input and output streams
+  
+  ctpl_input_stream_read_double() and ctpl_input_stream_read_long() are renamed
+  to ctpl_input_stream_read_float() and ctpl_input_stream_read_int() for more
+  consistency with the rest of the API.
+  
   ### Others
   
   The environment to pass to ctpl_eval_*() is not constant anymore. This will
