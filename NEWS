@@ -18,7 +18,7 @@
   * Some internal refactoring.
   
   Yes, it is the second API break since the library's birth, less than one year
-  ago. I know it and I apologize for the inconvenience (packagers will hate me).
+  ago. I know it and I apologize for the inconvenience.
   
   But even if it's an API break, if you make normal usage of the library, it
   shouldn't be too painful for you to upgrade to the new version (see below).
@@ -54,7 +54,7 @@
   ctpl_environ_free() with ctpl_environ_unref(). Note that ctpl_environ_unref()
   does not support NULL argument.
   
-  ctpl_environ_pop() has changed. It now takes an third argument to get the
+  ctpl_environ_pop() has changed. It now takes a third argument to get the
   poped value and returns a boolean (see the documentation for more details).
   Anyway you should probably not need ctpl_environ_pop() at all.
   
@@ -68,16 +68,16 @@
   
   The environment to pass to ctpl_eval_*() is not constant anymore. This will
   probably not change anything for you, but it's a subtle change. This is to
-  allow future operators to affect the environment if needed (this isn't the
+  allow future operators to affect the environment if needed (which isn't the
   case yet).
   
   ## The dark side of the cleanup
   
-  Apart the inconvenience of an API break, some "functionality" of the library
-  may be gone -- yes, having many internal exposed may allow unwanted
-  "features". First, know that these functionality weren't planned. Then, feel
-  free to contact me, explaining what functionality you miss and why, and I'll
-  probably be happy to re-introduce it cleanly for you.
+  Apart the inconvenience of an API break, some "features" of the library may be
+  gone -- yes, having many internal exposed may allow unwanted "features".
+  First, know that these features weren't planned. Then, feel free to contact
+  me, explaining what functionality you miss and why, and I'll probably be happy
+  to re-introduce it cleanly for you.
   
   ## CLI tool changes
   
