@@ -35,8 +35,8 @@ import tempfile
 
 
 APPNAME		= 'ctpl'
-VERSION		= '0.2.2'
-LTVERSION	= '1.0.2' # emulate Libtool version
+VERSION		= '0.3'
+LTVERSION	= '2.0.0' # emulate Libtool version
 
 srcdir = '.'
 blddir = '_build_'
