@@ -53,7 +53,8 @@ HEADERS = [
 'src/ctpl-output-stream.h',
 'src/ctpl-parser.h',
 'src/ctpl-token.h',
-'src/ctpl-value.h']
+'src/ctpl-value.h',
+'src/ctpl-version.h']
 
 LIBRARY_SOURCES = '''
 src/ctpl-environ.c
