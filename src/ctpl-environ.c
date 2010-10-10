@@ -562,33 +562,40 @@ read_array (CtplInputStream *stream,
                                  CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
                                  "Not an array");
   } else {
-    CtplValue item;
-    gboolean  in_array = TRUE;
-    
     ctpl_value_set_array (value, CTPL_VTYPE_INT, 0, NULL);
-    ctpl_value_init (&item);
-    while (! err && in_array) {
-      if (skip_blank (stream, &err) >= 0 &&
-          read_value (stream, &item, &err)) {
-        ctpl_value_array_append (value, &item);
-        if (skip_blank (stream, &err) >= 0) {
-          c = ctpl_input_stream_get_c (stream, &err);
-          if (err) {
-            /* I/O error */
-          } else if (c == ARRAY_END_CHAR) {
-            in_array = FALSE;
-          } else if (c == ARRAY_SEPARATOR_CHAR) {
-            /* nothing to do, just continue reading */
-          } else {
-            ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
-                                         CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
-                                         "Missing `%c` separator between array "
-                                         "values", ARRAY_SEPARATOR_CHAR);
+    /* don't try to extract any value from an empty array */
+    if (skip_blank (stream, &err) >= 0 &&
+        ctpl_input_stream_peek_c (stream, &err) == ARRAY_END_CHAR &&
+        ! err) {
+      ctpl_input_stream_get_c (stream, &err); /* eat character */
+    } else {
+      CtplValue item;
+      gboolean  in_array = TRUE;
+      
+      ctpl_value_init (&item);
+      while (! err && in_array) {
+        if (skip_blank (stream, &err) >= 0 &&
+            read_value (stream, &item, &err)) {
+          ctpl_value_array_append (value, &item);
+          if (skip_blank (stream, &err) >= 0) {
+            c = ctpl_input_stream_get_c (stream, &err);
+            if (err) {
+              /* I/O error */
+            } else if (c == ARRAY_END_CHAR) {
+              in_array = FALSE;
+            } else if (c == ARRAY_SEPARATOR_CHAR) {
+              /* nothing to do, just continue reading */
+            } else {
+              ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
+                                           CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
+                                           "Missing `%c` separator between array "
+                                           "values", ARRAY_SEPARATOR_CHAR);
+            }
           }
         }
       }
+      ctpl_value_free_value (&item);
     }
-    ctpl_value_free_value (&item);
   }
   if (err) {
     g_propagate_error (error, err);
