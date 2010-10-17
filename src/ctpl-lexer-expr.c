@@ -280,17 +280,9 @@ static const gsize operators_array_length = G_N_ELEMENTS (operators_array) - 1;
 const gchar *
 ctpl_operator_to_string (CtplOperator op)
 {
-  gsize i = operators_array_length; /* by default, index the last op (error) */
+  g_return_val_if_fail (op >= 0 && op <= CTPL_OPERATOR_NONE, NULL);
   
-  /* if not an operator, final incrementation leads to index (n_ops + 1),
-   * the error message; otherwise, we break then i indexes the operator. */
-  for (i = 0; i < operators_array_length; i++) {
-    if (operators_array[i].op == op) {
-      break;
-    }
-  }
-  
-  return operators_array[i].str;
+  return operators_array[op].str;
 }
 
 /*
