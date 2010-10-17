@@ -210,30 +210,11 @@ read_symbol (CtplInputStream *stream,
   return token;
 }
 
-/* Gets whether op1 has priority over op2.
- * If both operators have the same priority, returns %TRUE */
-static gboolean
-operator_is_prior (CtplOperator op1,
-                   CtplOperator op2)
-{
-  if ((op1 == CTPL_OPERATOR_EQUAL || op1 == CTPL_OPERATOR_INF ||
-       op1 == CTPL_OPERATOR_INFEQ || op1 == CTPL_OPERATOR_SUP ||
-       op1 == CTPL_OPERATOR_SUPEQ || op1 == CTPL_OPERATOR_NEQ ||
-       op1 == CTPL_OPERATOR_AND   || op1 == CTPL_OPERATOR_OR) ||
-      ((op1 == CTPL_OPERATOR_MUL || op1 == CTPL_OPERATOR_DIV ||
-        op1 == CTPL_OPERATOR_MODULO) &&
-       ! operator_is_prior (op2, CTPL_OPERATOR_EQUAL)) ||
-      ((op1 == CTPL_OPERATOR_PLUS || op1 == CTPL_OPERATOR_MINUS) &&
-       ! operator_is_prior (op2, CTPL_OPERATOR_MUL))) {
-    return TRUE;
-  }
-  return FALSE;
-}
-
 /* 
  * operators_array:
  * 
- * List of operators, with their representation in the CTPL language.
+ * List of operators, with their priority and representation in the CTPL
+ * language.
  * Don't forget to update this when adding an operator */
 /* This is ordered alphabetically but tweaked for the string representations to be
  * match-able in order. E.g. >= must come before > not for > to match >=.
@@ -242,30 +223,40 @@ operator_is_prior (CtplOperator op1,
  * operators_array[i].op == i */
 static const struct {
   CtplOperator  op;       /* The operator ID */
+  guint         priority; /* Op's priority: the higher the prior */
   const gchar  *str;      /* Its string representation */
   gsize         str_len;  /* Cached length of @str */
 } operators_array[] = {
-  { CTPL_OPERATOR_AND,    "&&", 2 },
-  { CTPL_OPERATOR_DIV,    "/",  1 },
-  { CTPL_OPERATOR_EQUAL,  "==", 2 },
-  { CTPL_OPERATOR_INFEQ,  "<=", 2 },
-  { CTPL_OPERATOR_INF,    "<",  1 },
-  { CTPL_OPERATOR_MINUS,  "-",  1 },
-  { CTPL_OPERATOR_MODULO, "%",  1 },
-  { CTPL_OPERATOR_MUL,    "*",  1 },
-  { CTPL_OPERATOR_NEQ,    "!=", 2 },
-  { CTPL_OPERATOR_OR,     "||", 2 },
-  { CTPL_OPERATOR_PLUS,   "+",  1 },
-  { CTPL_OPERATOR_SUPEQ,  ">=", 2 },
-  { CTPL_OPERATOR_SUP,    ">",  1 },
+  { CTPL_OPERATOR_AND,    30, "&&", 2 },
+  { CTPL_OPERATOR_DIV,    20, "/",  1 },
+  { CTPL_OPERATOR_EQUAL,  30, "==", 2 },
+  { CTPL_OPERATOR_INFEQ,  30, "<=", 2 },
+  { CTPL_OPERATOR_INF,    30, "<",  1 },
+  { CTPL_OPERATOR_MINUS,  10, "-",  1 },
+  { CTPL_OPERATOR_MODULO, 20, "%",  1 },
+  { CTPL_OPERATOR_MUL,    20, "*",  1 },
+  { CTPL_OPERATOR_NEQ,    30, "!=", 2 },
+  { CTPL_OPERATOR_OR,     30, "||", 2 },
+  { CTPL_OPERATOR_PLUS,   10, "+",  1 },
+  { CTPL_OPERATOR_SUPEQ,  30, ">=", 2 },
+  { CTPL_OPERATOR_SUP,    30, ">",  1 },
   /* must be last */
-  { CTPL_OPERATOR_NONE,   "not an operator", 15 }
+  { CTPL_OPERATOR_NONE,   0,  "not an operator", 15 }
 };
 /* number of true operators, without the NONE at the end */
 static const gsize operators_array_length = G_N_ELEMENTS (operators_array) - 1;
 /* the maximum length of a valid operator */
 #define            OPERATORS_STR_MAXLEN     (2)
 
+
+/* Gets whether op1 has priority over op2.
+ * If both operators have the same priority, returns %TRUE */
+static gboolean
+operator_is_prior (CtplOperator op1,
+                   CtplOperator op2)
+{
+  return operators_array[op1].priority >= operators_array[op2].priority;
+}
 
 /*
  * ctpl_operator_to_string:
