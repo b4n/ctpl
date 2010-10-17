@@ -235,10 +235,11 @@ operator_is_prior (CtplOperator op1,
  * 
  * List of operators, with their representation in the CTPL language.
  * Don't forget to update this when adding an operator */
-/* TODO: make this indexable by the .op field for speed. E.g. this would work:
- * operators_array[i].op == i
- * Hum, not that simple since the order depends on the operator string
- * representation too: >= must come before > to be matched correctly */
+/* This is ordered alphabetically but tweaked for the string representations to be
+ * match-able in order. E.g. >= must come before > not for > to match >=.
+ * 
+ * The order must also be the same as the CtplOperator enum, so
+ * operators_array[i].op == i */
 static const struct {
   CtplOperator  op;       /* The operator ID */
   const gchar  *str;      /* Its string representation */

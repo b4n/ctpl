@@ -50,39 +50,40 @@ G_BEGIN_DECLS
 
 /*
  * CtplOperator:
- * @CTPL_OPERATOR_PLUS:   Addition operator
- * @CTPL_OPERATOR_MINUS:  Subtraction operator
- * @CTPL_OPERATOR_DIV:    Division operator
- * @CTPL_OPERATOR_MUL:    Multiplication operator
- * @CTPL_OPERATOR_EQUAL:  Equality test operator
- * @CTPL_OPERATOR_INF:    Inferiority test operator
- * @CTPL_OPERATOR_SUP:    Superiority test operator
- * @CTPL_OPERATOR_MODULO: Modulo operator
- * @CTPL_OPERATOR_SUPEQ:  @CTPL_OPERATOR_SUP || @CTPL_OPERATOR_EQUAL
- * @CTPL_OPERATOR_INFEQ:  @CTPL_OPERATOR_INF || @CTPL_OPERATOR_EQUAL
- * @CTPL_OPERATOR_NEQ:    Non-equality test operator (! @CTPL_OPERATOR_EQUAL)
  * @CTPL_OPERATOR_AND:    Boolean AND operator
+ * @CTPL_OPERATOR_DIV:    Division operator
+ * @CTPL_OPERATOR_EQUAL:  Equality test operator
+ * @CTPL_OPERATOR_INFEQ:  @CTPL_OPERATOR_INF || @CTPL_OPERATOR_EQUAL
+ * @CTPL_OPERATOR_INF:    Inferiority test operator
+ * @CTPL_OPERATOR_MINUS:  Subtraction operator
+ * @CTPL_OPERATOR_MODULO: Modulo operator
+ * @CTPL_OPERATOR_MUL:    Multiplication operator
+ * @CTPL_OPERATOR_NEQ:    Non-equality test operator (! @CTPL_OPERATOR_EQUAL)
  * @CTPL_OPERATOR_OR:     Boolean OR operator
+ * @CTPL_OPERATOR_PLUS:   Addition operator
+ * @CTPL_OPERATOR_SUPEQ:  @CTPL_OPERATOR_SUP || @CTPL_OPERATOR_EQUAL
+ * @CTPL_OPERATOR_SUP:    Superiority test operator
  * @CTPL_OPERATOR_NONE:   Not an operator, denoting no operator
  * 
  * Operators constants.
  * 
  * See also ctpl_operator_to_string() and ctpl_operator_from_string().
  */
+/* keep order as needed by operators_array in lexer-expr.c */
 typedef enum {
-  CTPL_OPERATOR_PLUS,
-  CTPL_OPERATOR_MINUS,
-  CTPL_OPERATOR_DIV,
-  CTPL_OPERATOR_MUL,
-  CTPL_OPERATOR_EQUAL,
-  CTPL_OPERATOR_INF,
-  CTPL_OPERATOR_SUP,
-  CTPL_OPERATOR_MODULO,
-  CTPL_OPERATOR_SUPEQ,
-  CTPL_OPERATOR_INFEQ,
-  CTPL_OPERATOR_NEQ,
   CTPL_OPERATOR_AND,
+  CTPL_OPERATOR_DIV,
+  CTPL_OPERATOR_EQUAL,
+  CTPL_OPERATOR_INFEQ,
+  CTPL_OPERATOR_INF,
+  CTPL_OPERATOR_MINUS,
+  CTPL_OPERATOR_MODULO,
+  CTPL_OPERATOR_MUL,
+  CTPL_OPERATOR_NEQ,
   CTPL_OPERATOR_OR,
+  CTPL_OPERATOR_PLUS,
+  CTPL_OPERATOR_SUPEQ,
+  CTPL_OPERATOR_SUP,
   /* must be last */
   CTPL_OPERATOR_NONE
 } CtplOperator;
