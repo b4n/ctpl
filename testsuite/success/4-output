@@ -1,0 +1,36 @@
+
+  neq
+  
+    
+      
+        
+          first[first]
+        
+          first[second]
+        
+          first[third]
+        
+      
+    
+      
+        
+          second[first]
+        
+          second[second]
+        
+          second[third]
+        
+      
+    
+      
+        
+          third[first]
+        
+          third[second]
+        
+          third[third]
+        
+      
+    
+  
+
