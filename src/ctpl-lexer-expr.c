@@ -426,8 +426,8 @@ lex_operand_index (CtplInputStream *stream,
   gboolean success = TRUE;
   
   /* if we have something that looks like an index, try to read it */
-  /* FIXME: handle blanks before the index */
-  while (success && ctpl_input_stream_peek_c (stream, NULL) == '[') {
+  while (success && ctpl_input_stream_skip_blank (stream, error) >= 0 &&
+         ctpl_input_stream_peek_c (stream, NULL) == '[') {
     CtplTokenExpr  *idx;
     
     success = FALSE;
