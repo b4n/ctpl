@@ -105,7 +105,7 @@ ctpl_eval_operator_minus (CtplValue  *lvalue,
   return rv;
 }
 
-/* Tries to evaluate a addition operation */
+/* Tries to evaluate an addition operation */
 static gboolean
 ctpl_eval_operator_plus (CtplValue *lvalue,
                          CtplValue *rvalue,
@@ -122,11 +122,12 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
           const GSList *array;
           
           for (array = ctpl_value_get_array (rvalue);
-               array->data;
+               array;
                array = array->next) {
             ctpl_value_array_append (value, array->data);
           }
         }
+        break;
         
         default:
           ctpl_value_array_append (value, rvalue);
