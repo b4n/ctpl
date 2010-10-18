@@ -271,14 +271,12 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
 }
 
 /* reads an end block end (} of a {end} block)
- * Returns: %TRUE on success, %FALSE otherwise. */
-static gboolean
+ * Always returns %NULL to stop lexing pass or notify an error. */
+static CtplToken *
 ctpl_lexer_read_token_tpl_end (CtplInputStream *stream,
                                LexerState      *state,
                                GError         **error)
 {
-  gboolean  rv = FALSE;
-  
   //~ g_debug ("end?");
   if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
     gint    c;
@@ -305,23 +303,20 @@ ctpl_lexer_read_token_tpl_end (CtplInputStream *stream,
                                      "or 'for' before)");
       } else {
         state->last_statement_type_if = S_END;
-        rv = TRUE;
       }
     }
   }
   
-  return rv;
+  return NULL;
 }
 
 /* reads an else block end (} of a {else} block)
- * Returns: %TRUE on success, %FALSE otherwise. */
-static gboolean
+ * Always returns %NULL to stop lexing pass or notify an error. */
+static CtplToken *
 ctpl_lexer_read_token_tpl_else (CtplInputStream *stream,
                                 LexerState      *state,
                                 GError         **error)
 {
-  gboolean  rv = FALSE;
-  
   //~ g_debug ("else?");
   if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
     GError *err = NULL;
@@ -347,12 +342,11 @@ ctpl_lexer_read_token_tpl_else (CtplInputStream *stream,
                                      "'if' before)");
       } else {
         state->last_statement_type_if = S_ELSE;
-        rv = TRUE;
       }
     }
   }
   
-  return rv;
+  return NULL;
 }
 
 /* Reads an expression token (:BLANKCHARS:?:EXPRCHARS::BLANKCHARS:?}, without
@@ -424,36 +418,29 @@ ctpl_lexer_read_token_tpl (CtplInputStream *stream,
       first_word = ctpl_input_stream_peek_symbol_full (stream, 5,
                                                        &first_word_len, error);
       if (first_word) {
-        /* FIXME: there is lot of duplicates */
-        if (strcmp (first_word, "if") == 0) {
-          /* an if condition:
-           * if expr */
-          ctpl_input_stream_skip (stream, first_word_len, NULL);
-          token = ctpl_lexer_read_token_tpl_if (stream, state, error);
-        } else if (strcmp (first_word, "for") == 0) {
-          /* a for loop:
-           * for iter in array */
-          ctpl_input_stream_skip (stream, first_word_len, NULL);
-          token = ctpl_lexer_read_token_tpl_for (stream, state, error);
-        } else if (strcmp (first_word, "end") == 0) {
-          /* a block end:
-           * {end} */
-          ctpl_input_stream_skip (stream, first_word_len, NULL);
-          ctpl_lexer_read_token_tpl_end (stream, state, error);
-          /* here we will return NULL, which is fine as it simply stops token
-           * reading, and as we use nested lexing calls for nested blocks */
-        } else if (strcmp (first_word, "else") == 0) {
-          /* an else statement:
-           * {else} */
-          ctpl_input_stream_skip (stream, first_word_len, NULL);
-          ctpl_lexer_read_token_tpl_else (stream, state, error);
-          /* return NULL, see above */
+        /* tries to handle @keyword, returns whether it has been handled.
+         * @handler must return a token on success, or %NULL to stop lexing
+         * (not necessarily an error, may end a nested pass) */
+        #define HANDLE_KEYWORD(keyword, handler)                               \
+          ((strcmp (first_word, keyword) == 0)                                 \
+           ? (ctpl_input_stream_skip (stream, first_word_len, NULL),           \
+              (token = handler (stream, state, error)),                        \
+              TRUE)                                                            \
+           : FALSE)
+        
+        if        (HANDLE_KEYWORD ("if",    ctpl_lexer_read_token_tpl_if)) {
+        } else if (HANDLE_KEYWORD ("for",   ctpl_lexer_read_token_tpl_for)) {
+        } else if (HANDLE_KEYWORD ("end",   ctpl_lexer_read_token_tpl_end)) {
+        } else if (HANDLE_KEYWORD ("else",  ctpl_lexer_read_token_tpl_else)) {
         } else {
-          /* an expression, or nothing valid */
+          /* if nothing matched, it's an expression or nothing valid */
           token = ctpl_lexer_read_token_tpl_expr (stream, state, error);
         }
+        
+        #undef HANDLE_KEYWORD
+        
+        g_free (first_word);
       }
-      g_free (first_word);
     }
   }
   
