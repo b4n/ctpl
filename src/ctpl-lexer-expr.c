@@ -588,7 +588,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
         }
         if (token) {
           expect_operand = ! expect_operand;
-          tokens = g_slist_append (tokens, token);
+          tokens = g_slist_prepend (tokens, token);
         } else if (! state->lex_all) {
           if (err->domain != CTPL_IO_ERROR) {
             /* if we don't validate all, we don't want to throw an error when no
@@ -609,6 +609,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
                                      "No valid operand at start of expression");
       } else {
         /* here check validity of token list, then create the final token. */
+        tokens = g_slist_reverse (tokens);
         expr_tok = validate_token_list (stream, tokens, &err);
       }
     }
