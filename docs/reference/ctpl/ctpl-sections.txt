@@ -70,7 +70,6 @@ CtplTokenValue
 ctpl_token_new_data
 ctpl_token_new_expr
 ctpl_token_new_for
-ctpl_token_new_for_expr
 ctpl_token_new_if
 ctpl_token_dump
 ctpl_token_expr_new_operator

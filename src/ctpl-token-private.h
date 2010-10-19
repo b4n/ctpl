@@ -36,7 +36,7 @@ G_BEGIN_DECLS
  * Represents a CTPL language token.
  * 
  * A #CtplToken is created with ctpl_token_new_data(), ctpl_token_new_expr(),
- * ctpl_token_new_for_expr() or ctpl_token_new_if(), and freed with
+ * ctpl_token_new_for() or ctpl_token_new_if(), and freed with
  * ctpl_token_free().
  * You can append or prepend tokens to others with ctpl_token_append() and
  * ctpl_token_prepend().
@@ -243,9 +243,8 @@ CtplToken    *ctpl_token_new_data           (const gchar *data,
                                              gssize       len);
 G_GNUC_INTERNAL
 CtplToken    *ctpl_token_new_expr           (CtplTokenExpr *expr);
-#define ctpl_token_new_for ctpl_token_new_for_expr
 G_GNUC_INTERNAL
-CtplToken    *ctpl_token_new_for_expr       (CtplTokenExpr *array,
+CtplToken    *ctpl_token_new_for            (CtplTokenExpr *array,
                                              const gchar   *iterator,
                                              CtplToken     *children);
 G_GNUC_INTERNAL

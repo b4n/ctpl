@@ -112,7 +112,7 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
 }
 
 /*
- * ctpl_token_new_for_expr:
+ * ctpl_token_new_for:
  * @array: Expression to iterate over (should expand to an iteratable value)
  * @iterator: String containing the name of the array iterator
  * @children: Sub-tree that should be computed on each loop iteration
@@ -123,9 +123,9 @@ ctpl_token_new_expr (CtplTokenExpr *expr)
  *          longer needed.
  */
 CtplToken *
-ctpl_token_new_for_expr (CtplTokenExpr  *array,
-                         const gchar    *iterator,
-                         CtplToken      *children)
+ctpl_token_new_for (CtplTokenExpr  *array,
+                    const gchar    *iterator,
+                    CtplToken      *children)
 {
   CtplToken *token;
   
