@@ -35,7 +35,7 @@ done
 
 for f in fail/*; do
   echo "*** fail test '$f'"
-  "${TESTPRG[@]}" "${ARGS[@]}" "$f" && exit 1
+  "${TESTPRG[@]}" "${ARGS[@]}" "$f" 2>&1 && exit 1
 done
 
 # remove error on exit
