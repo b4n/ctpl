@@ -1,6 +1,6 @@
 
 bin_PROGRAMS    = 
-noinst_PROGRAMS = test
+check_PROGRAMS  = test
 lib_LTLIBRARIES = libctpl.la
 
 libctpl_la_CPPFLAGS = -DG_LOG_DOMAIN=\"CTPL\" -DCTPL_COMPILATION
