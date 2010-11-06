@@ -107,5 +107,6 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/Makefile
                  docs/reference/ctpl/Makefile
                  docs/reference/ctpl/version.xml
+                 testsuite/Makefile
                  README])
 AC_OUTPUT

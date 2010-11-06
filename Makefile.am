@@ -1,4 +1,4 @@
-SUBDIRS = src data docs
+SUBDIRS = src data docs testsuite
 
 EXTRA_DIST = AUTHORS \
              COPYING \
