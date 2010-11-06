@@ -1,0 +1,4 @@
+{for f in floats}{f}
+{end}
+# here test addition with a string, just to be sure
+{string+3.14}
