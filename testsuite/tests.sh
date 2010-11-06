@@ -1,13 +1,13 @@
-#!/bin/bash
+#!/bin/sh
 
 # automake tests integration
 top_srcdir="${top_srcdir:-..}"
 srcdir="${srcdir:-.}"
 
 
-TESTPRG=("${top_srcdir}/libtool" "execute" "${top_srcdir}/src/ctpl")
+TESTPRG="${top_srcdir}/libtool execute ${top_srcdir}/src/ctpl"
 
-ARGS=("-e" "${srcdir}/environ")
+ARGS="-e ${srcdir}/environ"
 
 # display error on exit
 trap "
@@ -17,14 +17,13 @@ echo '***      FAILED!      ***' >&2
 echo '*************************' >&2
 " EXIT
 
-export IFS=$'\n'
 for f in $(ls "${srcdir}/"success/* | grep -v -e '-output$'); do
   success=false
   output="$f-output"
   output_real="$(tempfile)"
   
   echo "*** success test '$f'"
-  "${TESTPRG[@]}" "${ARGS[@]}" "$f" > "$output_real" && success=true
+  $TESTPRG $ARGS "$f" > "$output_real" && success=true
   if $success; then
     if [ -f "$output" ]; then
       echo "  * checking output..."
@@ -40,7 +39,7 @@ done
 
 for f in "${srcdir}/"fail/*; do
   echo "*** fail test '$f'"
-  "${TESTPRG[@]}" "${ARGS[@]}" "$f" 2>&1 && exit 1
+  $TESTPRG $ARGS "$f" 2>&1 && exit 1
 done
 
 # remove error on exit
