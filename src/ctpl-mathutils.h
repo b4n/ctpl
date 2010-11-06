@@ -55,19 +55,58 @@ gboolean    ctpl_math_string_to_int     (const gchar *string,
                                          glong       *value);
 
 /*
+ * ctpl_math_dtostr:
+ * @buf: A buffer to write to
+ * @buf_len: The size of @buf
+ * @f: A floating-point number (C's double)
+ * 
+ * Writes a double to a string. This behaves the same as g_ascii_dtostr() but
+ * tries to avoid any false-positive precision. The suggested buffer size is
+ * %G_ASCII_DTOSTR_BUF_SIZE.
+ * Use it exactly as g_ascii_dtostr().
+ * 
+ * See also ctpl_math_float_to_string() which does the same but dynamically
+ * allocates a new buffer of the correct size.
+ * 
+ * <note>
+ * I tried different approaches to have a good balance between good precision
+ * and false precision (double's imprecision), and %.15g seemed to be the
+ * best and easiest one.
+ * 15 is completely arbitrary but shown good results -- actually the only
+ * tests where the string read from the environ was different from the output
+ * one was when it needed more than 15 digits, and even then, it was only
+ * rounded.
+ * </note>
+ * 
+ * <note>
+ * Use of G_ASCII_DTOSTR_BUF_SIZE is also fine since what GLib does in
+ * g_ascii_dtostr() is exactly the same but with more precision (%.17g).
+ * Not really a problem that this is an implementation detail since they need
+ * at least the same space to keep exact backward compatibility.
+ * </note>
+ * 
+ * Returns: the passed buffer.
+ */
+#define ctpl_math_dtostr(buf, buf_len, f) \
+  (g_ascii_formatd ((buf), (buf_len), "%.15g", (f)))
+
+/*
  * ctpl_math_float_to_string:
  * @f: A floating-point number (C's double)
  * 
  * Converts a floating-point number to a string.
+ * 
+ * See also ctpl_math_dtostr().
  * 
  * Returns: (type utf8) (transfer full): A newly allocated string holding a
  *          representation of @f in the C locale. This string should be free
  *          with g_free().
  */
 #define ctpl_math_float_to_string(f) \
-  (g_ascii_dtostr (g_malloc (G_ASCII_DTOSTR_BUF_SIZE), \
-                   G_ASCII_DTOSTR_BUF_SIZE, \
-                   (f)))
+  (ctpl_math_dtostr (g_malloc (G_ASCII_DTOSTR_BUF_SIZE), \
+                     G_ASCII_DTOSTR_BUF_SIZE, \
+                     (f)))
+
 /*
  * ctpl_math_int_to_string:
  * @i: An integer number (C's long int)

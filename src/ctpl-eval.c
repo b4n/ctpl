@@ -165,8 +165,8 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
           gchar buf[G_ASCII_DTOSTR_BUF_SIZE];
           
           tmp = g_strconcat (ctpl_value_get_string (lvalue),
-                             g_ascii_dtostr (buf, sizeof (buf),
-                                             ctpl_value_get_float (rvalue)),
+                             ctpl_math_dtostr (buf, sizeof (buf),
+                                               ctpl_value_get_float (rvalue)),
                              NULL);
         } else if (CTPL_VALUE_HOLDS_INT (rvalue)) {
           tmp = g_strdup_printf ("%s%ld", ctpl_value_get_string (lvalue),

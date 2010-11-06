@@ -1121,9 +1121,7 @@ ctpl_value_to_string (const CtplValue *value)
     }
     
     case CTPL_VTYPE_FLOAT:
-      val = g_ascii_dtostr (g_malloc (G_ASCII_DTOSTR_BUF_SIZE),
-                            G_ASCII_DTOSTR_BUF_SIZE,
-                            value->value.v_float);
+      val = ctpl_math_float_to_string (value->value.v_float);
       break;
     
     case CTPL_VTYPE_INT:
