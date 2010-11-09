@@ -1149,18 +1149,6 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
           /* Fallthrough */
         case 'b':
         case 'B':
-          if (type & READ_INT &&
-              ((gstring->len == 1 ||
-                (gstring->len == 2 && (gstring->str[0] == '+' ||
-                                       gstring->str[0] == '-'))) &&
-               gstring->str[gstring->len - 1] == '0') &&
-              buf_len > 1 && ISBDIGIT (buf[1])) {
-            have_mantissa = FALSE; /* the previous 0 wasn't mantissa finally */
-            base = 2;
-            type &= READ_INT;
-            break;
-          }
-          /* Fallthrough */
         case 'a':
         case 'A':
         case 'c':
@@ -1192,29 +1180,39 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
           }
           /* Fallthrough */
         case '0':
+          if (! have_mantissa && buf_len > 2) {
+            gboolean is_start = TRUE;
+            
+            if ((type & READ_INT) &&
+                (buf[1] == 'b' || buf[1] == 'B') && ISBDIGIT (buf[2])) {
+              type &= READ_INT;
+              base = 2;
+            } else if ((type & READ_INT) &&
+                       (buf[1] == 'o' || buf[1] == 'O') && ISODIGIT (buf[2])) {
+              type &= READ_INT;
+              base = 8;
+            } else if ((buf[1] == 'x' || buf[1] == 'X') && ISXDIGIT (buf[2])) {
+              /* needed for floating-points */
+              g_string_append_c (gstring, c);
+              g_string_append_c (gstring, buf[1]);
+              base = 16;
+            } else {
+              is_start = FALSE;
+            }
+            if (is_start) {
+              /* eat the character we just handled. no need to check the error
+               * since the data is already cached -- so no error can happen */
+              ctpl_input_stream_get_c (stream, NULL);
+              break;
+            }
+          }
+          /* Fallthrough */
         case '1':
           g_string_append_c (gstring, c);
           if (! have_exponent_delim) {
             have_mantissa = TRUE;
           } else {
             have_exponent = TRUE;
-          }
-          break;
-        
-        case 'o':
-        case 'O':
-          if (type & READ_INT &&
-              ((gstring->len == 1 ||
-                (gstring->len == 2 && (gstring->str[0] == '+' ||
-                                       gstring->str[0] == '-'))) &&
-               gstring->str[gstring->len - 1] == '0') &&
-              buf_len > 1 && ISODIGIT (buf[1])) {
-            /*g_string_append_c (gstring, c);*/
-            have_mantissa = FALSE; /* the previous 0 wasn't mantissa finally */
-            base = 8;
-            type &= READ_INT;
-          } else {
-            in_number = FALSE;
           }
           break;
         
@@ -1228,21 +1226,6 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
             have_sign = FALSE;
             type &= READ_FLOAT;
             g_string_append_c (gstring, 'p');
-          } else {
-            in_number = FALSE;
-          }
-          break;
-        
-        case 'x':
-        case 'X':
-          if ((gstring->len == 1 ||
-               (gstring->len == 2 && (gstring->str[0] == '+' ||
-                                      gstring->str[0] == '-'))) &&
-              gstring->str[gstring->len - 1] == '0' &&
-              buf_len >= 2 && ISXDIGIT (buf[1])) {
-            g_string_append_c (gstring, c);
-            have_mantissa = FALSE; /* the previous 0 wasn't mantissa finally */
-            base = 16;
           } else {
             in_number = FALSE;
           }
