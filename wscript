@@ -68,7 +68,8 @@ src/ctpl-output-stream.c
 src/ctpl-parser.c
 src/ctpl-stack.c
 src/ctpl-token.c
-src/ctpl-value.c'''
+src/ctpl-value.c
+src/ctpl-version.c'''
 
 
 CTPL_SOURCES = ['src/ctpl.c']
