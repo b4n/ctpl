@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.64])
 AC_INIT([CTPL],
-        [0.3],
+        [0.3.1],
         [ban@herbesfolles.org],
         [ctpl],
         [http://ctpl.tuxfamily.org])
@@ -23,9 +23,13 @@ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 # Remember to bump library version before releases; here the rules:
 # If you have:
 #   * not changed the interface (bug fixes):          CURRENT:REV+1:AGE
-#   * augmented the interface (new things):           CURRENT+1:0:AGE+1
+#   * augmented the interface (new things [1]):       CURRENT+1:0:AGE+1
 #   * broken the interface (removed/changed things):  CURRENT+1:0:0
-CTPL_LTVERSION="2:0:0"
+#
+# [1] "New things" include extension of the template syntax. Refer to
+#     http://sourceware.org/autobook/autobook/autobook_91.html#SEC91 for more
+#     info
+CTPL_LTVERSION="3:0:1"
 AC_SUBST([CTPL_LTVERSION])
 
 # Checks for programs.
