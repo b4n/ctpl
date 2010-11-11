@@ -60,7 +60,7 @@ static GOptionEntry option_entries[] = {
     "Specify the encoding of the input and output files.", "ENCODING" },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &OPT_input_files,
     "Input files", "INPUTFILE[...]" },
-  { NULL }
+  { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
 };
 
 

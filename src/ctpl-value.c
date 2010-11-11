@@ -971,7 +971,6 @@ ctpl_value_get_array_int (const CtplValue *value,
     }
   }
   
- success:
   if (length) *length = len;
   return array;
  fail:
@@ -1016,7 +1015,6 @@ ctpl_value_get_array_float (const CtplValue *value,
     }
   }
   
- success:
   if (length) *length = len;
   return array;
  fail:
@@ -1064,7 +1062,6 @@ ctpl_value_get_array_string (const CtplValue *value,
   }
   array[n] = NULL;
   
- success:
   if (length) *length = len;
   return array;
  fail:

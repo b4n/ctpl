@@ -353,14 +353,13 @@ validate_token_list (CtplInputStream *stream,
   gint            opt = 0;
   gint            opd = 0;
   gint            i = 0;
-  GSList         *tmp;
   GSList         *last_opd = NULL;
   
   /*g_debug ("validating tokens...");*/
   /* we can assume the token list is fully valid, never having invalid token
    * suits as the caller have checked it, except for the last token that may be
    * an operator (then which misses its right operand) */
-  for (tmp = tokens; tokens; tokens = tokens->next) {
+  for (; tokens; tokens = tokens->next) {
     if ((i++ % 2) == 0) {
       operands[opd++] = tokens->data;
       last_opd = tokens;
