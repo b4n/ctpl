@@ -1,3 +1,32 @@
+# 0.3.1
+
+  The version 0.3.1 is a bugfix and enhancement release for the 0.3 branch.
+  
+  ## Changes summary
+  
+  * Fixed crash in addition operator when handling arrays;
+  * Improved floating-point numbers output;
+  * Added support for blanks between a symbol and its index;
+  * Added support for empty arrays in environment descriptions;
+  
+  The most interesting change of this release is probably the improved output of
+  floating-points numbers. Floating point numbers always suffered from false
+  precision: for example "3.14" was wrongly rendered as "3.1400000000000001".
+  This problem should be fixed now.
+  
+  ### Internal changes that you might notice
+  
+  The way numbers are read has changed a little bit, now only the characters
+  that forms a fully valid number are read. This may lead to a different error
+  with some malformed templates -- even though there will still be an error, but
+  maybe at another step of the lexing process.
+  
+  For example, template "{0x}" raised an error about the number lacking a
+  mantissa (0x is a valid prefix for an hexadecimal value, but lacks the actual
+  hexadecimal number), and now correctly read the number but raises an error
+  about character "x" being unexpected.
+
+
 # 0.3
 
   The version 0.3 is an API and ABI break from the previous 0.2 branch.
