@@ -1,4 +1,4 @@
-# 0.3.1
+# 0.3.1 (13/11/2010)
 
   The version 0.3.1 is a bugfix and enhancement release for the 0.3 branch.
   
@@ -27,7 +27,7 @@
   about character "x" being unexpected.
 
 
-# 0.3
+# 0.3 (09/10/2010)
 
   The version 0.3 is an API and ABI break from the previous 0.2 branch.
   
