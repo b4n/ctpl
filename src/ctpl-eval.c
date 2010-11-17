@@ -383,33 +383,40 @@ ctpl_eval_operator_div (CtplValue *lvalue,
 }
 
 /*
- * ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq:
+ * ctpl_eval_operator_cmp:
  * @lvalue: Input left operand (may be modified for internal purpose)
  * @rvalue: Input right operand (may be modified for internal purpose)
- * @op: The operator, one of CTPL_OPERATOR_SUP, _INF, _EQ, _NEQ, _INFEQ, _SUPEQ.
- * @value: Output value, result of the operation
+ * @op: The operator, only used for error messages.
+ * @result (out): Result of the operation: 0 if values are equal, < 0 if @lvalue
+ *                is inferior to @rvalue and > 0 if @lvalue is superior to
+ *                @rvalue
  * @error: a #GError to fill with an eventual error, of %NULL to ignore errors.
  * 
- * Evaluates superiority, inferiority, equality and derived.
+ * Compares two values to a strcmp()-like value.
  * Errors can happen if the types of the operand can't be compared.
+ * 
+ * See also ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq().
  * 
  * Returns: %TRUE on success, %FALSE on failure.
  */
 static gboolean
-ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
-                                               CtplValue     *rvalue,
-                                               CtplOperator   op,
-                                               CtplValue     *value,
-                                               GError       **error)
+ctpl_eval_operator_cmp (CtplValue     *lvalue,
+                        CtplValue     *rvalue,
+                        CtplOperator   op,
+                        gint          *result,
+                        GError       **error)
 {
-  /* boolean operators expands to integers (1:TRUE or 0:FALSE) */
-  gboolean rv     = TRUE;
-  gboolean result = FALSE;
+  gboolean rv = TRUE;
   
+  *result = 0;
   switch (ctpl_value_get_held_type (lvalue)) {
     case CTPL_VTYPE_ARRAY:
-      if (ctpl_value_get_held_type (rvalue) != CTPL_VTYPE_ARRAY) {
-        /* fail, can't comapre array with other things */
+      if (! CTPL_VALUE_HOLDS_ARRAY (rvalue)) {
+        g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                     "Invalid operands for operator '%s' (have '%s' and '%s')",
+                     ctpl_operator_to_string (op),
+                     ctpl_value_get_held_type_name (lvalue),
+                     ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
       } else {
         const GSList *larray;
@@ -417,7 +424,18 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
         
         larray = ctpl_value_get_array (lvalue);
         rarray = ctpl_value_get_array (rvalue);
-        /*TODO*/
+        for (; rv && *result == 0 && larray && rarray;
+             larray = larray->next, rarray = rarray->next) {
+          rv = ctpl_eval_operator_cmp (larray->data, rarray->data, op, result,
+                                       error);
+        }
+        if (rv && *result == 0) {
+          if (! larray && rarray) {
+            *result = -1;
+          } else if (larray && ! rarray) {
+            *result = 1;
+          }
+        }
       }
       break;
     
@@ -428,14 +446,13 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
         
         lval = ctpl_value_get_int (lvalue);
         rval = ctpl_value_get_int (rvalue);
-        switch (op) {
-          case CTPL_OPERATOR_EQUAL: result = (lval == rval); break;
-          case CTPL_OPERATOR_NEQ:   result = (lval != rval); break;
-          case CTPL_OPERATOR_INF:   result = (lval <  rval); break;
-          case CTPL_OPERATOR_INFEQ: result = (lval <= rval); break;
-          case CTPL_OPERATOR_SUP:   result = (lval >  rval); break;
-          case CTPL_OPERATOR_SUPEQ: result = (lval >= rval); break;
-          default: /* avoid compiler warnings about non-handled cases */ break;
+        /* no (lval - rval) because of possible over/underflow in subtraction */
+        if (lval < rval) {
+          *result = -1;
+        } else if (lval > rval) {
+          *result = 1;
+        } else {
+          *result = 0;
         }
         break;
       }
@@ -450,14 +467,16 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
         
         lval = ctpl_value_get_float (lvalue);
         rval = ctpl_value_get_float (rvalue);
-        switch (op) {
-          case CTPL_OPERATOR_EQUAL: result = CTPL_MATH_FLOAT_EQ (lval, rval); break;
-          case CTPL_OPERATOR_NEQ:   result = ! CTPL_MATH_FLOAT_EQ (lval, rval); break;
-          case CTPL_OPERATOR_INF:   result = (lval <  rval); break;
-          case CTPL_OPERATOR_INFEQ: result = (lval <= rval); break;
-          case CTPL_OPERATOR_SUP:   result = (lval >  rval); break;
-          case CTPL_OPERATOR_SUPEQ: result = (lval >= rval); break;
-          default: /* avoid compiler warnings about non-handled cases */ break;
+        if (CTPL_MATH_FLOAT_EQ (lval, rval)) {
+          *result = 0;
+        } else if (lval < rval) {
+          *result = -1;
+        } else if (lval > rval) {
+          *result = 1;
+        } else {
+          /* FIXME: should never happen, but what if CTPL_FLOAT_EQ() is more 
+           * precise than < and >? guess it's impossible... */
+          g_return_val_if_reached (FALSE);
         }
       }
       break;
@@ -471,25 +490,58 @@ ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
                      ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
       } else {
-        gchar  *tmp = NULL;
-        gint    strcmp_result;
+        gchar *tmp;
         
         tmp = ctpl_value_to_string (rvalue);
-        strcmp_result = strcmp (ctpl_value_get_string (lvalue), tmp);
-        switch (op) {
-          case CTPL_OPERATOR_EQUAL: result = (strcmp_result == 0); break;
-          case CTPL_OPERATOR_NEQ:   result = (strcmp_result != 0); break;
-          case CTPL_OPERATOR_INF:   result = (strcmp_result <  0); break;
-          case CTPL_OPERATOR_INFEQ: result = (strcmp_result <= 0); break;
-          case CTPL_OPERATOR_SUP:   result = (strcmp_result >  0); break;
-          case CTPL_OPERATOR_SUPEQ: result = (strcmp_result >= 0); break;
-          default: /* avoid compiler warnings about non-handled cases */ break;
-        }
+        *result = strcmp (ctpl_value_get_string (lvalue), tmp);
         g_free (tmp);
       }
       break;
   }
-  ctpl_value_set_int (value, result ? 1 : 0);
+  
+  return rv;
+}
+
+/*
+ * ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq:
+ * @lvalue: Input left operand (may be modified for internal purpose)
+ * @rvalue: Input right operand (may be modified for internal purpose)
+ * @op: The operator, one of CTPL_OPERATOR_SUP, _INF, _EQ, _NEQ, _INFEQ, _SUPEQ.
+ * @value: Output value, result of the operation
+ * @error: a #GError to fill with an eventual error, of %NULL to ignore errors.
+ * 
+ * Evaluates superiority, inferiority, equality and derived.
+ * Errors can happen if the types of the operand can't be compared.
+ * 
+ * See also ctpl_eval_operator_cmp().
+ * 
+ * Returns: %TRUE on success, %FALSE on failure.
+ */
+static gboolean
+ctpl_eval_operator_sup_inf_eq_neq_supeq_infeq (CtplValue     *lvalue,
+                                               CtplValue     *rvalue,
+                                               CtplOperator   op,
+                                               CtplValue     *value,
+                                               GError       **error)
+{
+  /* boolean operators expands to integers (1:TRUE or 0:FALSE) */
+  gboolean  rv     = TRUE;
+  gboolean  result = FALSE;
+  gint      r      = 0;
+  
+  rv = ctpl_eval_operator_cmp (lvalue, rvalue, op, &r, error);
+  if (rv) {
+    switch (op) {
+      case CTPL_OPERATOR_EQUAL: result = (r == 0); break;
+      case CTPL_OPERATOR_NEQ:   result = (r != 0); break;
+      case CTPL_OPERATOR_INF:   result = (r <  0); break;
+      case CTPL_OPERATOR_INFEQ: result = (r <= 0); break;
+      case CTPL_OPERATOR_SUP:   result = (r >  0); break;
+      case CTPL_OPERATOR_SUPEQ: result = (r >= 0); break;
+      default: /* avoid compiler warnings about non-handled cases */ break;
+    }
+  }
+  ctpl_value_set_int (value, result ? 1L : 0L);
   
   return rv;
 }

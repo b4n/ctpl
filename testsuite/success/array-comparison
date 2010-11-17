@@ -1,0 +1,27 @@
+{if larray_eq == rarray_eq}OK{else}FAIL{end}
+{if larray_eq != rarray_eq}FAIL{else}OK{end}
+{if larray_eq >= rarray_eq}OK{else}FAIL{end}
+{if larray_eq >  rarray_eq}FAIL{else}OK{end}
+{if larray_eq <  rarray_eq}FAIL{else}OK{end}
+{if larray_eq <= rarray_eq}OK{else}FAIL{end}
+
+{if larray_inf == rarray_inf}FAIL{else}OK{end}
+{if larray_inf != rarray_inf}OK{else}FAIL{end}
+{if larray_inf >= rarray_inf}FAIL{else}OK{end}
+{if larray_inf >  rarray_inf}FAIL{else}OK{end}
+{if larray_inf <  rarray_inf}OK{else}FAIL{end}
+{if larray_inf <= rarray_inf}OK{else}FAIL{end}
+
+{if empty_array == empty_array2}OK{else}FAIL{end}
+{if empty_array != empty_array2}FAIL{else}OK{end}
+{if empty_array >= empty_array2}OK{else}FAIL{end}
+{if empty_array >  empty_array2}FAIL{else}OK{end}
+{if empty_array <  empty_array2}FAIL{else}OK{end}
+{if empty_array <= empty_array2}OK{else}FAIL{end}
+
+{if empty_array == rarray_eq}FAIL{else}OK{end}
+{if empty_array != rarray_eq}OK{else}FAIL{end}
+{if empty_array >= rarray_eq}FAIL{else}OK{end}
+{if empty_array >  rarray_eq}FAIL{else}OK{end}
+{if empty_array <  rarray_eq}OK{else}FAIL{end}
+{if empty_array <= rarray_eq}OK{else}FAIL{end}

@@ -1,3 +1,13 @@
+# 0.3.2 (???)
+
+  The version 0.3.2 is a bugfix and enhancement release for the 0.3 branch.
+  
+  ## Changes summary
+  
+  * Fixed crash comparing arrays with other types;
+  * Actually implemented array comparison;
+
+
 # 0.3.1 (13/11/2010)
 
   The version 0.3.1 is a bugfix and enhancement release for the 0.3 branch.
