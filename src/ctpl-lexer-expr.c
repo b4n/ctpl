@@ -93,8 +93,10 @@
  *     <listitem>
  *       <para>
  *         Any numeric constant that ctpl_input_stream_read_number() supports,
- *         or any reference to any 
- *         <link linkend="ctpl-CtplEnviron">environment</link> variable.
+ *         any reference to any
+ *         <link linkend="ctpl-CtplEnviron">environment</link> variable,
+ *         or any string literal that ctpl_input_stream_read_string_literal()
+ *         supports.
  *         An operand may be suffixed with an index of the form
  *         <code>[&lt;expression&gt;]</code>.
  *       </para>
@@ -206,6 +208,32 @@ read_symbol (CtplInputStream *stream,
     }
   }
   g_free (symbol);
+  
+  return token;
+}
+
+/* Reads a string literal from @stream
+ * See ctpl_input_stream_read_string_literal()
+ * Returns: A new #CtplTokenExpr holding the string, or %NULL on error */
+static CtplTokenExpr *
+read_string_literal (CtplInputStream *stream,
+                     LexerExprState  *state,
+                     GError         **error)
+{
+  CtplTokenExpr *token = NULL;
+  gchar         *string;
+  
+  (void)state; /* we don't use the state, silent compilers */
+  string = ctpl_input_stream_read_string_literal (stream, error);
+  if (string) {
+    CtplValue value;
+    
+    ctpl_value_init (&value);
+    ctpl_value_set_string (&value, string);
+    token = ctpl_token_expr_new_value (&value);
+    ctpl_value_free_value (&value);
+  }
+  g_free (string);
   
   return token;
 }
@@ -479,6 +507,8 @@ lex_operand (CtplInputStream *stream,
       token = read_number (stream, state, error);
     } else if (ctpl_is_symbol (c)) {
       token = read_symbol (stream, state, error);
+    } else if (c == CTPL_STRING_DELIMITER_CHAR) {
+      token = read_string_literal (stream, state, error);
     } else {
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
                                    CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,

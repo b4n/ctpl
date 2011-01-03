@@ -1,0 +1,4 @@
+{if "a"=="b"}FAIL{else}OK{end}
+{if "this is a \"string\"" == foo}FAIL{else}OK{end}
+{if "(was foo)" != foo}FAIL{else}OK{end}
+{if "\"\\\"" != "\"\\\""}FAIL{else}OK{end}

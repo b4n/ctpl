@@ -1,6 +1,3 @@
 * Cleanup test application
 * improve `inline` support and usage.
 * handle encodings?
-
-? Add support for string literals in expressions (started in string-literals
-  branch)

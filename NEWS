@@ -6,6 +6,7 @@
   
   * Fixed crash comparing arrays with other types;
   * Actually implemented array comparison;
+  * Added support for string literals in expressions;
 
 
 # 0.3.1 (13/11/2010)
