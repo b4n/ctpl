@@ -161,7 +161,6 @@ ctpl_lexer_expr_error_quark (void)
 
 
 /* @stream: #CtplInputStream holding the number.
- * @state: Lexer state
  * @error: return location for errors, or %NULL to ignore them
  * See ctpl_input_stream_read_number()
  * Returns: A new #CtplTokenExpr or %NULL if the input doesn't contain any valid
@@ -169,13 +168,11 @@ ctpl_lexer_expr_error_quark (void)
  */
 static CtplTokenExpr *
 read_number (CtplInputStream *stream,
-             LexerExprState  *state,
              GError         **error)
 {
   CtplTokenExpr  *token = NULL;
   CtplValue       value;
   
-  (void)state; /* we don't use the state, silent compilers */
   ctpl_value_init (&value);
   if (ctpl_input_stream_read_number (stream, &value, error)) {
     token = ctpl_token_expr_new_value (&value);
@@ -190,13 +187,11 @@ read_number (CtplInputStream *stream,
  * Returns: A new #CtplTokenExpr holding the symbol, or %NULL on error */
 static CtplTokenExpr *
 read_symbol (CtplInputStream *stream,
-             LexerExprState  *state,
              GError         **error)
 {
   CtplTokenExpr *token = NULL;
   gchar         *symbol;
   
-  (void)state; /* we don't use the state, silent compilers */
   symbol = ctpl_input_stream_read_symbol (stream, error);
   if (symbol) {
     if (*symbol) {
@@ -217,13 +212,11 @@ read_symbol (CtplInputStream *stream,
  * Returns: A new #CtplTokenExpr holding the string, or %NULL on error */
 static CtplTokenExpr *
 read_string_literal (CtplInputStream *stream,
-                     LexerExprState  *state,
                      GError         **error)
 {
   CtplTokenExpr *token = NULL;
   gchar         *string;
   
-  (void)state; /* we don't use the state, silent compilers */
   string = ctpl_input_stream_read_string_literal (stream, error);
   if (string) {
     CtplValue value;
@@ -489,7 +482,6 @@ lex_operand_index (CtplInputStream *stream,
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
 lex_operand (CtplInputStream *stream,
-             LexerExprState  *state,
              GError         **error)
 {
   CtplTokenExpr  *token = NULL;
@@ -504,11 +496,11 @@ lex_operand (CtplInputStream *stream,
     if (g_ascii_isdigit (c) ||
         (c == '.' && g_ascii_isdigit (next_c)) ||
         c == '+' || c == '-') {
-      token = read_number (stream, state, error);
+      token = read_number (stream, error);
     } else if (ctpl_is_symbol (c)) {
-      token = read_symbol (stream, state, error);
+      token = read_symbol (stream, error);
     } else if (c == CTPL_STRING_DELIMITER_CHAR) {
-      token = read_string_literal (stream, state, error);
+      token = read_string_literal (stream, error);
     } else {
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
                                    CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
@@ -526,7 +518,6 @@ lex_operand (CtplInputStream *stream,
  * Returns: A new #CtplTokenExpr on success, %NULL on error. */
 static CtplTokenExpr *
 lex_operator (CtplInputStream *stream,
-              LexerExprState  *state,
               GError         **error)
 {
   CtplTokenExpr  *token   = NULL;
@@ -535,7 +526,6 @@ lex_operator (CtplInputStream *stream,
   gchar           buf[OPERATORS_STR_MAXLEN];
   gssize          read_size;
   
-  (void)state; /* we don't use the state, silent compilers */
   read_size = ctpl_input_stream_peek (stream, buf, sizeof buf, error);
   if (read_size >= 0) {
     /*g_debug ("Lexing operator '%.*s'", sizoef buf, buf);*/
@@ -608,11 +598,11 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
                 }
               }
             } else {
-              token = lex_operand (stream, state, &err);
+              token = lex_operand (stream, &err);
             }
           } else {
             /* try to read an operator */
-            token = lex_operator (stream, state, &err);
+            token = lex_operator (stream, &err);
           }
         }
         if (token) {
