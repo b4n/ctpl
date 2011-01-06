@@ -1118,7 +1118,8 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
         
         case '+':
         case '-':
-          if (! have_sign && (! have_mantissa || ! have_exponent) &&
+          if (! have_sign && (! have_mantissa ||
+                              (have_exponent_delim && ! have_exponent)) &&
               /* ISDIGIT() is fine here even though we probably don't know the
                * base yet because the default base is 10 and the exponent or
                * power are also in base 10 */

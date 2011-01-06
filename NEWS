@@ -7,6 +7,8 @@
   * Fixed crash comparing arrays with other types;
   * Actually implemented array comparison;
   * Added support for string literals in expressions;
+  * Fixed wrong reading of some numbers that led to parsing failure when the
+    addition or subtraction operators was not surrounded by blank characters.
 
 
 # 0.3.1 (13/11/2010)
