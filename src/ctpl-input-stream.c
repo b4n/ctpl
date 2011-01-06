@@ -389,16 +389,13 @@ ensure_cache_filled (CtplInputStream *stream,
   if (stream->buf_pos >= stream->buf_size) {
     gssize read_size;
     
-    /*g_debug ("buffering...");*/
     read_size = g_input_stream_read (stream->stream, stream->buffer,
                                      stream->buf_size, NULL, error);
     if (read_size < 0) {
-      /*g_debug ("failed: %s", error ? (*error)->message : "???");*/
       success = FALSE;
     } else {
       stream->buf_size = (gsize)read_size;
       stream->buf_pos = 0U;
-      /*g_debug ("OK, buffer content is: '%.*s'", stream->buf_size, stream->buffer);*/
     }
   }
   
@@ -429,8 +426,6 @@ resize_cache (CtplInputStream *stream,
   
   g_return_val_if_fail (new_size > 0, FALSE);
   
-  /*g_debug ("resizing queried (from %"G_GSIZE_FORMAT" to %"G_GSIZE_FORMAT" bytes)",
-           stream->buf_size, new_size);*/
   if (new_size > stream->buf_size) {
     gssize read_size;
     gchar *new_buffer;
@@ -564,7 +559,6 @@ ctpl_input_stream_read (CtplInputStream *stream,
         default:
           stream->pos ++;
       }
-      /*g_debug ("read character %d (%c)", c, c);*/
       ((gchar *)buffer)[read_size] = c;
       count --;
     }
@@ -1104,7 +1098,6 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
     if (! err) {
       gchar c = (buf_len > 0) ? buf[0] : CTPL_EOF;
       
-      /*g_debug ("c = %c", c);*/
       switch (c) {
         case '.':
           if (! have_dot && ! have_exponent_delim && (type & READ_FLOAT)) {
@@ -1252,7 +1245,6 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
       glong   longval = 0;
       gint    errno_save = errno;
       
-      /*g_debug ("trying to convert '%s'", nptr);*/
       errno = 0;
       if (type & READ_INT) {
         longval = strtol (nptr, &endptr, base);
@@ -1386,7 +1378,6 @@ ctpl_input_stream_read_float (CtplInputStream *stream,
     
     c = ctpl_input_stream_peek_c (stream, &err);
     if (! err) {
-      /*g_debug ("c = %c", c);*/
       switch (c) {
         case '.':
           if (have_dot || have_exponent) {
@@ -1493,7 +1484,6 @@ ctpl_input_stream_read_float (CtplInputStream *stream,
       gchar *nptr = gstring->str;
       gchar *endptr;
       
-      /*g_debug ("trying to convert fp '%s'", nptr);*/
       value = g_ascii_strtod (nptr, &endptr);
       if (! endptr || *endptr != 0) {
         ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,

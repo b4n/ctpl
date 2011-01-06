@@ -152,7 +152,6 @@ ctpl_lexer_read_token_tpl_if (CtplInputStream *stream,
   CtplToken      *token = NULL;
   CtplTokenExpr  *expr;
   
-  //~ g_debug ("if?");
   expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
   if (expr) {
     if (ctpl_lexer_read_stmt_end (stream, "if", error)) {
@@ -161,13 +160,11 @@ ctpl_lexer_read_token_tpl_if (CtplInputStream *stream,
       CtplToken  *else_token = NULL;
       LexerState  substate = *state;
       
-      //~ g_debug ("if token: `if %s`", expr);
       substate.block_depth ++;
       substate.last_statement_type_if = S_IF;
       if_token = ctpl_lexer_lex_internal (stream, &substate, &err);
       if (! err) {
         if (substate.last_statement_type_if == S_ELSE) {
-          //~ g_debug ("have else");
           else_token = ctpl_lexer_lex_internal (stream, &substate, &err);
         }
         if (! err /* don't override errors */ &&
@@ -201,7 +198,6 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
 {
   CtplToken  *token = NULL;
   
-  //~ g_debug ("for?");
   if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
     gchar *iter_name;
     
@@ -214,7 +210,6 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
                                    CTPL_LEXER_ERROR_SYNTAX_ERROR,
                                    "No iterator identifier for 'for' statement");
     } else {
-      //~ g_debug ("for: iter is '%s'", iter_name);
       if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
         gchar *keyword_in;
         
@@ -237,10 +232,8 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
               CtplToken  *for_children;
               LexerState  substate = *state;
               
-              //~ g_debug ("for token: `for %s in %s`", iter_name, array_name);
               substate.block_depth ++;
               for_children = ctpl_lexer_lex_internal (stream, &substate, &err);
-              //~ g_debug ("for child: %d", (void *)for_children);
               if (! err) {
                 if (state->block_depth != substate.block_depth) {
                   ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_ERROR,
@@ -275,9 +268,7 @@ ctpl_lexer_read_token_tpl_end (CtplInputStream *stream,
                                LexerState      *state,
                                GError         **error)
 {
-  //~ g_debug ("end?");
   if (ctpl_lexer_read_stmt_end (stream, "end", error)) {
-    //~ g_debug ("block end");
     state->block_depth --;
     if (state->block_depth < 0) {
       /* a non-opened block was closed, fail */
@@ -300,9 +291,7 @@ ctpl_lexer_read_token_tpl_else (CtplInputStream *stream,
                                 LexerState      *state,
                                 GError         **error)
 {
-  //~ g_debug ("else?");
   if (ctpl_lexer_read_stmt_end (stream, "else", error)) {
-    //~ g_debug ("else statement");
     if (state->last_statement_type_if != S_IF) {
       /* else but no opened if, fail */
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
@@ -470,10 +459,8 @@ ctpl_lexer_read_token (CtplInputStream *stream,
   if (err) {
     g_propagate_error (error, err);
   } else {
-    //~ g_debug ("Will read a token (starts with %c)", c);
     switch (c) {
       case CTPL_START_CHAR:
-        //~ g_debug ("start of a template recognized syntax");
         token = ctpl_lexer_read_token_tpl (stream, state, error);
         break;
       

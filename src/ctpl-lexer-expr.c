@@ -376,7 +376,6 @@ validate_token_list (CtplInputStream *stream,
   gint            i = 0;
   GSList         *last_opd = NULL;
   
-  /*g_debug ("validating tokens...");*/
   /* we can assume the token list is fully valid, never having invalid token
    * suits as the caller have checked it, except for the last token that may be
    * an operator (then which misses its right operand) */
@@ -384,18 +383,13 @@ validate_token_list (CtplInputStream *stream,
     if ((i++ % 2) == 0) {
       operands[opd++] = tokens->data;
       last_opd = tokens;
-      /*g_debug ("found an operand:");
-      ctpl_token_expr_dump (operands[opd-1]);*/
     } else {
       operators[opt++] = tokens->data;
-      /*g_debug ("found an operator:");
-      ctpl_token_expr_dump (operands[opt-1]);*/
       if (opt > 1) {
         if (operator_is_prior (operators[0]->token.t_operator->operator,
                                operators[1]->token.t_operator->operator)) {
           CtplTokenExpr *nexpr;
           
-          /*g_debug ("Operator is prior");*/
           nexpr = operators[0];
           operators[0] = operators[1];
           operators[1] = NULL;
@@ -406,7 +400,6 @@ validate_token_list (CtplInputStream *stream,
           operands[1] = NULL;
           opd = 1;
         } else {
-          /*g_debug ("Operator is not prior");*/
           operands[1] = validate_token_list (stream, last_opd, error);
           opt --;
           
@@ -433,7 +426,6 @@ validate_token_list (CtplInputStream *stream,
                                  "Too few operands for operator '%s'",
                                  token_operator_to_string (operators[opt - 1]));
   }
-  /*_debug ("done.");*/
   
   return expr;
 }
@@ -528,7 +520,6 @@ lex_operator (CtplInputStream *stream,
   
   read_size = ctpl_input_stream_peek (stream, buf, sizeof buf, error);
   if (read_size >= 0) {
-    /*g_debug ("Lexing operator '%.*s'", sizoef buf, buf);*/
     op = ctpl_operator_from_string (buf, read_size, &off);
     if (op == CTPL_OPERATOR_NONE) {
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
