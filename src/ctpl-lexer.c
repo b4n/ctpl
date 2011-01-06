@@ -112,6 +112,36 @@ ctpl_lexer_error_quark (void)
 }
 
 
+/* Reads a statement end (the "}" part) */
+static gboolean
+ctpl_lexer_read_stmt_end (CtplInputStream  *stream,
+                          const gchar      *stmt_name,
+                          GError          **error)
+{
+  gboolean success = FALSE;
+  
+  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
+    GError *err = NULL;
+    gint    c;
+    
+    c = ctpl_input_stream_get_c (stream, &err);
+    if (err) {
+      /* I/O error */
+      g_propagate_error (error, err);
+    } else if (c != CTPL_END_CHAR) {
+      /* trash before the end, fail */
+      ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
+                                   CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                                   "Unexpected character '%c' before end of "
+                                   "'%s' statement", c, stmt_name);
+    } else {
+      success = TRUE;
+    }
+  }
+  
+  return success;
+}
+
 /* reads the data part of a if, aka the expression (e.g. " a > b" in "if a > b")
  * Return a new token or %NULL on error */
 static CtplToken *
@@ -123,51 +153,37 @@ ctpl_lexer_read_token_tpl_if (CtplInputStream *stream,
   CtplTokenExpr  *expr;
   
   //~ g_debug ("if?");
-  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
-    expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
-    if (expr) {
-      GError *err = NULL;
-      gint    c;
+  expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
+  if (expr) {
+    if (ctpl_lexer_read_stmt_end (stream, "if", error)) {
+      GError     *err = NULL;
+      CtplToken  *if_token;
+      CtplToken  *else_token = NULL;
+      LexerState  substate = *state;
       
-      c = ctpl_input_stream_get_c (stream, &err);
-      if (err) {
-        /* I/O error */
-      } else if (c != CTPL_END_CHAR) {
-        /* there is trash before the end, then fail */
-        ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
-                                     CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                     "Unexpected character '%c' before end of "
-                                     "'if' statement", c);
-      } else {
-        CtplToken  *if_token;
-        CtplToken  *else_token = NULL;
-        LexerState  substate = *state;
-        
-        //~ g_debug ("if token: `if %s`", expr);
-        substate.block_depth ++;
-        substate.last_statement_type_if = S_IF;
-        if_token = ctpl_lexer_lex_internal (stream, &substate, &err);
-        if (! err) {
-          if (substate.last_statement_type_if == S_ELSE) {
-            //~ g_debug ("have else");
-            else_token = ctpl_lexer_lex_internal (stream, &substate, &err);
-          }
-          if (! err /* don't override errors */ &&
-              state->block_depth != substate.block_depth) {
-            /* if a block was not closed, fail */
-            ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_ERROR,
-                                         CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                         "Unclosed 'if/else' block");
-          }
-          if (! err) {
-            token = ctpl_token_new_if (expr, if_token, else_token);
-            /* set expr to NULL not to free it since it is now used */
-            expr = NULL;
-          }
+      //~ g_debug ("if token: `if %s`", expr);
+      substate.block_depth ++;
+      substate.last_statement_type_if = S_IF;
+      if_token = ctpl_lexer_lex_internal (stream, &substate, &err);
+      if (! err) {
+        if (substate.last_statement_type_if == S_ELSE) {
+          //~ g_debug ("have else");
+          else_token = ctpl_lexer_lex_internal (stream, &substate, &err);
         }
-      }
-      if (err) {
-        g_propagate_error (error, err);
+        if (! err /* don't override errors */ &&
+            state->block_depth != substate.block_depth) {
+          /* if a block was not closed, fail */
+          ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_ERROR,
+                                       CTPL_LEXER_ERROR_SYNTAX_ERROR,
+                                       "Unclosed 'if/else' block");
+        }
+        if (! err) {
+          token = ctpl_token_new_if (expr, if_token, else_token);
+          /* set expr to NULL not to free it since it is now used */
+          expr = NULL;
+        } else {
+          g_propagate_error (error, err);
+        }
       }
     }
     ctpl_token_expr_free (expr);
@@ -212,50 +228,32 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
                                        "Missing 'in' keyword after iterator name "
                                        "of 'for' statement");
         } else {
-          if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
-            CtplTokenExpr *array_expr;
-            
-            array_expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
-            if (! array_expr) {
-            } else {
-              if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
-                gint    c;
-                GError *err = NULL;
-                
-                c = ctpl_input_stream_get_c (stream, &err);
-                if (err) {
-                  /* I/O error */
-                  g_propagate_error (error, err);
-                } else if (c != CTPL_END_CHAR) {
-                  /* trash before the end, fail */
-                  ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
+          CtplTokenExpr *array_expr;
+          
+          array_expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
+          if (array_expr) {
+            if (ctpl_lexer_read_stmt_end (stream, "for", error)) {
+              GError     *err = NULL;
+              CtplToken  *for_children;
+              LexerState  substate = *state;
+              
+              //~ g_debug ("for token: `for %s in %s`", iter_name, array_name);
+              substate.block_depth ++;
+              for_children = ctpl_lexer_lex_internal (stream, &substate, &err);
+              //~ g_debug ("for child: %d", (void *)for_children);
+              if (! err) {
+                if (state->block_depth != substate.block_depth) {
+                  ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_ERROR,
                                                CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                               "Unexpected character '%c' "
-                                               "before end of 'for' statement",
-                                               c);
+                                               "Unclosed 'for' block");
                 } else {
-                  CtplToken  *for_children;
-                  LexerState  substate = *state;
-                  
-                  //~ g_debug ("for token: `for %s in %s`", iter_name, array_name);
-                  substate.block_depth ++;
-                  for_children = ctpl_lexer_lex_internal (stream, &substate, &err);
-                  //~ g_debug ("for child: %d", (void *)for_children);
-                  if (! err) {
-                    if (state->block_depth != substate.block_depth) {
-                      ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_ERROR,
-                                                   CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                                   "Unclosed 'for' block");
-                    } else {
-                      token = ctpl_token_new_for (array_expr, iter_name,
-                                                  for_children);
-                      array_expr = NULL; /* avoid freeing expression */
-                    }
-                  }
-                  if (err) {
-                    g_propagate_error (error, err);
-                  }
+                  token = ctpl_token_new_for (array_expr, iter_name,
+                                              for_children);
+                  array_expr = NULL; /* avoid freeing expression */
                 }
+              }
+              if (err) {
+                g_propagate_error (error, err);
               }
             }
             ctpl_token_expr_free (array_expr);
@@ -278,32 +276,17 @@ ctpl_lexer_read_token_tpl_end (CtplInputStream *stream,
                                GError         **error)
 {
   //~ g_debug ("end?");
-  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
-    gint    c;
-    GError *err = NULL;
-    
-    c = ctpl_input_stream_get_c (stream, &err);
-    if (err) {
-      /* I/O error */
-      g_propagate_error (error, err);
-    } else if (c != CTPL_END_CHAR) {
-      /* fail, missing } at the end */
+  if (ctpl_lexer_read_stmt_end (stream, "end", error)) {
+    //~ g_debug ("block end");
+    state->block_depth --;
+    if (state->block_depth < 0) {
+      /* a non-opened block was closed, fail */
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
                                    CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                   "Unexpected character '%c' before end of "
-                                   "'end' statement", c);
+                                   "Unmatching 'end' statement (needs a 'if' "
+                                   "or 'for' before)");
     } else {
-      //~ g_debug ("block end");
-      state->block_depth --;
-      if (state->block_depth < 0) {
-        /* a non-opened block was closed, fail */
-        ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
-                                     CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                     "Unmatching 'end' statement (needs a 'if' "
-                                     "or 'for' before)");
-      } else {
-        state->last_statement_type_if = S_END;
-      }
+      state->last_statement_type_if = S_END;
     }
   }
   
@@ -318,31 +301,16 @@ ctpl_lexer_read_token_tpl_else (CtplInputStream *stream,
                                 GError         **error)
 {
   //~ g_debug ("else?");
-  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
-    GError *err = NULL;
-    gint    c;
-    
-    c = ctpl_input_stream_get_c (stream, &err);
-    if (err) {
-      /* I/O error */
-      g_propagate_error (error, err);
-    } else if (c != CTPL_END_CHAR) {
-      /* fail, missing } at the end */
+  if (ctpl_lexer_read_stmt_end (stream, "else", error)) {
+    //~ g_debug ("else statement");
+    if (state->last_statement_type_if != S_IF) {
+      /* else but no opened if, fail */
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
                                    CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                   "Unexpected character '%c' before end of "
-                                   "'else' statement", c);
+                                   "Unmatching 'else' statement (needs an "
+                                   "'if' before)");
     } else {
-      //~ g_debug ("else statement");
-      if (state->last_statement_type_if != S_IF) {
-        /* else but no opened if, fail */
-        ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
-                                     CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                     "Unmatching 'else' statement (needs an "
-                                     "'if' before)");
-      } else {
-        state->last_statement_type_if = S_ELSE;
-      }
+      state->last_statement_type_if = S_ELSE;
     }
   }
   
@@ -360,28 +328,12 @@ ctpl_lexer_read_token_tpl_expr (CtplInputStream *stream,
   CtplTokenExpr  *expr;
   
   (void)state; /* we don't use the state, silent compilers */
-  if (ctpl_input_stream_skip_blank (stream, error) >= 0) {
-    expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
-    if (expr) {
-      GError *err = NULL;
-      gint    c;
-      
-      c = ctpl_input_stream_get_c (stream, &err);
-      if (err) {
-        /* I/O error */
-        g_propagate_error (error, err);
-      } else if (c != CTPL_END_CHAR) {
-        /* trash before the end, fail */
-        ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
-                                     CTPL_LEXER_ERROR_SYNTAX_ERROR,
-                                     "Unexpected character '%c' before end of "
-                                     "statement", c);
-      } else {
-        token = ctpl_token_new_expr (expr);
-      }
-      if (! token) {
-        ctpl_token_expr_free (expr);
-      }
+  expr = ctpl_lexer_expr_lex_full (stream, FALSE, error);
+  if (expr) {
+    if (ctpl_lexer_read_stmt_end (stream, "expression", error)) {
+      token = ctpl_token_new_expr (expr);
+    } else {
+      ctpl_token_expr_free (expr);
     }
   }
   
