@@ -238,7 +238,6 @@ do_multiply_string (const gchar  *str,
       }
     }
   }
-  //~ g_debug ("mutiplied string: '%s'", buf);
   
   return buf;
 }
@@ -375,7 +374,6 @@ ctpl_eval_operator_div (CtplValue *lvalue,
       rv = FALSE;
     } else {
       ctpl_value_set_float (value, lval / rval);
-      //~ g_debug ("division result: %f", ctpl_value_get_float (value));
     }
   }
   
@@ -776,12 +774,6 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
     }
     g_free (value_str);
   }
-  //~ {
-    //~ gchar *dump;
-    //~ dump = ctpl_value_to_string (value);
-    //~ g_debug ("result: %s", dump);
-    //~ g_free (dump);
-  //~ }
   
   return rv;
 }
