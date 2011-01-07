@@ -179,6 +179,8 @@ ctpl_lexer_read_token_tpl_if (CtplInputStream *stream,
           /* set expr to NULL not to free it since it is now used */
           expr = NULL;
         } else {
+          ctpl_token_free (if_token);
+          ctpl_token_free (else_token);
           g_propagate_error (error, err);
         }
       }
@@ -239,6 +241,7 @@ ctpl_lexer_read_token_tpl_for (CtplInputStream *stream,
                   ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_ERROR,
                                                CTPL_LEXER_ERROR_SYNTAX_ERROR,
                                                "Unclosed 'for' block");
+                  ctpl_token_free (for_children);
                 } else {
                   token = ctpl_token_new_for (array_expr, iter_name,
                                               for_children);
