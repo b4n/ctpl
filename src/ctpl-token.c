@@ -301,8 +301,11 @@ ctpl_token_expr_free_full (CtplTokenExpr *token,
         break;
     }
     while (token->indexes) {
+      GSList *next = token->indexes->next;
+      
       ctpl_token_expr_free (token->indexes->data);
-      token->indexes = token->indexes->next;
+      g_slist_free_1 (token->indexes);
+      token->indexes = next;
     }
     g_slice_free1 (sizeof *token, token);
   }
