@@ -237,6 +237,7 @@ ctpl_token_expr_new_value (const CtplValue *value)
   token = ctpl_token_expr_new ();
   if (token) {
     token->type = CTPL_TOKEN_EXPR_TYPE_VALUE;
+    ctpl_value_init (&token->token.t_value);
     ctpl_value_copy (value, &token->token.t_value);
   }
   
