@@ -1,5 +1,17 @@
 #!/bin/sh
 
+#
+# this script used to test the library, but since it rely on the ctpl CLI tool,
+# which depends on a newer version of GIO and on GIO-UNIX, it's not a viable
+# solution.
+# now the tests this script used to do are done by parsing-tests.
+# 
+# TODO: make this script test the CLI tool rather than the same things than
+# parsing-tests; e.g. encoding conversions.
+# though, testing whether the parsing succeed with the CLI tool is also a good
+# thing, so (a part) should be kept.
+#
+
 # automake tests integration
 top_srcdir="${top_srcdir:-..}"
 srcdir="${srcdir:-.}"
