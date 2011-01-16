@@ -692,6 +692,63 @@ ctpl_eval_operator (const CtplTokenExpr  *operator,
   return rv;
 }
 
+static gboolean
+ctpl_eval_value_index (const CtplTokenExpr  *expr,
+                       CtplEnviron          *env,
+                       CtplValue            *value,
+                       GError              **error)
+{
+  gboolean  rv = TRUE;
+  GSList   *indexes;
+  
+  for (indexes = expr->indexes; rv && indexes; indexes = indexes->next) {
+    gchar *value_str = NULL;
+    
+    #define VALUE_AS_STRING (value_str = ctpl_value_to_string (value))
+    
+    rv = FALSE;
+    /* FIXME: improve error messages? */
+    if (! CTPL_VALUE_HOLDS_ARRAY (value)) {
+      g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                   "Value '%s' cannot be indexed", VALUE_AS_STRING);
+    } else {
+      CtplValue idx_value;
+      
+      ctpl_value_init (&idx_value);
+      if (ctpl_eval_value (indexes->data, env, &idx_value, error)) {
+        if (! ctpl_value_convert (&idx_value, CTPL_VTYPE_INT)) {
+          g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                       "Cannot convert index of value '%s' to integer",
+                       VALUE_AS_STRING);
+        } else {
+          const CtplValue  *new_value;
+          glong             idx = ctpl_value_get_int (&idx_value);
+          
+          if (idx < 0 ||
+              ! (new_value = ctpl_value_array_index (value, (gsize)idx))) {
+            g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
+                         "Cannot index value '%s' at %ld",
+                         VALUE_AS_STRING, idx);
+          } else {
+            ctpl_value_copy (new_value, value);
+            rv = TRUE;
+          }
+        }
+        ctpl_value_free_value (&idx_value);
+      }
+    }
+    
+    #undef VALUE_AS_STRING
+    
+    g_free (value_str);
+  }
+  if (! rv) {
+    ctpl_value_free_value (value);
+  }
+  
+  return rv;
+}
+
 /**
  * ctpl_eval_value:
  * @expr: The #CtplTokenExpr to evaluate
@@ -713,7 +770,6 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
                  GError              **error)
 {
   gboolean  rv = TRUE;
-  GSList   *indexes;
   
   switch (expr->type) {
     case CTPL_TOKEN_EXPR_TYPE_VALUE:
@@ -739,40 +795,8 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
       rv = ctpl_eval_operator (expr, env, value, error);
       break;
   }
-  for (indexes = expr->indexes; rv && indexes; indexes = indexes->next) {
-    gchar *value_str = ctpl_value_to_string (value);
-    
-    rv = FALSE;
-    /* FIXME: improve error messages? */
-    if (! CTPL_VALUE_HOLDS_ARRAY (value)) {
-      g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                   "Value '%s' cannot be indexed", value_str);
-    } else {
-      CtplValue idx_value;
-      
-      if (! ctpl_eval_value (indexes->data, env, &idx_value, error)) {
-      } else if (! ctpl_value_convert (&idx_value, CTPL_VTYPE_INT)) {
-        g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
-                     "Cannot convert index of value '%s' to integer",
-                     value_str);
-      } else {
-        CtplValue  *new_value;
-        glong       idx = ctpl_value_get_int (&idx_value);
-        
-        if (idx < 0 ||
-            ! (new_value = ctpl_value_array_index (value, (gsize)idx))) {
-          g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
-                       "Cannot index value '%s' at %ld", value_str, idx);
-        } else {
-          ctpl_value_copy (new_value, value);
-          rv = TRUE;
-        }
-      }
-    }
-    if (! rv) {
-      ctpl_value_free (value);
-    }
-    g_free (value_str);
+  if (rv) {
+    rv = ctpl_eval_value_index (expr, env, value, error);
   }
   
   return rv;
@@ -838,10 +862,12 @@ ctpl_eval_bool (const CtplTokenExpr  *expr,
   
   ctpl_value_init (&value);
   rv = ctpl_eval_value (expr, env, &value, error);
-  if (rv && result) {
-    *result = ctpl_eval_bool_value (&value);
+  if (rv) {
+    if (result) {
+      *result = ctpl_eval_bool_value (&value);
+    }
+    ctpl_value_free_value (&value);
   }
-  ctpl_value_free_value (&value);
   
   return rv;
 }
