@@ -1,3 +1,14 @@
+# 0.3.3 (11/08/2011)
+
+  The version 0.3.3 is a bugfix release for the 0.3 branch.
+  
+  ## Changes summary
+  
+  * Fixed crash when indexing expressions;
+  * Fixed two possible reads of uninitialized memory;
+  * Plugged a few memory leaks;
+
+
 # 0.3.2 (07/01/2011)
 
   The version 0.3.2 is a bugfix and enhancement release for the 0.3 branch.
