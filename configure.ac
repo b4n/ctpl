@@ -15,6 +15,23 @@ AC_CONFIG_HEADERS([config.h])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
+
+# CLI-tool specific macros to enable/disable it
+AC_ARG_ENABLE([cli-tool],
+              AS_HELP_STRING([--disable-cli-tool],
+                             [Disable the standalone command-line tool [[default=auto]]]),
+              [enable_cli_tool="$enableval"],
+              [enable_cli_tool="auto"])
+
+# Output or not $1 as an error or a warning depending on $enable_cli_tool
+AC_DEFUN([CLI_TOOL_MSG_ERROR],
+[
+  AS_IF([test "x$enable_cli_tool" = "xyes"],
+        [AC_MSG_ERROR([$1])],
+        [test "x$enable_cli_tool" != "xno"],
+        [AC_MSG_WARN([$1])])
+])
+
 #
 # revision of the library (libtool stuff)
 # 
@@ -49,13 +66,15 @@ HAVE_GIO_UNIX="no"
 PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0],
                   [HAVE_GIO_UNIX="yes"],
                   [HAVE_GIO_UNIX="no"
-                   AC_MSG_WARN([The ctpl command-line utility will not be built because of the following error: ${GIO_UNIX_PKG_ERRORS}])])
+                   CLI_TOOL_MSG_ERROR([Cannot build the CLI tool: ${GIO_UNIX_PKG_ERRORS}])
+                   enable_cli_tool="no"])
 HAVE_GIO_2_24="no"
 PKG_CHECK_MODULES([GIO_2_24], [gio-2.0 >= 2.24],
                   [HAVE_GIO_2_24="yes"],
                   [HAVE_GIO_2_24="no"
-                   AC_MSG_WARN([The ctpl command-line utility will not be built because of the following error: ${GIO_2_24_PKG_ERRORS}])])
-AM_CONDITIONAL([BUILD_CTPL], [test x$HAVE_GIO_UNIX = xyes -a x$HAVE_GIO_2_24 = xyes])
+                   CLI_TOOL_MSG_ERROR([Cannot build the CLI tool: ${GIO_2_24_PKG_ERRORS}])
+                   enable_cli_tool="no"])
+AM_CONDITIONAL([BUILD_CTPL], [test "x$enable_cli_tool" != xno])
 
 # needed for the math functions checks to work
 AC_CHECK_LIB([m], [acos])

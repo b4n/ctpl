@@ -29,6 +29,12 @@ For detailed installation instructions, see the INSTALL file.
 If you are working on Windows, you may want to consider using the alternate
 build system, see below.
 
+Optional features
+-----------------
+
+You can explicitly enable or disable building of the command-line tool by giving
+the --enable-cli-tool or --disable-cli-tool argument to configure.
+
 
 Alternate installation, Waf
 ===========================
