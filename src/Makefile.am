@@ -39,6 +39,7 @@ EXTRA_DIST          = ctpl-lexer-private.h \
                       ctpl-mathutils.h \
                       ctpl-stack.h \
                       ctpl-token-private.h
+CLEANFILES          =
 
 if BUILD_CTPL
 bin_PROGRAMS += ctpl
@@ -55,3 +56,29 @@ test_CFLAGS   = $(libctpl_la_CFLAGS)
 test_LDADD    = $(libctpl_la_LIBADD)
 test_SOURCES  = test.c \
                 $(libctpl_la_SOURCES)
+
+# gobject-introspection stuff
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_GIRS          =
+INTROSPECTION_SCANNER_ARGS  = --add-include-path=$(srcdir) --warn-all
+INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+
+if HAVE_INTROSPECTION
+Ctpl-1.0.gir: $(lib_LTLIBRARIES)
+Ctpl_1_0_gir_VERSION          = @VERSION@
+Ctpl_1_0_gir_EXPORT_PACKAGES  = ctpl
+Ctpl_1_0_gir_INCLUDES         = GLib-2.0 Gio-2.0 GObject-2.0
+Ctpl_1_0_gir_CFLAGS           = $(INCLUDES) -DCTPL_COMPILATION
+Ctpl_1_0_gir_SCANNERFLAGS     = --c-include "ctpl/ctpl.h"
+Ctpl_1_0_gir_LIBS             = $(lib_LTLIBRARIES)
+Ctpl_1_0_gir_FILES            = $(libctpl_la_SOURCES) $(ctplinclude_HEADERS)
+INTROSPECTION_GIRS           += Ctpl-1.0.gir
+
+girdir        = $(datadir)/gir-1.0
+gir_DATA      = $(INTROSPECTION_GIRS)
+
+typelibdir    = $(libdir)/girepository-1.0
+typelib_DATA  = $(INTROSPECTION_GIRS:.gir=.typelib)
+
+CLEANFILES   += $(gir_DATA) $(typelib_DATA)
+endif

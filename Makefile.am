@@ -14,6 +14,6 @@ EXTRA_DIST = AUTHORS \
 DISTCLEANFILES = config.status \
                  config.log
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc
+DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-introspection
 
 ACLOCAL_AMFLAGS = -I build/m4

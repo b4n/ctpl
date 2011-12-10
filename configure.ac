@@ -58,6 +58,9 @@ AC_PROG_CC_C99
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
 
+# check for gobject-introspection
+GOBJECT_INTROSPECTION_CHECK([0.6.7])
+
 # Checks for libraries.
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.10])
 PKG_CHECK_MODULES([GIO],  [gio-2.0])
