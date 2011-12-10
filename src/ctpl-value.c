@@ -166,7 +166,7 @@ ctpl_value_copy (const CtplValue *src_value,
 }
 
 /**
- * ctpl_value_dup:
+ * ctpl_value_dup: (skip)
  * @value: A #CtplValue to copy
  * 
  * Duplicates a #CtplValue.

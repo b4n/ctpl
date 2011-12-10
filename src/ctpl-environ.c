@@ -136,7 +136,7 @@ ctpl_environ_new (void)
 }
 
 /**
- * ctpl_environ_ref:
+ * ctpl_environ_ref: (skip)
  * @env: a #CtplEnviron
  * 
  * Adds a reference to a #CtplEnviron.
@@ -154,7 +154,7 @@ ctpl_environ_ref (CtplEnviron *env)
 }
 
 /**
- * ctpl_environ_unref:
+ * ctpl_environ_unref: (skip)
  * @env: a #CtplEnviron
  * 
  * Removes a reference from a #CtplEnviron. If the reference count drops to 0,
@@ -378,8 +378,8 @@ ctpl_environ_foreach_hfunc (gpointer  symbol,
 /**
  * ctpl_environ_foreach:
  * @env: A #CtplEnviron
- * @func: A #CtplEnvironForeachFunc
- * @user_data: user data to pass to @func
+ * @func: (closure user_data) (scope call): A #CtplEnvironForeachFunc
+ * @user_data: (closure): user data to pass to @func
  * 
  * Calls @func on each symbol of the environment.
  */

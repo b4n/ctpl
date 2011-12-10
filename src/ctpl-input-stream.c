@@ -115,7 +115,7 @@ ctpl_input_stream_new (GInputStream *stream,
 
 /**
  * ctpl_input_stream_new_for_memory:
- * @data: Data for which create the stream
+ * @data: (scope notified) (array length=length): Data for which create the stream
  * @length: length of @data
  * @destroy: #GDestroyNotify to call on @data when finished, or %NULL
  * @name: The name of the stream to identify it in error messages
@@ -236,7 +236,7 @@ ctpl_input_stream_new_for_uri (const gchar *uri,
 }
 
 /**
- * ctpl_input_stream_ref:
+ * ctpl_input_stream_ref: (skip)
  * @stream: A #CtplInputStream
  * 
  * Adds a reference to a #CtplInputStream.
@@ -254,7 +254,7 @@ ctpl_input_stream_ref (CtplInputStream *stream)
 }
 
 /**
- * ctpl_input_stream_unref:
+ * ctpl_input_stream_unref: (skip)
  * @stream: A #CtplInputStream
  * 
  * Removes a reference from a #CtplInputStream. If the reference count drops to

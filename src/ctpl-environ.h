@@ -65,7 +65,7 @@ typedef struct _CtplEnviron CtplEnviron;
  * @env: The #CtplEnviron on which the function was called
  * @symbol: The current symbol
  * @value: The symbol's value
- * @user_data: User data passed to ctpl_environ_foreach()
+ * @user_data: (closure): User data passed to ctpl_environ_foreach()
  * 
  * User function for ctpl_environ_foreach().
  * 
