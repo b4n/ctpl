@@ -25,6 +25,7 @@
 #define H_CTPL_TOKEN_H
 
 #include <glib.h>
+#include <glib-object.h>
 #include "ctpl-value.h"
 
 G_BEGIN_DECLS
@@ -43,6 +44,8 @@ typedef struct _CtplToken             CtplToken;
  */
 typedef struct _CtplTokenExpr         CtplTokenExpr;
 
+GType         ctpl_token_get_type           (void) G_GNUC_CONST;
+GType         ctpl_token_expr_get_type      (void) G_GNUC_CONST;
 void          ctpl_token_free               (CtplToken *token);
 void          ctpl_token_expr_free          (CtplTokenExpr *token);
 

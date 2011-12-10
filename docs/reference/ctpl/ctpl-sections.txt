@@ -76,7 +76,7 @@ ctpl_token_expr_new_operator
 ctpl_token_expr_new_symbol
 ctpl_token_expr_new_value
 ctpl_token_expr_dump
-ctpl_token_get_type
+ctpl_token_get_token_type
 ctpl_token_append
 ctpl_token_prepend
 </SECTION>

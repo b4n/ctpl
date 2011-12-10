@@ -77,6 +77,10 @@ struct _CtplEnviron
   GHashTable     *symbol_table; /* hash table containing stacks of symbols */
 };
 
+G_DEFINE_BOXED_TYPE (CtplEnviron,
+                     ctpl_environ,
+                     ctpl_environ_ref,
+                     ctpl_environ_unref)
 
 /*<standard>*/
 GQuark

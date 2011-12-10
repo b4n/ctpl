@@ -194,7 +194,7 @@ ctpl_parser_parse_token (const CtplToken   *token,
 {
   gboolean rv = FALSE;
   
-  switch (ctpl_token_get_type (token)) {
+  switch (ctpl_token_get_token_type (token)) {
     case CTPL_TOKEN_TYPE_DATA:
       rv = ctpl_parser_parse_token_data (token->token.t_data, output, error);
       break;
@@ -212,7 +212,7 @@ ctpl_parser_parse_token (const CtplToken   *token,
       break;
     
     default:
-      g_critical ("Invalid/unknown token type %d", ctpl_token_get_type (token));
+      g_critical ("Invalid/unknown token type %d", ctpl_token_get_token_type (token));
       g_assert_not_reached ();
   }
   

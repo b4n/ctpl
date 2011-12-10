@@ -1,5 +1,5 @@
 check_LTLIBRARIES   = libctpl-test.la
-check_PROGRAMS      = parsing-tests float-test read-number-test
+check_PROGRAMS      = parsing-tests float-test read-number-test gtype-api-test
 if BUILD_CTPL
 dist_check_SCRIPTS  = tests.sh
 else
@@ -21,6 +21,7 @@ libctpl_test_la_LIBADD   = ../src/libctpl.la @GLIB_LIBS@ @GIO_LIBS@
 parsing_tests_SOURCES    = parsing-tests.c
 float_test_SOURCES       = float-test.c
 read_number_test_SOURCES = read-number-test.c
+gtype_api_test_SOURCES   = gtype-api-test.c
 
 
 TESTS_ENVIRONMENT = $(SHELL) >/dev/null

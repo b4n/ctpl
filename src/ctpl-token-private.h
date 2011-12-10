@@ -277,14 +277,14 @@ G_GNUC_INTERNAL
 void          ctpl_token_expr_dump          (const CtplTokenExpr *token);
 
 /*
- * ctpl_token_get_type:
+ * ctpl_token_get_token_type:
  * @token: A #CtplToken
  * 
  * Gets the type of a #CtplToken.
  * 
  * Returns: The <link linkend="CtplTokenType">type</link> of @token.
  */
-#define ctpl_token_get_type(token) ((token)->type)
+#define ctpl_token_get_token_type(token) ((token)->type)
 
 
 G_END_DECLS

@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <glib.h>
+#include <glib-object.h>
 #include <gio/gio.h>
 #include "ctpl-value.h"
 
@@ -45,6 +46,7 @@ typedef struct _CtplInputStream CtplInputStream;
 #define CTPL_EOF  0
 
 
+GType             ctpl_input_stream_get_type            (void) G_GNUC_CONST;
 CtplInputStream  *ctpl_input_stream_new                 (GInputStream  *stream,
                                                          const gchar   *name);
 CtplInputStream  *ctpl_input_stream_new_for_memory      (const gchar   *data,

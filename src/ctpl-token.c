@@ -40,6 +40,18 @@
  * with ctpl_token_expr_free().
  */
 
+static CtplTokenExpr   *ctpl_token_expr_dup     (const CtplTokenExpr *token);
+static CtplToken       *ctpl_token_dup          (const CtplToken *token);
+
+G_DEFINE_BOXED_TYPE (CtplToken,
+                     ctpl_token,
+                     ctpl_token_dup,
+                     ctpl_token_free)
+G_DEFINE_BOXED_TYPE (CtplTokenExpr,
+                     ctpl_token_expr,
+                     ctpl_token_expr_dup,
+                     ctpl_token_expr_free)
+
 /* returns the length of @s. If @max is >= 0, return it, return the computed
  * length of @s otherwise. */
 #define GET_LEN(s, max) (((max) < 0) ? strlen (s) : (gsize)max)
@@ -270,6 +282,38 @@ ctpl_token_expr_new_symbol (const char *symbol,
 }
 
 
+static CtplTokenExpr *
+ctpl_token_expr_dup (const CtplTokenExpr *token)
+{
+  CtplTokenExpr *copy = NULL;
+  
+  if (token) {
+    GSList *iter;
+    
+    switch (token->type) {
+      case CTPL_TOKEN_EXPR_TYPE_OPERATOR:
+        copy = ctpl_token_expr_new_operator (token->token.t_operator->operator,
+                                             ctpl_token_expr_dup (token->token.t_operator->loperand),
+                                             ctpl_token_expr_dup (token->token.t_operator->roperand));
+        break;
+      
+      case CTPL_TOKEN_EXPR_TYPE_SYMBOL:
+        copy = ctpl_token_expr_new_symbol (token->token.t_symbol, -1);
+        break;
+      
+      case CTPL_TOKEN_EXPR_TYPE_VALUE:
+        copy = ctpl_token_expr_new_value (&token->token.t_value);
+        break;
+    }
+    for (iter = token->indexes; iter; iter = iter->next) {
+      copy->indexes = g_slist_append (copy->indexes,
+                                      ctpl_token_expr_dup (iter->data));
+    }
+  }
+  
+  return copy;
+}
+
 /*
  * ctpl_token_expr_free_full:
  * @token: A #CtplTokenExpr to free
@@ -321,6 +365,46 @@ void
 ctpl_token_expr_free (CtplTokenExpr *token)
 {
   ctpl_token_expr_free_full (token, TRUE);
+}
+
+static CtplToken *
+ctpl_token_dup (const CtplToken *token)
+{
+  CtplToken *copy = NULL;
+  
+  while (token) {
+    CtplToken *item = NULL;
+    
+    switch (token->type) {
+      case CTPL_TOKEN_TYPE_DATA:
+        item = ctpl_token_new_data (token->token.t_data, -1);
+        break;
+      
+      case CTPL_TOKEN_TYPE_EXPR:
+        item = ctpl_token_new_expr (ctpl_token_expr_dup (token->token.t_expr));
+        break;
+      
+      case CTPL_TOKEN_TYPE_FOR:
+        item = ctpl_token_new_for (ctpl_token_expr_dup (token->token.t_for->array),
+                                   token->token.t_for->iter,
+                                   ctpl_token_dup (token->token.t_for->children));
+        break;
+      
+      case CTPL_TOKEN_TYPE_IF:
+        item = ctpl_token_new_if (ctpl_token_expr_dup (token->token.t_if->condition),
+                                  ctpl_token_dup (token->token.t_if->if_children),
+                                  ctpl_token_dup (token->token.t_if->else_children));
+        break;
+    }
+    if (! copy) {
+      copy = item;
+    } else {
+      ctpl_token_append (copy, item);
+    }
+    token = token->next;
+  }
+  
+  return copy;
 }
 
 /**

@@ -25,6 +25,7 @@
 #define H_CTPL_ENVIRON_H
 
 #include <glib.h>
+#include <glib-object.h>
 #include "ctpl-value.h"
 #include "ctpl-input-stream.h"
 
@@ -76,6 +77,7 @@ typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
                                              gpointer         user_data);
 
 
+GType             ctpl_environ_get_type         (void) G_GNUC_CONST;
 GQuark            ctpl_environ_error_quark      (void) G_GNUC_CONST;
 CtplEnviron      *ctpl_environ_new              (void);
 CtplEnviron      *ctpl_environ_ref              (CtplEnviron *env);

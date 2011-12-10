@@ -20,6 +20,7 @@
 #include "ctpl-value.h"
 #include "ctpl-mathutils.h"
 #include <glib.h>
+#include <glib-object.h>
 #include <stdarg.h>
 
 
@@ -82,9 +83,14 @@
  * </example>
  */
 
-
 static void   ctpl_value_set_array_internal   (CtplValue     *value,
                                                const GSList  *values);
+
+
+G_DEFINE_BOXED_TYPE (CtplValue,
+                     ctpl_value,
+                     ctpl_value_dup,
+                     ctpl_value_free)
 
 
 /**

@@ -25,6 +25,7 @@
 #define H_CTPL_VALUE_H
 
 #include <glib.h>
+#include <glib-object.h>
 #include <stdarg.h>
 
 G_BEGIN_DECLS
@@ -121,6 +122,7 @@ struct _CtplValue
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_ARRAY))
 
 
+GType         ctpl_value_get_type             (void) G_GNUC_CONST;
 void          ctpl_value_init                 (CtplValue *value);
 CtplValue    *ctpl_value_new                  (void);
 void          ctpl_value_copy                 (const CtplValue *src_value,
