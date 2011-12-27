@@ -210,7 +210,7 @@ do_multiply_string (const gchar  *str,
   } else {
     gsize       buf_len;
     gsize       str_len;
-    gsize       i, j;
+    gsize       i;
     
     str_len = strlen (str);
     /* detect possible integer overflow. last check is because we allocate one
@@ -230,9 +230,7 @@ do_multiply_string (const gchar  *str,
                      "multiplication", buf_len + 1);
       } else {
         for (i = 0; i < (gsize)n; i++) {
-          for (j = 0; j < str_len; j++) {
-            buf[str_len * i + j] = str[j];
-          }
+          memcpy (&buf[str_len * i], str, str_len);
         }
         buf[buf_len] = 0;
       }
