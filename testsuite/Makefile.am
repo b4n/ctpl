@@ -7,8 +7,8 @@ EXTRA_SCRIPTS = tests.sh
 endif
 
 
-EXTRA_DIST  = $(wildcard success/*) \
-              $(wildcard fail/*) \
+EXTRA_DIST  = success				\
+              fail				\
               environ
 
 AM_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@

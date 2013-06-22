@@ -50,9 +50,11 @@ CTPL_LTVERSION="4:1:2"
 AC_SUBST([CTPL_LTVERSION])
 
 # Checks for programs.
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 LT_PREREQ([2.2.0])
 LT_INIT
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CC_C99
 
 # check for gtk-doc
