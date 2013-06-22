@@ -23,5 +23,4 @@ float_test_SOURCES       = float-test.c
 read_number_test_SOURCES = read-number-test.c
 
 
-TESTS_ENVIRONMENT = $(SHELL) >/dev/null
 TESTS = $(check_PROGRAMS) $(dist_check_SCRIPTS)
