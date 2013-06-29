@@ -10,7 +10,7 @@ AC_INIT([CTPL],
 AC_CONFIG_SRCDIR([src/ctpl.h])
 AC_CONFIG_AUX_DIR([build/aux])
 AC_CONFIG_MACRO_DIR([build/m4])
-AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign parallel-tests])
+AM_INIT_AUTOMAKE([1.11.1 -Wall foreign parallel-tests])
 AC_CONFIG_HEADERS([config.h])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
