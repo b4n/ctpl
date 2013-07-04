@@ -43,7 +43,8 @@ EXTRA_DIST          = ctpl-lexer-private.h \
 if BUILD_CTPL
 bin_PROGRAMS += ctpl
 
-ctpl_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@ @GIO_UNIX_CFLAGS@
+ctpl_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@ @GIO_UNIX_CFLAGS@ \
+                -DLOCALEDIR='"$(localedir)"'
 ctpl_LDADD    = libctpl.la @GLIB_LIBS@ @GIO_LIBS@ @GIO_UNIX_LIBS@
 ctpl_SOURCES  = ctpl.c
 endif
