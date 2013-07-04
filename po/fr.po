@@ -1,0 +1,367 @@
+# French translation of CTPL.
+# Copyright (C) 2013 Colomban Wendling <ban@herbesfolles.org>
+# This file is distributed under the same license as the CTPL package.
+# Colomban Wendling <ban@herbesfolles.org>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: CTPL 0.3.3\n"
+"Report-Msgid-Bugs-To: ban@herbesfolles.org\n"
+"POT-Creation-Date: 2013-07-04 22:11+0200\n"
+"PO-Revision-Date: 2013-07-04 23:29+0200\n"
+"Last-Translator: Colomban Wendling <ban@herbesfolles.org>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/ctpl.c:49
+msgid "Write output to FILE. If not provided, defaults to stdout."
+msgstr "Écrire la sortie dans FICHIER. Si non spécifié, écrit dans stdout."
+
+#: src/ctpl.c:50
+msgid "FILE"
+msgstr "FICHIER"
+
+#: src/ctpl.c:52
+msgid "Add environment from ENVFILE. This option may appear more than once."
+msgstr ""
+"Ajouter l'environnement depuis ENVFILE. Cette option peut apparaître "
+"plusieurs fois."
+
+#: src/ctpl.c:53
+msgid "ENVFILE"
+msgstr "ENVFILE"
+
+#: src/ctpl.c:55
+msgid "Add environment chunk CHUNK. This option may appear more than once."
+msgstr ""
+"Ajouter le morceau d'environnement MORCEAU. Cette option peut apparaître "
+"plusieurs fois."
+
+#: src/ctpl.c:56
+msgid "CHUNK"
+msgstr "MORCEAU"
+
+#: src/ctpl.c:58
+msgid "Be verbose."
+msgstr "Être verbeux"
+
+#: src/ctpl.c:60
+msgid "Print the version information and exit."
+msgstr "Affiche la version et quitte."
+
+#: src/ctpl.c:62
+msgid "Specify the encoding of the input and output files."
+msgstr "Spécifie l'encodage des fichiers d'entrée et de sortie."
+
+#: src/ctpl.c:62
+msgid "ENCODING"
+msgstr "ENCODAGE"
+
+#: src/ctpl.c:64
+msgid "Input files"
+msgstr "Fichiers d'entrée"
+
+#: src/ctpl.c:64
+msgid "INPUTFILE[...]"
+msgstr "FICHIER[...]"
+
+#: src/ctpl.c:139
+msgid "- CTPL template parser"
+msgstr " - processeur de templates CTPL"
+
+#: src/ctpl.c:143
+#, c-format
+msgid "CTPL %s\n"
+msgstr "CTPL %s\n"
+
+#: src/ctpl.c:147
+msgid "Missing input file(s)"
+msgstr "Fichier(s) d'entrée manquant(s)"
+
+#: src/ctpl.c:226
+#, c-format
+msgid "Loading environment file '%s'...\n"
+msgstr "Chargement du fichier d'environnement « %s »...\n"
+
+#: src/ctpl.c:230
+#, c-format
+msgid "Failed to load environment from file '%s': %s\n"
+msgstr "Impossible de charger l'environnement depuis le fichier « %s » : %s\n"
+
+#: src/ctpl.c:257
+#, c-format
+msgid "Loading environment chunk '%s'...\n"
+msgstr "Chargement du morceau d'environnement « %s »...\n"
+
+#: src/ctpl.c:259
+#, c-format
+msgid "Failed to load environment from chunk '%s': %s\n"
+msgstr "Impossible de charger l'environnement depuis le morceau « %s » : %s\n"
+
+#: src/ctpl.c:313
+#, c-format, fuzzy
+msgid "Parsing template '%s'...\n"
+msgstr "Parsage de la template « %s »…\n"
+
+#: src/ctpl.c:315
+#, c-format, fuzzy
+msgid "Failed to parse template '%s': %s\n"
+msgstr "Impossible de parser la template « %s » : %s\n"
+
+#: src/ctpl.c:340
+#, c-format
+msgid "Failed to open output: %s\n"
+msgstr "Impossible d'ouvrir la sortie : %s\n"
+
+#: src/ctpl.c:356
+#, c-format
+msgid "Failed to create encoding converter: %s\n"
+msgstr "Impossible de créer le convertisseur d'encodage : %s\n"
+
+#: src/ctpl.c:390
+#, c-format
+msgid "Option parsing failed: %s\n"
+msgstr "Impossible d'analyser les options : %s\n"
+
+#: src/ctpl-environ.c:564
+msgid "Not an array"
+msgstr "N'est pas un tableau"
+
+#: src/ctpl-environ.c:592
+#, c-format
+msgid "Missing `%c` separator between array values"
+msgstr "Séparateur « %c » manquant entre les éléments du tableau."
+
+#: src/ctpl-environ.c:631
+msgid "No valid value can be read"
+msgstr "Aucune valeur valide ne peut être lue"
+
+#: src/ctpl-environ.c:657
+msgid "Missing symbol"
+msgstr "Symbole manquant"
+
+#: src/ctpl-environ.c:670
+#, c-format
+msgid "Missing `%c` separator between symbol and value"
+msgstr "Séparateur « %c » manquant entre le symbole et la valeur"
+
+#: src/ctpl-environ.c:686
+#, c-format
+msgid "Missing `%c` separator after end of symbol's value"
+msgstr "Séparateur « %c » manquant après la fin de la valeur du symbole"
+
+#: src/ctpl-environ.c:755
+msgid "environment description"
+msgstr "description d'environnement"
+
+#: src/ctpl-eval.c:78
+#, c-format
+msgid ""
+"Invalid operands for operator '%s' (have '%s' and '%s', expect operands "
+"compatible with '%s')"
+msgstr ""
+"Opérandes invalides pour l'opérateur « %s » (« %s » et « %s » rencontrés, "
+"opérande d'un type compatible avec « %s » attendue)"
+
+#: src/ctpl-eval.c:158
+#, c-format
+msgid "Operator '+' cannot be used with '%s' and '%s' types"
+msgstr "L'opérateur « + » ne peut être utilisé avec les types « %s » et « %s »"
+
+#: src/ctpl-eval.c:262
+#, c-format
+msgid ""
+"Invalid operands for operator '*' (have '%s' and '%s'): cannot multiply "
+"arrays."
+msgstr ""
+"Opérandes invalides pour l'opérateur « * » (« %s » et « %s » rencontrés) : "
+"impossible de multiplier les tableaux."
+
+#: src/ctpl-eval.c:273
+#, c-format
+msgid ""
+"Invalid operands for operator '*' (have '%s' and '%s'): cannot multiply a "
+"string with something not a number."
+msgstr ""
+"Opérandes invalides pour l'opérateur « * » (« %s » et « %s » rencontrés) : "
+"impossible de multiplier une chaîne avec quelque chose d'autre qu'un nombre."
+
+#: src/ctpl-eval.c:326
+#, c-format
+msgid "Invalid operands for operator '*' (have '%s' and '%s')"
+msgstr ""
+"Opérandes invalides pour l'opérateur « * » (« %s » et « %s » rencontrés)"
+
+#: src/ctpl-eval.c:373
+msgid "Division by zero"
+msgstr "Division par zéro"
+
+#: src/ctpl-eval.c:414 src/ctpl-eval.c:486
+#, c-format
+msgid "Invalid operands for operator '%s' (have '%s' and '%s')"
+msgstr ""
+"Opérandes invalides pour l'opérateur « %s » (« %s » et « %s » rencontrés)"
+
+#: src/ctpl-eval.c:593
+msgid "Division by zero through modulo"
+msgstr "Division par zéro à travers un modulo"
+
+#: src/ctpl-eval.c:715
+#, c-format
+msgid "Value '%s' cannot be indexed"
+msgstr "La valeur « %s » ne peut pas être indexée"
+
+#: src/ctpl-eval.c:723
+#, c-format
+msgid "Cannot convert index of value '%s' to integer"
+msgstr "Impossible de convertir l'index de la valeur « %s » en un entier"
+
+#: src/ctpl-eval.c:732
+#, c-format
+msgid "Cannot index value '%s' at %ld"
+msgstr "Impossible d'indexer la valeur « %s » à la position %ld"
+
+#: src/ctpl-eval.c:789
+#, c-format
+msgid "Symbol '%s' cannot be found in the environment"
+msgstr "le symbole « %s » ne peut être trouvé dans l'environnement"
+
+#: src/ctpl-input-stream.c:368
+msgid "<stream>"
+msgstr "<flux>"
+
+#: src/ctpl-input-stream.c:1019
+msgid "Missing string delimiter"
+msgstr "Délimiteur de chaîne manquant"
+
+#: src/ctpl-input-stream.c:1046
+msgid "Unexpected EOF inside string constant"
+msgstr "Fin de fichier inattendue à l'intérieur d'une chaîne constante"
+
+#: src/ctpl-input-stream.c:1241
+msgid "Missing mantissa in numeric constant"
+msgstr "Mantisse manquante dans la constante numérique"
+
+#: src/ctpl-input-stream.c:1258
+#, c-format
+msgid "Invalid base %d numeric constant \"%s\""
+msgstr "Constante numérique de base %d invalide : « %s »"
+
+#: src/ctpl-input-stream.c:1263
+msgid "Overflow in numeric constant conversion"
+msgstr "Dépassement lors de la conversion de la constante numérique"
+
+#: src/ctpl-input-stream.c:1483
+msgid "Missing mantissa in float constant"
+msgstr "Mantisse manquante dans la constante flottante"
+
+#: src/ctpl-input-stream.c:1492
+#, c-format
+msgid "Invalid float constant \"%s\""
+msgstr "Constante flottante invalide : « %s »"
+
+#: src/ctpl-input-stream.c:1497
+msgid "Overflow in float constant conversion"
+msgstr "Dépassement lors de la conversion de la constante flottante"
+
+#: src/ctpl-lexer.c:136
+#, c-format
+msgid "Unexpected character '%c' before end of '%s' statement"
+msgstr "Caractère « %c » inattendu avant la fin de l'instruction « %s »"
+
+#: src/ctpl-lexer.c:176
+msgid "Unclosed 'if/else' block"
+msgstr "Bloc « if/else » non fermé"
+
+#: src/ctpl-lexer.c:214
+msgid "No iterator identifier for 'for' statement"
+msgstr "Pas d'identifiant itérateur pour l'instruction « for »"
+
+#: src/ctpl-lexer.c:227
+msgid "Missing 'in' keyword after iterator name of 'for' statement"
+msgstr ""
+"Mot-clé « in » manquant après le nom d'itérateur de l'instruction « for »"
+
+#: src/ctpl-lexer.c:245
+msgid "Unclosed 'for' block"
+msgstr "Bloc « for » non fermé"
+
+#: src/ctpl-lexer.c:282
+msgid "Unmatched 'end' statement (needs a 'if' or 'for' before)"
+msgstr "Instruction « end » inattendue (il faut un « if » ou un « for » avant)"
+
+#: src/ctpl-lexer.c:304
+msgid "Unmatched 'else' statement (needs an 'if' before)"
+msgstr "Instruction « else » inattendue (il faut un « if » avant)"
+
+#: src/ctpl-lexer.c:355
+#, c-format
+msgid "Unexpected character '%c' before start of statement"
+msgstr "Caractère « %c » inattendu avant le début de l'instruction"
+
+#: src/ctpl-lexer.c:437
+#, c-format
+msgid "Unexpected character '%c' inside data block"
+msgstr "Caractère « %c » inattendu dans le bloc de données"
+
+#: src/ctpl-lexer-expr.c:203
+msgid "No valid symbol"
+msgstr "Aucun symbole valide"
+
+#: src/ctpl-lexer-expr.c:427
+#, c-format
+msgid "Too few operands for operator '%s'"
+msgstr "Trop peu d'opérandes pour l'opérateur « %s »"
+
+#: src/ctpl-lexer-expr.c:460
+#, c-format
+msgid "Unexpected character '%c', expected index end"
+msgstr "Caractère « %c » inattendu, une fin d'index était attendue"
+
+#: src/ctpl-lexer-expr.c:500 src/ctpl-lexer-expr.c:620
+msgid "No valid operand at start of expression"
+msgstr "Aucune opérande valide au début de l'expression"
+
+#: src/ctpl-lexer-expr.c:528
+msgid "No valid operator"
+msgstr "Aucun opérateur valide"
+
+#: src/ctpl-lexer-expr.c:565
+msgid "Too many closing parenthesis"
+msgstr "Trop de parenthèses fermantes"
+
+#: src/ctpl-lexer-expr.c:589
+msgid "Missing closing parenthesis"
+msgstr "Parenthèse fermante manquante"
+
+#: src/ctpl-lexer-expr.c:690
+msgid "Trash data at end of expression"
+msgstr "Données invalides à la fin de l'expression"
+
+#: src/ctpl-parser.c:122
+#, c-format
+msgid "Cannot iterate over value '%s'"
+msgstr "Impossible d'itérer sur la valeur « %s »"
+
+#: src/ctpl-parser.c:178
+msgid "Cannot convert expression to a printable format"
+msgstr "Impossible de convertir l'expression dans un format imprimable"
+
+#: src/ctpl-value.c:853
+msgid "integer"
+msgstr "entier"
+
+#: src/ctpl-value.c:856
+msgid "float"
+msgstr "flottant"
+
+#: src/ctpl-value.c:859
+msgid "string"
+msgstr "chaîne"
+
+#: src/ctpl-value.c:864
+msgid "array"
+msgstr "tableau"
