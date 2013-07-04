@@ -21,6 +21,7 @@
 #include <string.h>
 #include <errno.h>
 #include <glib.h>
+#include "ctpl-i18n.h"
 #include "ctpl-lexer-private.h"
 #include "ctpl-token.h"
 #include "ctpl-token-private.h"
@@ -199,7 +200,7 @@ read_symbol (CtplInputStream *stream,
     } else {
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
                                    CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                                   "No valid symbol");
+                                   _("No valid symbol"));
     }
   }
   g_free (symbol);
@@ -423,7 +424,7 @@ validate_token_list (CtplInputStream *stream,
      * not be perfectly exact, it is probably better with it than without */
     ctpl_input_stream_set_error (stream, error, CTPL_LEXER_ERROR,
                                  CTPL_LEXER_EXPR_ERROR_MISSING_OPERAND,
-                                 "Too few operands for operator '%s'",
+                                 _("Too few operands for operator '%s'"),
                                  token_operator_to_string (operators[opt - 1]));
   }
   
@@ -456,8 +457,8 @@ lex_operand_index (CtplInputStream *stream,
         } else {
           ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
                                        CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                                       "Unexpected character '%c', expected "
-                                       "index end", c);
+                                       _("Unexpected character '%c', expected "
+                                         "index end"), c);
         }
         ctpl_token_expr_free (idx);
       } else {
@@ -496,7 +497,7 @@ lex_operand (CtplInputStream *stream,
     } else {
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
                                    CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                                   "No valid operand at start of expression");
+                                   _("No valid operand at start of expression"));
     }
     if (token && ! lex_operand_index (stream, token, error)) {
       ctpl_token_expr_free (token); token = NULL;
@@ -524,7 +525,7 @@ lex_operator (CtplInputStream *stream,
     if (op == CTPL_OPERATOR_NONE) {
       ctpl_input_stream_set_error (stream, error, CTPL_LEXER_EXPR_ERROR,
                                    CTPL_LEXER_EXPR_ERROR_MISSING_OPERATOR,
-                                   "No valid operator");
+                                   _("No valid operator"));
     } else {
       if (ctpl_input_stream_skip (stream, off, error) >= 0) {
         token = ctpl_token_expr_new_operator (op, NULL, NULL);
@@ -561,7 +562,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
               /* if we validate all, throw an error */
               ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_EXPR_ERROR,
                                            CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                                           "Too much closing parenthesis");
+                                           _("Too many closing parenthesis"));
             }
             /* else, just stop lexing */
           } else {
@@ -585,7 +586,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
                   ctpl_input_stream_set_error (stream, &err,
                                                CTPL_LEXER_EXPR_ERROR,
                                                CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                                               "Missing closing parenthesis");
+                                               _("Missing closing parenthesis"));
                 }
               }
             } else {
@@ -616,7 +617,7 @@ ctpl_lexer_expr_lex_internal (CtplInputStream  *stream,
         /* if no tokens were read, complain */
         ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_EXPR_ERROR,
                                      CTPL_LEXER_EXPR_ERROR_FAILED,
-                                     "No valid operand at start of expression");
+                                     _("No valid operand at start of expression"));
       } else {
         /* here check validity of token list, then create the final token. */
         tokens = g_slist_reverse (tokens);
@@ -686,7 +687,7 @@ ctpl_lexer_expr_lex_full (CtplInputStream *stream,
       /* if we lex all and we don't have reached EOF here, complain */
       ctpl_input_stream_set_error (stream, &err, CTPL_LEXER_EXPR_ERROR,
                                    CTPL_LEXER_EXPR_ERROR_SYNTAX_ERROR,
-                                   "Trash data at end of expression");
+                                   _("Trash data at end of expression"));
     }
   }
   if (err) {

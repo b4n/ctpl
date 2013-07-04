@@ -1,2 +1,9 @@
 # List of source files which contain translatable strings.
 src/ctpl.c
+src/ctpl-environ.c
+src/ctpl-eval.c
+src/ctpl-input-stream.c
+src/ctpl-lexer.c
+src/ctpl-lexer-expr.c
+src/ctpl-parser.c
+src/ctpl-value.c
