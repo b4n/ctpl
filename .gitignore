@@ -11,6 +11,17 @@ config.*
 /stamp-*
 *.stamp
 
+# generated executables
+src/ctpl
+
+# test suite
+src/test
+testsuite/*.log
+testsuite/*.trs
+testsuite/float-test
+testsuite/read-number-test
+testsuite/parsing-tests
+
 # documentation
 docs/reference/ctpl/html/
 docs/reference/ctpl/xml/
@@ -30,3 +41,6 @@ docs/reference/ctpl/ctpl.*
 *.lo
 *.la
 *.so
+
+# other
+/README
