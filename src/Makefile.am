@@ -4,11 +4,13 @@ check_PROGRAMS  = test
 lib_LTLIBRARIES = libctpl.la
 
 libctpl_la_CPPFLAGS = -DG_LOG_DOMAIN=\"CTPL\" -DCTPL_COMPILATION
-libctpl_la_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@
+libctpl_la_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@ \
+                      -DLOCALEDIR='"$(localedir)"'
 libctpl_la_LDFLAGS  = -version-info @CTPL_LTVERSION@
 libctpl_la_LIBADD   = @GLIB_LIBS@ @GIO_LIBS@ -lm
 libctpl_la_SOURCES  = ctpl-environ.c \
                       ctpl-eval.c \
+                      ctpl-i18n.c \
                       ctpl-io.c \
                       ctpl-input-stream.c \
                       ctpl-lexer.c \
@@ -35,7 +37,8 @@ ctplinclude_HEADERS = ctpl.h \
                       ctpl-value.h \
                       ctpl-version.h
 
-EXTRA_DIST          = ctpl-lexer-private.h \
+EXTRA_DIST          = ctpl-i18n.h \
+                      ctpl-lexer-private.h \
                       ctpl-mathutils.h \
                       ctpl-stack.h \
                       ctpl-token-private.h
@@ -43,7 +46,8 @@ EXTRA_DIST          = ctpl-lexer-private.h \
 if BUILD_CTPL
 bin_PROGRAMS += ctpl
 
-ctpl_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@ @GIO_UNIX_CFLAGS@
+ctpl_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@ @GIO_UNIX_CFLAGS@ \
+                -DLOCALEDIR='"$(localedir)"'
 ctpl_LDADD    = libctpl.la @GLIB_LIBS@ @GIO_LIBS@ @GIO_UNIX_LIBS@
 ctpl_SOURCES  = ctpl.c
 endif

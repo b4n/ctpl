@@ -57,6 +57,11 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CC_C99
 
+# gettext
+AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT([external])
+AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [The GetText package name])
+
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
 
@@ -132,6 +137,7 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/Makefile
                  docs/reference/ctpl/Makefile
                  docs/reference/ctpl/version.xml
+                 po/Makefile.in
                  testsuite/Makefile
                  README])
 AC_OUTPUT

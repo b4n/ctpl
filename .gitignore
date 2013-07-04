@@ -8,7 +8,7 @@ libtool
 Makefile
 Makefile.in
 config.*
-/stamp-*
+stamp-*
 *.stamp
 
 # generated executables
@@ -30,6 +30,19 @@ docs/reference/ctpl/ctpl-*.txt
 docs/reference/ctpl/ctpl-*.txt.bak
 # this one is perhaps not so good
 docs/reference/ctpl/ctpl.*
+
+# gettext stuff
+/ABOUT-NLS
+/po/Makefile.in.in
+/po/Makevars.template
+/po/POTFILES
+/po/Rules-quot
+/po/en@boldquot.header
+/po/en@quot.header
+/po/*.sin
+/po/*.sed
+/po/*.pot
+/po/*.gmo
 
 # may be removed if some .m4 or .make became manually generated
 *.m4

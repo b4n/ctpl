@@ -19,6 +19,7 @@
 
 #include "ctpl-environ.h"
 #include <glib.h>
+#include "ctpl-i18n.h"
 #include "ctpl-stack.h"
 #include "ctpl-value.h"
 
@@ -560,7 +561,7 @@ read_array (CtplInputStream *stream,
   } else if (c != ARRAY_START_CHAR) {
     ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
                                  CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
-                                 "Not an array");
+                                 _("Not an array"));
   } else {
     ctpl_value_set_array (value, CTPL_VTYPE_INT, 0, NULL);
     /* don't try to extract any value from an empty array */
@@ -588,8 +589,8 @@ read_array (CtplInputStream *stream,
             } else {
               ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
                                            CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
-                                           "Missing `%c` separator between array "
-                                           "values", ARRAY_SEPARATOR_CHAR);
+                                           _("Missing `%c` separator between array "
+                                             "values"), ARRAY_SEPARATOR_CHAR);
             }
           }
         }
@@ -627,7 +628,7 @@ read_value (CtplInputStream *stream,
   } else {
     ctpl_input_stream_set_error (stream, &err, CTPL_ENVIRON_ERROR,
                                  CTPL_ENVIRON_ERROR_LOADER_MISSING_VALUE,
-                                 "No valid value can be read");
+                                 _("No valid value can be read"));
   }
   if (err) {
     g_propagate_error (error, err);
@@ -653,7 +654,7 @@ load_next (CtplEnviron     *env,
     } else if (! *symbol) {
       ctpl_input_stream_set_error (stream, error, CTPL_ENVIRON_ERROR,
                                    CTPL_ENVIRON_ERROR_LOADER_MISSING_SYMBOL,
-                                   "Missing symbol");
+                                   _("Missing symbol"));
     } else {
       if (skip_blank (stream, error) >= 0) {
         GError *err = NULL;
@@ -666,8 +667,8 @@ load_next (CtplEnviron     *env,
         } else if (c != VALUE_SEPARATOR_CHAR) {
           ctpl_input_stream_set_error (stream, error, CTPL_ENVIRON_ERROR,
                                        CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
-                                       "Missing `%c` separator between symbol "
-                                       "and value", VALUE_SEPARATOR_CHAR);
+                                       _("Missing `%c` separator between symbol "
+                                         "and value"), VALUE_SEPARATOR_CHAR);
         } else {
           if (skip_blank (stream, error) >= 0) {
             CtplValue value;
@@ -682,8 +683,8 @@ load_next (CtplEnviron     *env,
               } else if (c != VALUE_END_CHAR) {
                 ctpl_input_stream_set_error (stream, error, CTPL_ENVIRON_ERROR,
                                              CTPL_ENVIRON_ERROR_LOADER_MISSING_SEPARATOR,
-                                             "Missing `%c` separator after end "
-                                             "of symbol's value",
+                                             _("Missing `%c` separator after "
+                                               "end of symbol's value"),
                                              VALUE_END_CHAR);
               } else {
                 /* skip blanks again to try to reach end before next call */
@@ -751,7 +752,7 @@ ctpl_environ_add_from_string (CtplEnviron  *env,
   CtplInputStream  *stream;
   
   stream = ctpl_input_stream_new_for_memory (string, -1, NULL,
-                                             "environment description");
+                                             _("environment description"));
   rv = ctpl_environ_add_from_stream (env, stream, error);
   ctpl_input_stream_unref (stream);
   

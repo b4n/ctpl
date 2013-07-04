@@ -19,6 +19,9 @@
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
+#else
+# define GETTEXT_PACKAGE  "ctpl"
+# define LOCALEDIR        NULL
 #endif
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,12 +29,10 @@
 #include <locale.h>
 #include <unistd.h> /* for STDOUT_FILENO */
 #include <glib.h>
+#include <glib/gi18n.h>
 #include <gio/gio.h>
 #include <gio/gunixoutputstream.h>
 #include "ctpl.h"
-
-
-#define GETTEXT_PACKAGE NULL /* FIXME: */
 
 
 /* options */
@@ -45,21 +46,22 @@ static gchar       *OPT_encoding      = NULL;
 
 static GOptionEntry option_entries[] = {
   { "output", 'o', 0, G_OPTION_ARG_FILENAME, &OPT_output_file,
-    "Write output to FILE. If not provided, defaults to stdout.", "FILE" },
+    N_("Write output to FILE. If not provided, defaults to stdout."),
+    N_("FILE") },
   { "env-file", 'e', 0, G_OPTION_ARG_FILENAME_ARRAY, &OPT_env_files,
-    "Add environment from ENVFILE. This option may appear more than once.",
-    "ENVFILE" },
+    N_("Add environment from ENVFILE. This option may appear more than once."),
+    N_("ENVFILE") },
   { "env-chunk", 'c', 0, G_OPTION_ARG_STRING_ARRAY, &OPT_env_chunks,
-    "Add environment chunk CHUNK. This option may appear more than once.",
-    "CHUNK" },
+    N_("Add environment chunk CHUNK. This option may appear more than once."),
+    N_("CHUNK") },
   { "verbose", 'v', 0, G_OPTION_ARG_NONE, &OPT_verbose,
-    "Be verbose.", NULL },
+    N_("Be verbose."), NULL },
   { "version", 0, 0, G_OPTION_ARG_NONE, &OPT_print_version,
-    "Print the version information and exit.", NULL },
+    N_("Print the version information and exit."), NULL },
   { "encoding", 0, 0, G_OPTION_ARG_STRING, &OPT_encoding,
-    "Specify the encoding of the input and output files.", "ENCODING" },
+    N_("Specify the encoding of the input and output files."), N_("ENCODING") },
   { G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &OPT_input_files,
-    "Input files", "INPUTFILE[...]" },
+    N_("Input files"), N_("INPUTFILE[...]") },
   { NULL, 0, 0, G_OPTION_ARG_NONE, NULL, NULL, NULL }
 };
 
@@ -134,15 +136,15 @@ parse_options (gint    *argc,
   gboolean        success = FALSE;
   GOptionContext *context;
   
-  context = g_option_context_new ("- CTPL template parser");
+  context = g_option_context_new (_("- CTPL template parser"));
   g_option_context_add_main_entries (context, option_entries, GETTEXT_PACKAGE);
   if (g_option_context_parse (context, argc, argv, error)) {
     if (OPT_print_version) {
-      printf ("CTPL %s\n", VERSION);
+      printf (_("CTPL %s\n"), VERSION);
       exit (0);
     } else if (OPT_input_files == NULL) {
       g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE,
-                   "Missing input file(s)");
+                   _("Missing input file(s)"));
     } else {
       if (! OPT_encoding) {
         const gchar *local_charset;
@@ -221,11 +223,11 @@ build_environ (void)
       GError           *err = NULL;
       CtplInputStream  *stream;
       
-      printv ("Loading environment file '%s'...\n", OPT_env_files[i]);
+      printv (_("Loading environment file '%s'...\n"), OPT_env_files[i]);
       stream = open_input_stream (OPT_env_files[i], &err);
       if (! stream ||
           ! ctpl_environ_add_from_stream (env, stream, &err)) {
-        printerr ("Failed to load environment from file '%s': %s\n",
+        printerr (_("Failed to load environment from file '%s': %s\n"),
                   OPT_env_files[i], err->message);
         g_error_free (err);
         success = FALSE;
@@ -252,9 +254,9 @@ build_environ (void)
         /* no conversion needed, it's already in utf8 */
         chunk = g_strdup (OPT_env_chunks[i]);
       }
-      printv ("Loading environment chunk '%s'...\n", chunk);
+      printv (_("Loading environment chunk '%s'...\n"), chunk);
       if (! chunk || ! ctpl_environ_add_from_string (env, chunk, &err)) {
-        printerr ("Failed to load environment from chunk '%s': %s\n",
+        printerr (_("Failed to load environment from chunk '%s': %s\n"),
                   chunk, err->message);
         g_error_free (err);
         success = FALSE;
@@ -308,9 +310,9 @@ parse_templates (CtplEnviron       *env,
     for (i = 0; success && OPT_input_files[i] != NULL; i++) {
       GError *err = NULL;
       
-      printv ("Parsing template '%s'...\n", OPT_input_files[i]);
+      printv (_("Parsing template '%s'...\n"), OPT_input_files[i]);
       if (! parse_template (OPT_input_files[i], output, env, &err)) {
-        printerr ("Failed to parse template '%s': %s\n",
+        printerr (_("Failed to parse template '%s': %s\n"),
                   OPT_input_files[i], err->message);
         g_error_free (err);
         success = FALSE;
@@ -335,7 +337,7 @@ get_output_stream (void)
     file = g_file_new_for_commandline_arg (OPT_output_file);
     gfostream = g_file_replace (file, NULL, FALSE, 0, NULL, &err);
     if (! gfostream) {
-      printerr ("Failed to open output: %s\n", err->message);
+      printerr (_("Failed to open output: %s\n"), err->message);
       g_error_free (err);
     } else {
       gostream = G_OUTPUT_STREAM (gfostream);
@@ -351,7 +353,7 @@ get_output_stream (void)
       
       converter = g_charset_converter_new (OPT_encoding, "utf8", &err);
       if (! converter) {
-        printerr ("Failed to create encoding converter: %s\n", err->message);
+        printerr (_("Failed to create encoding converter: %s\n"), err->message);
         g_error_free (err);
       } else {
         GOutputStream *gcostream;
@@ -378,10 +380,14 @@ int main (int     argc,
   GError *error = NULL;
   
   setlocale (LC_ALL, "");
+  textdomain (GETTEXT_PACKAGE);
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  
   g_type_init ();
   
   if (! parse_options (&argc, &argv, &error)) {
-    printerr ("Option parsing failed: %s\n", error->message);
+    printerr (_("Option parsing failed: %s\n"), error->message);
     g_clear_error (&error);
     err = 1;
   } else {
