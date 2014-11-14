@@ -58,7 +58,7 @@ AM_PROG_CC_C_O
 AC_PROG_CC_C99
 
 # gettext
-AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT_VERSION([0.19.3])
 AM_GNU_GETTEXT([external])
 AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [The GetText package name])
 
@@ -71,10 +71,22 @@ PKG_CHECK_MODULES([GIO],  [gio-2.0])
 # FIXME: needed by the ctpl utility to write to stdout
 HAVE_GIO_UNIX="no"
 PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0],
-                  [HAVE_GIO_UNIX="yes"],
+                  [HAVE_GIO_UNIX="yes"
+                   enable_cli_tool="yes"],
                   [HAVE_GIO_UNIX="no"
                    CLI_TOOL_MSG_ERROR([Cannot build the CLI tool: ${GIO_UNIX_PKG_ERRORS}])
                    enable_cli_tool="no"])
+
+# try gio-windows
+if test "x$enable_cli_tool" = xno; then
+PKG_CHECK_MODULES([GIO_UNIX], [gio-windows-2.0],
+                  [HAVE_GIO_UNIX="yes"
+                   enable_cli_tool="yes"],
+                  [HAVE_GIO_UNIX="no"
+                   CLI_TOOL_MSG_ERROR([Cannot build the CLI tool: ${GIO_UNIX_PKG_ERRORS}])
+                   enable_cli_tool="no"])
+fi
+
 HAVE_GIO_2_24="no"
 PKG_CHECK_MODULES([GIO_2_24], [gio-2.0 >= 2.24],
                   [HAVE_GIO_2_24="yes"],

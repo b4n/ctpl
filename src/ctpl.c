@@ -31,7 +31,14 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
+
+#ifdef G_OS_WIN32
+#include <windows.h>
+#include <gio/gwin32outputstream.h>
+#else
 #include <gio/gunixoutputstream.h>
+#endif
+
 #include "ctpl.h"
 
 
@@ -343,8 +350,13 @@ get_output_stream (void)
       gostream = G_OUTPUT_STREAM (gfostream);
     }
   } else {
-    /* FIXME: how to get rid of GIOUnix for that? */
+#ifdef G_OS_WIN32
+    HANDLE handle;
+    handle = GetStdHandle (STD_OUTPUT_HANDLE);
+    gostream = g_win32_output_stream_new (handle, FALSE);
+#else
     gostream = g_unix_output_stream_new (STDOUT_FILENO, FALSE);
+#endif
   }
   if (gostream) {
     if (encoding_needs_conversion (OPT_encoding)) {
