@@ -385,16 +385,33 @@ get_output_stream (void)
 }
 
 
+static void setup_i18n (void)
+{
+#ifdef G_OS_WIN32
+  gchar *base = g_win32_get_package_installation_directory_of_module (NULL);
+  gchar *dir  = g_build_filename (base, "share", "locale", NULL);
+  g_free (base);
+#else
+  const gchar *dir = LOCALEDIR;
+#endif
+  
+  setlocale (LC_ALL, "");
+  textdomain (GETTEXT_PACKAGE);
+  bindtextdomain (GETTEXT_PACKAGE, dir);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  
+#ifdef G_OS_WIN32
+  g_free (dir);
+#endif
+}
+
 int main (int     argc,
           char  **argv)
 {
   int     err   = 1;
   GError *error = NULL;
   
-  setlocale (LC_ALL, "");
-  textdomain (GETTEXT_PACKAGE);
-  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  setup_i18n ();
   
   g_type_init ();
   
