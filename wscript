@@ -59,6 +59,7 @@ HEADERS = [
 LIBRARY_SOURCES = '''
 src/ctpl-environ.c
 src/ctpl-eval.c
+src/ctpl-i18n.c
 src/ctpl-io.c
 src/ctpl-input-stream.c
 src/ctpl-lexer.c
@@ -129,6 +130,8 @@ def configure(conf):
 	conf.define('CTPL_PREFIX', '' if is_win32 else conf.env['PREFIX'], 1)
 	conf.define('PACKAGE', APPNAME, 1)
 	conf.define('VERSION', VERSION, 1)
+	conf.define('GETTEXT_PACKAGE', VERSION, 1)
+	conf.define('LOCALEDIR', os.path.join(conf.env['DATADIR'], 'locale'), 1)
 
 	conf.write_config_header('config.h')
 
