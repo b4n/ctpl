@@ -99,6 +99,7 @@ def configure(conf):
 	conf.check_cfg(package='gio-2.0', uselib_store='GIO', args='--cflags --libs', mandatory=True)
 	conf.check_cfg(package='gio-2.0', atleast_version='2.24.0', uselib_store='GIO_2_24', args='--cflags --libs', mandatory=False)
 	conf.check_cfg(package='gio-unix-2.0', uselib_store='GIO_UNIX', args='--cflags --libs', mandatory=False)
+	conf.check_cfg(package='gio-windows-2.0', uselib_store='GIO_WINDOWS', args='--cflags --libs', mandatory=False)
 
 	# Windows specials
 	if is_win32:
@@ -176,19 +177,18 @@ def build(bld):
 
 	# CTPL
 	# ctpl.c doesn't build on Windows currently because of g_unix_output_stream_new()
-	if not is_win32:
-		bld.new_task_gen(
-			features		= 'cc cprogram',
-			name			= 'ctpl_utility',
-			target			= 'ctpl',
-			source			= CTPL_SOURCES,
-			includes		= '. src',
-			uselib			= 'GLIB GIO_2_24 GIO_UNIX',
-			uselib_local	= 'ctpl_lib'
-		)
+	bld.new_task_gen(
+		features		= 'cc cprogram',
+		name			= 'ctpl_utility',
+		target			= 'ctpl',
+		source			= CTPL_SOURCES,
+		includes		= '. src',
+		uselib			= 'GLIB GIO_2_24 ' + ['GIO_UNIX','GIO_WINDOWS'][is_win32],
+		uselib_local	= 'ctpl_lib'
+	)
 
-		# ctpl.1
-		bld.install_files('${MANDIR}/man1', 'data/ctpl.1')
+	# ctpl.1
+	bld.install_files('${MANDIR}/man1', 'data/ctpl.1')
 
 	# ctpl.pc
 	bld.new_task_gen(
