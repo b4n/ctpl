@@ -3,7 +3,7 @@
 
 AC_PREREQ([2.64])
 AC_INIT([CTPL],
-        [0.3.3],
+        [0.3.4],
         [ban@herbesfolles.org],
         [ctpl],
         [http://ctpl.tuxfamily.org])
@@ -46,7 +46,7 @@ AC_DEFUN([CLI_TOOL_MSG_ERROR],
 # [1] "New things" include extension of the template syntax. Refer to
 #     http://sourceware.org/autobook/autobook/autobook_91.html#SEC91 for more
 #     info
-CTPL_LTVERSION="4:1:2"
+CTPL_LTVERSION="4:2:2"
 AC_SUBST([CTPL_LTVERSION])
 
 # Checks for programs.

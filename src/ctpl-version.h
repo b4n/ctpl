@@ -52,7 +52,7 @@ G_BEGIN_DECLS
  * 
  * Since: 0.3
  */
-#define CTPL_MICRO_VERSION 3
+#define CTPL_MICRO_VERSION 4
 
 /**
  * CTPL_CHECK_VERSION:
