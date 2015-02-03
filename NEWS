@@ -1,3 +1,15 @@
+# 0.3.4 (03/02/2015)
+
+  The version 0.3.4 is a bugfix and enhancement release for the 0.3 branch.
+  
+  ## Changes summary
+  
+  * Added Windows support to the command-line utility (Andrea Zagli);
+  * Added French and Italian translations;
+  * Fixed various build system issues;
+  * Added support for building for Windows with Automake;
+ 
+
 # 0.3.3 (11/08/2011)
 
   The version 0.3.3 is a bugfix release for the 0.3 branch.
