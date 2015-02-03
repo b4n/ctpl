@@ -1,1 +1,6 @@
-Enrico Tröger <enrico(dot)troeger(at)uvena(dot)de> - Original Waf build system
+Enrico Tröger <enrico(dot)troeger(at)uvena(dot)de>
+ - Original Waf build system
+Andrea Zagli <azagli(at)libero(dot)it>
+ - Windows support for the CLI tool
+ - Windows build system improvements
+ - Italian translation
