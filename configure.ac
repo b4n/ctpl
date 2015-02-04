@@ -3,14 +3,14 @@
 
 AC_PREREQ([2.64])
 AC_INIT([CTPL],
-        [0.3.3],
+        [0.3.4],
         [ban@herbesfolles.org],
         [ctpl],
         [http://ctpl.tuxfamily.org])
 AC_CONFIG_SRCDIR([src/ctpl.h])
-AC_CONFIG_AUX_DIR([build/aux])
+AC_CONFIG_AUX_DIR([build/auxf])
 AC_CONFIG_MACRO_DIR([build/m4])
-AM_INIT_AUTOMAKE([1.11.1 -Wall -Werror foreign])
+AM_INIT_AUTOMAKE([1.11.1 -Wall foreign parallel-tests])
 AC_CONFIG_HEADERS([config.h])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -46,14 +46,21 @@ AC_DEFUN([CLI_TOOL_MSG_ERROR],
 # [1] "New things" include extension of the template syntax. Refer to
 #     http://sourceware.org/autobook/autobook/autobook_91.html#SEC91 for more
 #     info
-CTPL_LTVERSION="4:1:2"
+CTPL_LTVERSION="4:2:2"
 AC_SUBST([CTPL_LTVERSION])
 
 # Checks for programs.
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 LT_PREREQ([2.2.0])
 LT_INIT
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CC_C99
+
+# gettext
+AM_GNU_GETTEXT_VERSION([0.17])
+AM_GNU_GETTEXT([external])
+AC_DEFINE([GETTEXT_PACKAGE], [PACKAGE_TARNAME], [The GetText package name])
 
 # check for gtk-doc
 GTK_DOC_CHECK(1.9)
@@ -64,19 +71,19 @@ GOBJECT_INTROSPECTION_CHECK([0.6.7])
 # Checks for libraries.
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.10])
 PKG_CHECK_MODULES([GIO],  [gio-2.0])
-# FIXME: needed by the ctpl utility to write to stdout
-HAVE_GIO_UNIX="no"
-PKG_CHECK_MODULES([GIO_UNIX], [gio-unix-2.0],
-                  [HAVE_GIO_UNIX="yes"],
-                  [HAVE_GIO_UNIX="no"
-                   CLI_TOOL_MSG_ERROR([Cannot build the CLI tool: ${GIO_UNIX_PKG_ERRORS}])
-                   enable_cli_tool="no"])
-HAVE_GIO_2_24="no"
-PKG_CHECK_MODULES([GIO_2_24], [gio-2.0 >= 2.24],
-                  [HAVE_GIO_2_24="yes"],
-                  [HAVE_GIO_2_24="no"
-                   CLI_TOOL_MSG_ERROR([Cannot build the CLI tool: ${GIO_2_24_PKG_ERRORS}])
-                   enable_cli_tool="no"])
+
+AS_IF([test "x$enable_cli_tool" != xno],[
+  MINGW_AC_WIN32_NATIVE_HOST
+  ctpl_cli_packages="gio-2.0 >= 2.24"
+  # needed by the ctpl utility to write to stdout, either gio-unix or gio-windows
+  AS_IF([test "x$mingw_cv_win32_host" = xyes],
+        [ctpl_cli_packages="$ctpl_cli_packages gio-windows-2.0"],
+        [ctpl_cli_packages="$ctpl_cli_packages gio-unix-2.0"])
+  PKG_CHECK_MODULES([CTPL_CLI], [$ctpl_cli_packages],
+                    [enable_cli_tool=yes],
+                    [CLI_TOOL_MSG_ERROR([Cannot build the CLI tool: $CTPL_CLI_PKG_ERRORS])
+                     enable_cli_tool=no])
+])
 AM_CONDITIONAL([BUILD_CTPL], [test "x$enable_cli_tool" != xno])
 
 # needed for the math functions checks to work
@@ -84,7 +91,7 @@ AC_CHECK_LIB([m], [acos])
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h math.h])
+AC_CHECK_HEADERS([stdlib.h string.h math.h libintl.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -133,6 +140,7 @@ AC_CONFIG_FILES([Makefile
                  docs/reference/Makefile
                  docs/reference/ctpl/Makefile
                  docs/reference/ctpl/version.xml
+                 po/Makefile.in
                  testsuite/Makefile
                  README])
 AC_OUTPUT

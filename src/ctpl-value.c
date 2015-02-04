@@ -22,6 +22,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include <stdarg.h>
+#include "ctpl-i18n.h"
 
 
 /**
@@ -855,18 +856,18 @@ ctpl_value_type_get_name (CtplValueType type)
 {
   switch (type) {
     case CTPL_VTYPE_INT:
-      return "integer";
+      return _("integer");
     
     case CTPL_VTYPE_FLOAT:
-      return "float";
+      return _("float");
     
     case CTPL_VTYPE_STRING:
-      return "string";
+      return _("string");
     
     case CTPL_VTYPE_ARRAY:
       /* TODO: return the array type? (e.g. "array of int",
        * "array of strings and floats", etc?) */
-      return "array";
+      return _("array");
   }
   
   return "???";

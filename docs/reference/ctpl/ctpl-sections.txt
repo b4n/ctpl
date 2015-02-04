@@ -202,10 +202,20 @@ ctpl_stack_is_empty
 <FILE>mathutils</FILE>
 <SUBSECTION Private>
 CTPL_MATH_FLOAT_EQ
-ctpl_math_string_to_float
-ctpl_math_string_to_int
+ctpl_math_dtostr
 ctpl_math_float_to_string
 ctpl_math_int_to_string
+ctpl_math_string_to_float
+ctpl_math_string_to_int
+</SECTION>
+
+<SECTION>
+<TITLE>Translation utilities</TITLE>
+<FILE>i18n</FILE>
+<SUBSECTION Private>
+_
+N_
+ctpl_gettext
 </SECTION>
 
 <SECTION>
@@ -244,6 +254,8 @@ ctpl_input_stream_skip_blank
 ctpl_input_stream_skip_word
 ctpl_input_stream_eof
 ctpl_input_stream_eof_fast
+<SUBSECTION Private>
+ctpl_input_stream_get_c_inline
 </SECTION>
 
 <SECTION>
@@ -256,6 +268,8 @@ ctpl_output_stream_unref
 ctpl_output_stream_get_stream
 ctpl_output_stream_write
 ctpl_output_stream_put_c
+<SUBSECTION Private>
+ctpl_output_stream_put_c_inline
 </SECTION>
 
 <SECTION>

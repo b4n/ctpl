@@ -7,8 +7,8 @@ EXTRA_SCRIPTS = tests.sh
 endif
 
 
-EXTRA_DIST  = $(wildcard success/*) \
-              $(wildcard fail/*) \
+EXTRA_DIST  = success				\
+              fail				\
               environ
 
 AM_CFLAGS   = @GLIB_CFLAGS@ @GIO_CFLAGS@
@@ -24,5 +24,4 @@ read_number_test_SOURCES = read-number-test.c
 gtype_api_test_SOURCES   = gtype-api-test.c
 
 
-TESTS_ENVIRONMENT = $(SHELL) >/dev/null
 TESTS = $(check_PROGRAMS) $(dist_check_SCRIPTS)

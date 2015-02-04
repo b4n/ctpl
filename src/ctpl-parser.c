@@ -20,6 +20,7 @@
 #include "ctpl-parser.h"
 #include <glib.h>
 #include <string.h>
+#include "ctpl-i18n.h"
 #include "ctpl-eval.h"
 #include "ctpl-token.h"
 #include "ctpl-token-private.h"
@@ -118,7 +119,7 @@ ctpl_parser_parse_token_for (const CtplTokenFor  *token,
       
       array_name = ctpl_value_to_string (&value);
       g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_INCOMPATIBLE_SYMBOL,
-                   "Cannot iterate over value '%s'",
+                   _("Cannot iterate over value '%s'"),
                    array_name);
       g_free (array_name);
     } else {
@@ -174,7 +175,7 @@ ctpl_parser_parse_token_expr (CtplTokenExpr    *expr,
     strval = ctpl_value_to_string (&eval_value);
     if (! strval) {
       g_set_error (error, CTPL_PARSER_ERROR, CTPL_PARSER_ERROR_FAILED,
-                   "Cannot convert expression to a printable format");
+                   _("Cannot convert expression to a printable format"));
     } else {
       rv = ctpl_output_stream_write (output, strval, -1, error);
     }

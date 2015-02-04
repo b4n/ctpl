@@ -1,4 +1,4 @@
-# aututools specific generated files/dirs
+# autotools specific generated files/dirs
 build/
 .deps/
 .libs/
@@ -8,8 +8,19 @@ libtool
 Makefile
 Makefile.in
 config.*
-/stamp-*
+stamp-*
 *.stamp
+
+# generated executables
+src/ctpl
+
+# test suite
+src/test
+testsuite/*.log
+testsuite/*.trs
+testsuite/float-test
+testsuite/read-number-test
+testsuite/parsing-tests
 
 # documentation
 docs/reference/ctpl/html/
@@ -19,6 +30,19 @@ docs/reference/ctpl/ctpl-*.txt
 docs/reference/ctpl/ctpl-*.txt.bak
 # this one is perhaps not so good
 docs/reference/ctpl/ctpl.*
+
+# gettext stuff
+/ABOUT-NLS
+/po/Makefile.in.in
+/po/Makevars.template
+/po/POTFILES
+/po/Rules-quot
+/po/en@boldquot.header
+/po/en@quot.header
+/po/*.sin
+/po/*.sed
+/po/*.pot
+/po/*.gmo
 
 # may be removed if some .m4 or .make became manually generated
 *.m4
@@ -30,3 +54,6 @@ docs/reference/ctpl/ctpl.*
 *.lo
 *.la
 *.so
+
+# other
+/README

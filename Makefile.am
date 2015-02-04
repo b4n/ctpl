@@ -1,4 +1,4 @@
-SUBDIRS = src data docs testsuite
+SUBDIRS = src data docs testsuite po
 
 EXTRA_DIST = AUTHORS \
              COPYING \
@@ -16,4 +16,4 @@ DISTCLEANFILES = config.status \
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-gtk-doc --enable-introspection
 
-ACLOCAL_AMFLAGS = -I build/m4
+ACLOCAL_AMFLAGS = -I build/m4 -I m4

@@ -20,6 +20,7 @@
 #include "ctpl-eval.h"
 #include <string.h>
 #include <glib.h>
+#include "ctpl-i18n.h"
 #include "ctpl-lexer-private.h"
 #include "ctpl-environ.h"
 #include "ctpl-value.h"
@@ -74,8 +75,8 @@ ensure_operands_type (CtplValue     *lvalue,
   if (! ctpl_value_convert (lvalue, vtype) ||
       ! ctpl_value_convert (rvalue, vtype)) {
     g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                 "Invalid operands for operator '%s' (have '%s' and '%s', "
-                 "expect operands compatible with '%s')",
+                 _("Invalid operands for operator '%s' (have '%s' and '%s', "
+                   "expect operands compatible with '%s')"),
                  operator_name,
                  ctpl_value_get_held_type_name (lvalue),
                  ctpl_value_get_held_type_name (rvalue),
@@ -154,7 +155,7 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
       /* FIXME: should I use ctpl_value_to_string() or ctpl_value_convert()? */
       if (CTPL_VALUE_HOLDS_ARRAY (rvalue)) {
         g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                     "Operator '+' cannot be used with '%s' and '%s' types",
+                     _("Operator '+' cannot be used with '%s' and '%s' types"),
                      ctpl_value_get_held_type_name (lvalue),
                      ctpl_value_get_held_type_name (rvalue));
         rv = FALSE;
@@ -210,7 +211,7 @@ do_multiply_string (const gchar  *str,
   } else {
     gsize       buf_len;
     gsize       str_len;
-    gsize       i, j;
+    gsize       i;
     
     str_len = strlen (str);
     /* detect possible integer overflow. last check is because we allocate one
@@ -230,9 +231,7 @@ do_multiply_string (const gchar  *str,
                      "multiplication", buf_len + 1);
       } else {
         for (i = 0; i < (gsize)n; i++) {
-          for (j = 0; j < str_len; j++) {
-            buf[str_len * i + j] = str[j];
-          }
+          memcpy (&buf[str_len * i], str, str_len);
         }
         buf[buf_len] = 0;
       }
@@ -260,8 +259,8 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
   if (L_OR_R_IS (CTPL_VTYPE_ARRAY)) {
     /* cannot multiply arrays */
     g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                 "Invalid operands for operator '*' (have '%s' and '%s'): "
-                 "cannot multiply arrays.",
+                 _("Invalid operands for operator '*' (have '%s' and '%s'): "
+                   "cannot multiply arrays."),
                  ctpl_value_get_held_type_name (lvalue),
                  ctpl_value_get_held_type_name (rvalue));
     rv = FALSE;
@@ -271,8 +270,8 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
     } else {
       /* cannot multiply a string with something not a number */
       g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                   "Invalid operands for operator '*' (have '%s' and '%s'): "
-                   "cannot multiply a string with something not a number.",
+                   _("Invalid operands for operator '*' (have '%s' and '%s'): "
+                     "cannot multiply a string with something not a number."),
                    ctpl_value_get_held_type_name (lvalue),
                    ctpl_value_get_held_type_name (rvalue));
       rv = FALSE;
@@ -324,7 +323,8 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
         rv = ctpl_value_convert (num_val, CTPL_VTYPE_INT);
         if (! rv) {
           g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                       "Invalid operands for operator '*' (have '%s' and '%s')",
+                       _("Invalid operands for operator '*' "
+                         "(have '%s' and '%s')"),
                        ctpl_value_get_held_type_name (lvalue),
                        ctpl_value_get_held_type_name (rvalue));
           rv = FALSE;
@@ -370,7 +370,7 @@ ctpl_eval_operator_div (CtplValue *lvalue,
     rval = ctpl_value_get_float (rvalue);
     if (CTPL_MATH_FLOAT_EQ (rval, 0)) {
       g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                   "Division by zero");
+                   _("Division by zero"));
       rv = FALSE;
     } else {
       ctpl_value_set_float (value, lval / rval);
@@ -411,7 +411,8 @@ ctpl_eval_operator_cmp (CtplValue     *lvalue,
     case CTPL_VTYPE_ARRAY:
       if (! CTPL_VALUE_HOLDS_ARRAY (rvalue)) {
         g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                     "Invalid operands for operator '%s' (have '%s' and '%s')",
+                     _("Invalid operands for operator '%s' "
+                       "(have '%s' and '%s')"),
                      ctpl_operator_to_string (op),
                      ctpl_value_get_held_type_name (lvalue),
                      ctpl_value_get_held_type_name (rvalue));
@@ -482,7 +483,8 @@ ctpl_eval_operator_cmp (CtplValue     *lvalue,
     case CTPL_VTYPE_STRING:
       if (CTPL_VALUE_HOLDS_ARRAY (rvalue)) {
         g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                     "Invalid operands for operator '%s' (have '%s' and '%s')",
+                     _("Invalid operands for operator '%s' "
+                       "(have '%s' and '%s')"),
                      ctpl_operator_to_string (op),
                      ctpl_value_get_held_type_name (lvalue),
                      ctpl_value_get_held_type_name (rvalue));
@@ -588,7 +590,7 @@ ctpl_eval_operator_modulo (CtplValue *lvalue,
     
     if (rval == 0) {
       g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                   "Division by zero through modulo");
+                   _("Division by zero through modulo"));
       rv = FALSE;
     } else {
       ctpl_value_set_int (value, lval % rval);
@@ -710,7 +712,7 @@ ctpl_eval_value_index (const CtplTokenExpr  *expr,
     /* FIXME: improve error messages? */
     if (! CTPL_VALUE_HOLDS_ARRAY (value)) {
       g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                   "Value '%s' cannot be indexed", VALUE_AS_STRING);
+                   _("Value '%s' cannot be indexed"), VALUE_AS_STRING);
     } else {
       CtplValue idx_value;
       
@@ -718,7 +720,7 @@ ctpl_eval_value_index (const CtplTokenExpr  *expr,
       if (ctpl_eval_value (indexes->data, env, &idx_value, error)) {
         if (! ctpl_value_convert (&idx_value, CTPL_VTYPE_INT)) {
           g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
-                       "Cannot convert index of value '%s' to integer",
+                       _("Cannot convert index of value '%s' to integer"),
                        VALUE_AS_STRING);
         } else {
           const CtplValue  *new_value;
@@ -727,7 +729,7 @@ ctpl_eval_value_index (const CtplTokenExpr  *expr,
           if (idx < 0 ||
               ! (new_value = ctpl_value_array_index (value, (gsize)idx))) {
             g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_FAILED,
-                         "Cannot index value '%s' at %ld",
+                         _("Cannot index value '%s' at %ld"),
                          VALUE_AS_STRING, idx);
           } else {
             ctpl_value_copy (new_value, value);
@@ -784,7 +786,7 @@ ctpl_eval_value (const CtplTokenExpr  *expr,
         ctpl_value_copy (symbol_value, value);
       } else {
         g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_SYMBOL_NOT_FOUND,
-                     "Symbol '%s' cannot be found in the environment",
+                     _("Symbol '%s' cannot be found in the environment"),
                      expr->token.t_symbol);
         rv = FALSE;
       }

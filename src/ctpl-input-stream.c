@@ -24,6 +24,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdarg.h>
+#include "ctpl-i18n.h"
 #include "ctpl-io.h"
 #include "ctpl-lexer-private.h"
 #include "ctpl-value.h"
@@ -370,7 +371,7 @@ ctpl_input_stream_set_error (CtplInputStream  *stream,
     message = g_strdup_vprintf (format, ap);
     va_end (ap);
     g_set_error (error, domain, code, "%s:%u:%u: %s",
-                 stream->name ? stream->name : "<stream>", stream->line,
+                 stream->name ? stream->name : _("<stream>"), stream->line,
                  stream->pos, message);
     g_free (message);
   }
@@ -1021,7 +1022,7 @@ ctpl_input_stream_read_string_literal (CtplInputStream *stream,
   if (c != CTPL_STRING_DELIMITER_CHAR) {
     ctpl_input_stream_set_error (stream, error, CTPL_IO_ERROR,
                                  CTPL_IO_ERROR_INVALID_STRING,
-                                 "Missing string delimiter");
+                                 _("Missing string delimiter"));
   } else {
     gboolean  in_str  = TRUE;
     gboolean  escaped = FALSE;
@@ -1048,7 +1049,7 @@ ctpl_input_stream_read_string_literal (CtplInputStream *stream,
     if (! err && in_str) {
       ctpl_input_stream_set_error (stream, &err,
                                    CTPL_IO_ERROR, CTPL_IO_ERROR_EOF,
-                                   "Unexpected EOF inside string constant");
+                                   _("Unexpected EOF inside string constant"));
     }
     if (err) {
       g_propagate_error (error, err);
@@ -1243,7 +1244,7 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
     if (! have_mantissa) {
       ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
                                    CTPL_IO_ERROR_INVALID_NUMBER,
-                                   "Missing mantissa in numeric constant");
+                                   _("Missing mantissa in numeric constant"));
     } else {
       gchar  *nptr = gstring->str;
       gchar  *endptr;
@@ -1260,12 +1261,12 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
       if (! endptr || *endptr != 0) {
         ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
                                      CTPL_IO_ERROR_INVALID_NUMBER,
-                                     "Invalid base %d numeric constant \"%s\"",
+                                     _("Invalid base %d numeric constant \"%s\""),
                                      base, nptr);
       } else if (errno == ERANGE) {
         ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
                                      CTPL_IO_ERROR_RANGE,
-                                     "Overflow in numeric constant conversion");
+                                     _("Overflow in numeric constant conversion"));
       } else {
         if (type & READ_INT) {
           ctpl_value_set_int (value, longval);
@@ -1485,7 +1486,7 @@ ctpl_input_stream_read_float (CtplInputStream *stream,
     if (! have_mantissa) {
       ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
                                    CTPL_IO_ERROR_INVALID_NUMBER,
-                                   "Missing mantissa in float constant");
+                                   _("Missing mantissa in float constant"));
     } else {
       gchar *nptr = gstring->str;
       gchar *endptr;
@@ -1494,12 +1495,12 @@ ctpl_input_stream_read_float (CtplInputStream *stream,
       if (! endptr || *endptr != 0) {
         ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
                                      CTPL_IO_ERROR_INVALID_NUMBER,
-                                     "Invalid float constant \"%s\"",
+                                     _("Invalid float constant \"%s\""),
                                      nptr);
       } else if (errno == ERANGE) {
         ctpl_input_stream_set_error (stream, &err, CTPL_IO_ERROR,
                                      CTPL_IO_ERROR_RANGE,
-                                     "Overflow in float constant conversion");
+                                     _("Overflow in float constant conversion"));
       }
     }
   }
