@@ -59,11 +59,15 @@ typedef enum _CtplParserError
 } CtplParserError;
 
 
-GQuark    ctpl_parser_error_quark   (void) G_GNUC_CONST;
-gboolean  ctpl_parser_parse         (const CtplToken   *tree,
-                                     CtplEnviron       *env,
-                                     CtplOutputStream  *output,
-                                     GError           **error);
+GQuark    ctpl_parser_error_quark         (void) G_GNUC_CONST;
+gboolean  ctpl_parser_parse               (const CtplToken   *tree,
+                                           CtplEnviron       *env,
+                                           CtplOutputStream  *output,
+                                           GError           **error);
+gboolean  ctpl_parser_parse_to_gstream    (const CtplToken *tree,
+                                           CtplEnviron     *env,
+                                           GOutputStream   *output,
+                                           GError         **error);
 
 
 G_END_DECLS

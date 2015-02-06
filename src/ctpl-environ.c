@@ -737,6 +737,36 @@ ctpl_environ_add_from_stream (CtplEnviron      *env,
 }
 
 /**
+ * ctpl_environ_add_from_gstream:
+ * @env: A #CtplEnviron to fill
+ * @gstream: A #GInputStream from where read the environment description.
+ * @name: (allow-none): The name of the stream, or %NULL for none. This is used
+ *                      to identify the stream in error messages
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Loads an environment description from a #GInputStream.
+ * 
+ * This is a convenience API mainly intended for language bindings.  Most C
+ * users will prefer calling ctpl_environ_add_from_stream() directly and
+ * provide the #CtplInputStream themselves.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_environ_add_from_gstream (CtplEnviron   *env,
+                               GInputStream  *gstream,
+                               const gchar   *name,
+                               GError       **error)
+{
+  CtplInputStream  *stream  = ctpl_input_stream_new (gstream, name);
+  gboolean          rv      = ctpl_environ_add_from_stream (env, stream, error);
+  
+  ctpl_input_stream_unref (stream);
+  
+  return rv;
+}
+
+/**
  * ctpl_environ_add_from_string:
  * @env: A #CtplEnviron to fill
  * @string: A string containing an environment description

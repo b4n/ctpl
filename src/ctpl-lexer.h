@@ -57,6 +57,9 @@ typedef enum _CtplLexerError
 GQuark      ctpl_lexer_error_quark  (void) G_GNUC_CONST;
 CtplToken  *ctpl_lexer_lex          (CtplInputStream *stream,
                                      GError         **error);
+CtplToken  *ctpl_lexer_lex_gstream  (GInputStream *gstream,
+                                     const gchar  *name,
+                                     GError      **error);
 CtplToken  *ctpl_lexer_lex_string   (const gchar *template,
                                      GError     **error);
 CtplToken  *ctpl_lexer_lex_path     (const gchar *path,

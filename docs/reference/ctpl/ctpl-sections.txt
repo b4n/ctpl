@@ -17,6 +17,7 @@ ctpl_check_version
 CTPL_LEXER_ERROR
 CtplLexerError
 ctpl_lexer_lex
+ctpl_lexer_lex_gstream
 ctpl_lexer_lex_string
 ctpl_lexer_lex_path
 <SUBSECTION Standard>
@@ -87,6 +88,7 @@ ctpl_token_prepend
 CTPL_PARSER_ERROR
 CtplParserError
 ctpl_parser_parse
+ctpl_parser_parse_to_gstream
 <SUBSECTION Standard>
 ctpl_parser_error_quark
 </SECTION>
@@ -121,6 +123,7 @@ ctpl_environ_pop
 ctpl_environ_foreach
 ctpl_environ_merge
 ctpl_environ_add_from_stream
+ctpl_environ_add_from_gstream
 ctpl_environ_add_from_path
 ctpl_environ_add_from_string
 <SUBSECTION Standard>

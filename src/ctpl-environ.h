@@ -108,6 +108,10 @@ void              ctpl_environ_merge            (CtplEnviron        *env,
 gboolean          ctpl_environ_add_from_stream  (CtplEnviron     *env,
                                                  CtplInputStream *stream,
                                                  GError         **error);
+gboolean          ctpl_environ_add_from_gstream (CtplEnviron     *env,
+                                                 GInputStream    *gstream,
+                                                 const gchar     *name,
+                                                 GError         **error);
 gboolean          ctpl_environ_add_from_string  (CtplEnviron  *env,
                                                  const gchar  *string,
                                                  GError      **error);

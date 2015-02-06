@@ -224,7 +224,7 @@ ctpl_parser_parse_token (const CtplToken   *token,
  * ctpl_parser_parse:
  * @tree: A #CtplToken from which start parsing
  * @env: A #CtplEnviron representing the parsing environment
- * @output: A #CtplInputStream in which write parsing output
+ * @output: A #CtplOutputStream in which write parsing output
  * @error: Location where return a #GError or %NULL to ignore errors
  * 
  * Parses a token tree against an environment and outputs the result to @output.
@@ -243,6 +243,34 @@ ctpl_parser_parse (const CtplToken   *tree,
   for (; rv && tree; tree = tree->next) {
     rv = ctpl_parser_parse_token (tree, env, output, error);
   }
+  
+  return rv;
+}
+
+/**
+ * ctpl_parser_parse_to_gstream:
+ * @tree: A #CtplToken from which start parsing
+ * @env: A #CtplEnviron representing the parsing environment
+ * @output: A #GOutputStream in which write parsing output
+ * @error: Location where return a #GError or %NULL to ignore errors
+ * 
+ * Parses a token tree against an environment and outputs the result to @output.
+ * 
+ * This is a convenience API for ctpl_parser_parse().
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise, in which case @error shall be
+ *          set to the error that occurred.
+ */
+gboolean
+ctpl_parser_parse_to_gstream (const CtplToken  *tree,
+                              CtplEnviron      *env,
+                              GOutputStream    *output,
+                              GError          **error)
+{
+  CtplOutputStream *stream  = ctpl_output_stream_new (output);
+  gboolean          rv      = ctpl_parser_parse (tree, env, stream, error);
+  
+  ctpl_output_stream_unref (stream);
   
   return rv;
 }

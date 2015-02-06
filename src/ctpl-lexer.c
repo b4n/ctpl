@@ -554,6 +554,38 @@ ctpl_lexer_lex (CtplInputStream *stream,
 }
 
 /**
+ * ctpl_lexer_lex_gstream:
+ * @gstream: A #GInputStream from which read the template
+ * @name: (allow-none): The name of the stream, or %NULL for none.  This is
+ *                      used to identify the stream in error messages.  See
+ *                      ctpl_input_stream_new().
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Analyses some given data and tries to create a tree of tokens representing
+ * it.
+ * 
+ * This is a convenience especially intended for language bindings.  Generally
+ * a C caller will prefer creating the #CtplInputStream himself and use
+ * ctpl_lexer_lex() directly.
+ * 
+ * Returns: A new #CtplToken tree holding all read tokens or %NULL on error.
+ *          The new tree should be freed with ctpl_token_free() when no longer
+ *          needed.
+ */
+CtplToken *
+ctpl_lexer_lex_gstream (GInputStream *gstream,
+                        const gchar  *name,
+                        GError      **error)
+{
+  CtplInputStream  *stream  = ctpl_input_stream_new (gstream, name);
+  CtplToken        *token   = ctpl_lexer_lex (stream, error);
+  
+  ctpl_input_stream_unref (stream);
+  
+  return token;
+}
+
+/**
  * ctpl_lexer_lex_string:
  * @template: A string containing the template data
  * @error: Return location for errors, or %NULL to ignore them.
