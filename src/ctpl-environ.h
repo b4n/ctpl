@@ -96,6 +96,10 @@ void              ctpl_environ_push_float       (CtplEnviron     *env,
 void              ctpl_environ_push_string      (CtplEnviron     *env,
                                                  const gchar     *symbol,
                                                  const gchar     *value);
+gboolean          ctpl_environ_push_gvalue      (CtplEnviron     *env,
+                                                 const gchar     *symbol,
+                                                 const GValue    *value,
+                                                 GError         **error);
 gboolean          ctpl_environ_pop              (CtplEnviron *env,
                                                  const gchar *symbol,
                                                  CtplValue  **poped_value);

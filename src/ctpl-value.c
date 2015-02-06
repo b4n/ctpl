@@ -94,6 +94,19 @@ G_DEFINE_BOXED_TYPE (CtplValue,
                      ctpl_value_free)
 
 
+/*<standard>*/
+GQuark
+ctpl_value_error_quark (void)
+{
+  static GQuark error_quark = 0;
+  
+  if (G_UNLIKELY (error_quark == 0)) {
+    error_quark = g_quark_from_static_string ("CtplValue");
+  }
+  
+  return error_quark;
+}
+
 /**
  * ctpl_value_init:
  * @value: An uninitialized #CtplValue
@@ -411,6 +424,111 @@ ctpl_value_set_string (CtplValue   *value,
   ctpl_value_free_value (value);
   value->type = CTPL_VTYPE_STRING;
   value->value.v_string = val_dup;
+}
+
+/**
+ * ctpl_value_set_from_gvalue:
+ * @value: A #CtplValue
+ * @val: A #GValue
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Sets the value of a #CtplValue to the given #GValue.  The value is copied.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_value_set_from_gvalue (CtplValue    *value,
+                            const GValue *val,
+                            GError      **error)
+{
+  gboolean  success = TRUE;
+  GType     type    = G_VALUE_TYPE (val);
+  
+  switch (G_TYPE_FUNDAMENTAL (type)) {
+
+#define TYPE_CASE(GTYPE, gvaluetype, ctpltype, ctplctype)                      \
+  case G_TYPE_##GTYPE:                                                         \
+    ctpl_value_set_##ctpltype (value,                                          \
+                               (ctplctype) g_value_get_##gvaluetype (val));    \
+    break;
+
+    TYPE_CASE (BOOLEAN, boolean,  int,    glong)
+    TYPE_CASE (CHAR,    char,     int,    glong)
+    TYPE_CASE (UCHAR,   uchar,    int,    glong)
+    TYPE_CASE (INT,     int,      int,    glong)
+    TYPE_CASE (UINT,    uint,     int,    glong)
+    TYPE_CASE (LONG,    long,     int,    glong)
+    TYPE_CASE (ULONG,   ulong,    int,    glong)
+    TYPE_CASE (INT64,   int64,    int,    glong)
+    TYPE_CASE (UINT64,  uint64,   int,    glong)
+    TYPE_CASE (FLOAT,   float,    float,  gdouble)
+    TYPE_CASE (DOUBLE,  double,   float,  gdouble)
+    TYPE_CASE (STRING,  string,   string, const gchar *)
+
+#undef TYPE_CASE
+
+    case G_TYPE_BOXED:
+      g_debug ("GValue type: %s", G_VALUE_TYPE_NAME (val));
+      if (g_type_is_a (type, G_TYPE_VALUE)) {
+        success = ctpl_value_set_from_gvalue (value, g_value_get_boxed (val),
+                                              error);
+      } else if (g_type_is_a (type, G_TYPE_VALUE_ARRAY)) {
+        const GValueArray  *array = g_value_get_boxed (val);
+        guint               i;
+        
+        ctpl_value_free_value (value);
+        value->type = CTPL_VTYPE_ARRAY;
+        value->value.v_array = NULL;
+        
+        for (i = 0; success && i < array->n_values; i++) {
+          CtplValue *item = ctpl_value_new ();
+          
+          ctpl_value_init (item);
+          success = ctpl_value_set_from_gvalue (item, &array->values[i], error);
+          if (! success) {
+            ctpl_value_free (item);
+          } else {
+            value->value.v_array = g_slist_prepend (value->value.v_array, item);
+          }
+        }
+        
+        value->value.v_array = g_slist_reverse (value->value.v_array);
+      } else if (g_type_is_a (type, G_TYPE_ARRAY)) {
+        const GArray *array = g_value_get_boxed (val);
+        guint         i;
+        
+        ctpl_value_free_value (value);
+        value->type = CTPL_VTYPE_ARRAY;
+        value->value.v_array = NULL;
+        
+        for (i = 0; success && i < array->len; i++) {
+          const GValue *src   = &g_array_index (array, GValue, i);
+          CtplValue    *item  = ctpl_value_new ();
+          
+          ctpl_value_init (item);
+          success = ctpl_value_set_from_gvalue (item, src, error);
+          if (! success) {
+            ctpl_value_free (item);
+          } else {
+            value->value.v_array = g_slist_prepend (value->value.v_array, item);
+          }
+        }
+        
+        value->value.v_array = g_slist_reverse (value->value.v_array);
+      } else {
+        goto invalid_type;
+      }
+      break;
+    
+    default:
+    invalid_type:
+      g_debug ("Unsupported GValue type: %s", G_VALUE_TYPE_NAME (val));
+      g_set_error (error, CTPL_VALUE_ERROR, CTPL_VALUE_ERROR_INVALID,
+                   "Unsupported value type '%s'", G_VALUE_TYPE_NAME (val));
+      success = FALSE;
+  }
+  
+  return success;
 }
 
 /*

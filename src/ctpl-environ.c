@@ -311,6 +311,34 @@ ctpl_environ_push_string (CtplEnviron  *env,
 }
 
 /**
+ * ctpl_environ_push_gvalue:
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @value: The symbol value
+ * @error: Return locations for errors, or %NULL to ignore them.
+ * 
+ * Pushes a symbol into a #CtplEnviron. See ctpl_environ_push().
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_environ_push_gvalue (CtplEnviron  *env,
+                          const gchar  *symbol,
+                          const GValue *value,
+                          GError      **error)
+{
+  gboolean  success;
+  CtplValue val;
+  
+  ctpl_value_init (&val);
+  success = ctpl_value_set_from_gvalue (&val, value, error);
+  ctpl_environ_push (env, symbol, &val);
+  ctpl_value_free_value (&val);
+  
+  return success;
+}
+
+/**
  * ctpl_environ_pop:
  * @env: A #CtplEnviron
  * @symbol: A symbol name

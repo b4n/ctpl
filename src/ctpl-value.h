@@ -32,6 +32,26 @@ G_BEGIN_DECLS
 
 
 /**
+ * CTPL_VALUE_ERROR:
+ * 
+ * Error domain of CtplValue.
+ */
+#define CTPL_VALUE_ERROR  (ctpl_value_error_quark ())
+
+/**
+ * CtplValueError:
+ * @CTPL_VALUE_ERROR_INVALID: The value is invalid
+ * @CTPL_VALUE_ERROR_FAILED:  An error occurred
+ * 
+ * Errors in the %CTPL_VALUE_ERROR domain.
+ */
+typedef enum _CtplValueError
+{
+  CTPL_VALUE_ERROR_INVALID,
+  CTPL_VALUE_ERROR_FAILED
+} CtplValueError;
+
+/**
  * CtplValueType:
  * @CTPL_VTYPE_INT: Integer (C's long int)
  * @CTPL_VTYPE_FLOAT: Floating point value (C's double)
@@ -123,6 +143,7 @@ struct _CtplValue
 
 
 GType         ctpl_value_get_type             (void) G_GNUC_CONST;
+GQuark        ctpl_value_error_quark          (void) G_GNUC_CONST;
 void          ctpl_value_init                 (CtplValue *value);
 CtplValue    *ctpl_value_new                  (void);
 void          ctpl_value_copy                 (const CtplValue *src_value,
@@ -145,6 +166,9 @@ void          ctpl_value_set_float            (CtplValue *value,
                                                gdouble    val);
 void          ctpl_value_set_string           (CtplValue   *value,
                                                const gchar *val);
+gboolean      ctpl_value_set_from_gvalue      (CtplValue     *value,
+                                               const GValue  *val,
+                                               GError       **error);
 void          ctpl_value_set_arrayv           (CtplValue     *value,
                                                CtplValueType  type,
                                                gsize          count,

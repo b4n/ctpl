@@ -119,6 +119,7 @@ ctpl_environ_push
 ctpl_environ_push_int
 ctpl_environ_push_float
 ctpl_environ_push_string
+ctpl_environ_push_gvalue
 ctpl_environ_pop
 ctpl_environ_foreach
 ctpl_environ_merge
@@ -162,6 +163,7 @@ ctpl_value_set_array_floatv
 ctpl_value_set_array_float
 ctpl_value_set_array_stringv
 ctpl_value_set_array_string
+ctpl_value_set_from_gvalue
 ctpl_value_array_append
 ctpl_value_array_prepend
 ctpl_value_array_append_int
@@ -184,6 +186,8 @@ ctpl_value_to_string
 ctpl_value_convert
 ctpl_value_type_get_name
 ctpl_value_get_held_type_name
+<SUBSECTION Standard>
+ctpl_value_error_quark
 </SECTION>
 
 <SECTION>
