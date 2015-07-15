@@ -214,6 +214,31 @@ ctpl_environ_lookup (const CtplEnviron *env,
 }
 
 /**
+ * ctpl_environ_lookup_gvalue: (rename-to ctpl_environ_lookup)
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @gvalue: (out) (allow-none): Return location for the symbol value
+ * 
+ * Looks up for a symbol in the given #CtplEnviron.
+ * 
+ * Returns: %TRUE on success, or %FALSE if the symbol can't be found.
+ */
+gboolean
+ctpl_environ_lookup_gvalue (const CtplEnviron *env,
+                            const gchar       *symbol,
+                            GValue            *gvalue)
+{
+  const CtplValue *value = NULL;
+  
+  value = ctpl_environ_lookup (env, symbol);
+  if (value && gvalue) {
+    ctpl_value_to_gvalue (value, gvalue);
+  }
+  
+  return value != NULL;
+}
+
+/**
  * ctpl_environ_push:
  * @env: A #CtplEnviron
  * @symbol: The symbol name
@@ -332,7 +357,73 @@ ctpl_environ_push_gvalue (CtplEnviron  *env,
   
   ctpl_value_init (&val);
   success = ctpl_value_set_from_gvalue (&val, value, error);
-  ctpl_environ_push (env, symbol, &val);
+  if (success) {
+    ctpl_environ_push (env, symbol, &val);
+  }
+  ctpl_value_free_value (&val);
+  
+  return success;
+}
+
+/**
+ * ctpl_environ_push_gvalue_array: (rename-to ctpl_environ_push_array)
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @values: (array length=n_values): The symbol values
+ * @n_values: The element count in @values
+ * @error: Return locations for errors, or %NULL to ignore them.
+ * 
+ * Pushes a symbol into a #CtplEnviron. See ctpl_environ_push().
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_environ_push_gvalue_array (CtplEnviron  *env,
+                                const gchar  *symbol,
+                                const GValue *values,
+                                gsize         n_values,
+                                GError      **error)
+{
+  gboolean  success;
+  CtplValue val;
+  
+  ctpl_value_init (&val);
+  success = ctpl_value_set_from_gvalue_array (&val, values, n_values, error);
+  if (success) {
+    ctpl_environ_push (env, symbol, &val);
+  }
+  ctpl_value_free_value (&val);
+  
+  return success;
+}
+
+/**
+ * ctpl_environ_push_gvalue_parray: (rename-to ctpl_environ_push_parray)
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @values: (array length=n_values): The symbol values
+ * @n_values: The element count in @values
+ * @error: Return locations for errors, or %NULL to ignore them.
+ * 
+ * Pushes a symbol into a #CtplEnviron. See ctpl_environ_push().
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_environ_push_gvalue_parray (CtplEnviron   *env,
+                                 const gchar   *symbol,
+                                 const GValue **values,
+                                 gsize          n_values,
+                                 GError       **error)
+{
+  gboolean  success;
+  CtplValue val;
+  
+  ctpl_value_init (&val);
+  success = ctpl_value_set_from_gvalue_parray (&val, values, n_values, error);
+  if (success) {
+    ctpl_environ_push (env, symbol, &val);
+  }
   ctpl_value_free_value (&val);
   
   return success;
@@ -375,6 +466,44 @@ ctpl_environ_pop (CtplEnviron *env,
   }
   
   return value != NULL;
+}
+
+/**
+ * ctpl_environ_pop_gvalue: (rename-to ctpl_environ_pop)
+ * @env: A #CtplEnviron
+ * @symbol: A symbol name
+ * @poped_value: (out) (allow-none) (transfer full): Return location for the
+ *               poped value, or %NULL. This is set only if poping succeeded,
+ *               so if this function returned %TRUE.
+ * 
+ * Tries to pop a symbol from a #CtplEnviron. See ctpl_environ_push() for
+ * details on pushing and poping.
+ * Use ctpl_environ_lookup_gvalue() if you want to get the symbol's value
+ * without poping it from the environ.
+ * 
+ * See ctpl_environ_pop().
+ * 
+ * Returns: Whether a value has been poped.
+ * 
+ * Since: 0.3
+ */
+gboolean
+ctpl_environ_pop_gvalue (CtplEnviron *env,
+                         const gchar *symbol,
+                         GValue      *poped_value)
+{
+  if (! poped_value) {
+    return ctpl_environ_pop (env, symbol, NULL);
+  } else {
+    CtplValue *value = NULL;
+    
+    if (ctpl_environ_pop (env, symbol, &value)) {
+      ctpl_value_to_gvalue (value, poped_value);
+      ctpl_value_free (value);
+    }
+    
+    return value != NULL;
+  }
 }
 
 /* data for ctpl_environ_foreach() */
@@ -424,6 +553,60 @@ ctpl_environ_foreach (CtplEnviron            *env,
   data.user_data = user_data;
   data.run = TRUE;
   g_hash_table_foreach (env->symbol_table, ctpl_environ_foreach_hfunc, &data);
+}
+
+/* data for ctpl_environ_foreach() */
+struct _CtplEnvironForeachGValueData
+{
+  CtplEnviron                  *env;
+  CtplEnvironForeachGValueFunc  func;
+  gpointer                      user_data;
+  gboolean                      run;
+};
+
+/* callback for ctpl_environ_foreach() */
+static void
+ctpl_environ_foreach_gvalue_hfunc (gpointer  symbol,
+                                   gpointer  stack,
+                                   gpointer  user_data)
+{
+  struct _CtplEnvironForeachGValueData *data = user_data;
+  
+  if (data->run) {
+    CtplValue *value;
+    
+    value = ctpl_stack_peek (stack);
+    if (value) {
+      GValue gvalue = { 0 };
+      
+      ctpl_value_to_gvalue (value, &gvalue);
+      data->run = data->func (data->env, symbol, &gvalue, data->user_data);
+      g_value_unset (&gvalue);
+    }
+  }
+}
+
+/**
+ * ctpl_environ_foreach_gvalue: (rename-to ctpl_environ_foreach)
+ * @env: A #CtplEnviron
+ * @func: (closure user_data) (scope call): A #CtplEnvironForeachGValueFunc
+ * @user_data: (closure): user data to pass to @func
+ * 
+ * Calls @func on each symbol of the environment.
+ */
+void
+ctpl_environ_foreach_gvalue (CtplEnviron                  *env,
+                             CtplEnvironForeachGValueFunc  func,
+                             gpointer                      user_data)
+{
+  struct _CtplEnvironForeachGValueData data;
+  
+  data.env = env;
+  data.func = func;
+  data.user_data = user_data;
+  data.run = TRUE;
+  g_hash_table_foreach (env->symbol_table, ctpl_environ_foreach_gvalue_hfunc,
+                        &data);
 }
 
 /* data for ctpl_environ_merge() */
@@ -765,7 +948,7 @@ ctpl_environ_add_from_stream (CtplEnviron      *env,
 }
 
 /**
- * ctpl_environ_add_from_gstream:
+ * ctpl_environ_add_from_gstream: (rename-to ctpl_environ_add_from_stream)
  * @env: A #CtplEnviron to fill
  * @gstream: A #GInputStream from where read the environment description.
  * @name: (allow-none): The name of the stream, or %NULL for none. This is used

@@ -75,6 +75,21 @@ typedef gboolean (*CtplEnvironForeachFunc)  (CtplEnviron     *env,
                                              const gchar     *symbol,
                                              const CtplValue *value,
                                              gpointer         user_data);
+/**
+ * CtplEnvironForeachGValueFunc: (rename-to CtplEnvironForeachFunc)
+ * @env: The #CtplEnviron on which the function was called
+ * @symbol: The current symbol
+ * @value: The symbol's value
+ * @user_data: (closure): User data passed to ctpl_environ_foreach_gvalue()
+ * 
+ * User function for ctpl_environ_foreach_gvalue().
+ * 
+ * Returns: %TRUE to continue enumerating environ, %FALSE to stop.
+ */
+typedef gboolean (*CtplEnvironForeachGValueFunc)  (CtplEnviron   *env,
+                                                   const gchar   *symbol,
+                                                   const GValue  *value,
+                                                   gpointer       user_data);
 
 
 GType             ctpl_environ_get_type         (void) G_GNUC_CONST;
@@ -84,6 +99,9 @@ CtplEnviron      *ctpl_environ_ref              (CtplEnviron *env);
 void              ctpl_environ_unref            (CtplEnviron *env);
 const CtplValue  *ctpl_environ_lookup           (const CtplEnviron *env,
                                                  const gchar       *symbol);
+gboolean          ctpl_environ_lookup_gvalue    (const CtplEnviron *env,
+                                                 const gchar       *symbol,
+                                                 GValue            *gvalue);
 void              ctpl_environ_push             (CtplEnviron     *env,
                                                  const gchar     *symbol,
                                                  const CtplValue *value);
@@ -100,12 +118,28 @@ gboolean          ctpl_environ_push_gvalue      (CtplEnviron     *env,
                                                  const gchar     *symbol,
                                                  const GValue    *value,
                                                  GError         **error);
+gboolean          ctpl_environ_push_gvalue_array(CtplEnviron   *env,
+                                                 const gchar   *symbol,
+                                                 const GValue *values,
+                                                 gsize          n_values,
+                                                 GError       **error);
+gboolean          ctpl_environ_push_gvalue_parray (CtplEnviron   *env,
+                                                   const gchar   *symbol,
+                                                   const GValue **values,
+                                                   gsize          n_values,
+                                                   GError       **error);
 gboolean          ctpl_environ_pop              (CtplEnviron *env,
                                                  const gchar *symbol,
                                                  CtplValue  **poped_value);
+gboolean          ctpl_environ_pop_gvalue       (CtplEnviron *env,
+                                                 const gchar *symbol,
+                                                 GValue      *poped_value);
 void              ctpl_environ_foreach          (CtplEnviron           *env,
                                                  CtplEnvironForeachFunc func,
                                                  gpointer               user_data);
+void              ctpl_environ_foreach_gvalue   (CtplEnviron                 *env,
+                                                 CtplEnvironForeachGValueFunc func,
+                                                 gpointer                     user_data);
 void              ctpl_environ_merge            (CtplEnviron        *env,
                                                  const CtplEnviron  *source,
                                                  gboolean            merge_symbols);

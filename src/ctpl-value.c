@@ -474,47 +474,33 @@ ctpl_value_set_from_gvalue (CtplValue    *value,
                                               error);
       } else if (g_type_is_a (type, G_TYPE_VALUE_ARRAY)) {
         const GValueArray  *array = g_value_get_boxed (val);
-        guint               i;
         
-        ctpl_value_free_value (value);
-        value->type = CTPL_VTYPE_ARRAY;
-        value->value.v_array = NULL;
-        
-        for (i = 0; success && i < array->n_values; i++) {
-          CtplValue *item = ctpl_value_new ();
-          
-          ctpl_value_init (item);
-          success = ctpl_value_set_from_gvalue (item, &array->values[i], error);
-          if (! success) {
-            ctpl_value_free (item);
-          } else {
-            value->value.v_array = g_slist_prepend (value->value.v_array, item);
-          }
-        }
-        
-        value->value.v_array = g_slist_reverse (value->value.v_array);
+        success = ctpl_value_set_from_gvalue_array (value, array->values,
+                                                    array->n_values, error);
       } else if (g_type_is_a (type, G_TYPE_ARRAY)) {
-        const GArray *array = g_value_get_boxed (val);
-        guint         i;
+        GArray *array = g_value_get_boxed (val);
         
-        ctpl_value_free_value (value);
-        value->type = CTPL_VTYPE_ARRAY;
-        value->value.v_array = NULL;
-        
-        for (i = 0; success && i < array->len; i++) {
-          const GValue *src   = &g_array_index (array, GValue, i);
-          CtplValue    *item  = ctpl_value_new ();
-          
-          ctpl_value_init (item);
-          success = ctpl_value_set_from_gvalue (item, src, error);
-          if (! success) {
-            ctpl_value_free (item);
-          } else {
-            value->value.v_array = g_slist_prepend (value->value.v_array, item);
-          }
+        /* branching on the array element type is a bit ugly, but we can't
+         * really do better as arrays don't hold type information */
+        if (sizeof (GValue *) == g_array_get_element_size (array)) {
+          success = ctpl_value_set_from_gvalue_parray (value,
+                                                       (const GValue **) array->data,
+                                                       array->len, error);
+        } else if (sizeof (GValue) == g_array_get_element_size (array)) {
+          success = ctpl_value_set_from_gvalue_array (value,
+                                                      (const GValue *) array->data,
+                                                      array->len, error);
+        } else {
+          g_set_error (error, CTPL_VALUE_ERROR, CTPL_VALUE_ERROR_INVALID,
+                       "Unsupported unknown array element type");
+          g_return_val_if_reached (FALSE);
         }
+      } else if (g_type_is_a (type, G_TYPE_PTR_ARRAY)) {
+        GPtrArray *array = g_value_get_boxed (val);
         
-        value->value.v_array = g_slist_reverse (value->value.v_array);
+        success = ctpl_value_set_from_gvalue_parray (value,
+                                                     (const GValue **) array->pdata,
+                                                     array->len, error);
       } else {
         goto invalid_type;
       }
@@ -529,6 +515,152 @@ ctpl_value_set_from_gvalue (CtplValue    *value,
   }
   
   return success;
+}
+
+static void
+free_value (GValue *value)
+{
+  if (value) {
+    g_value_unset (value);
+    g_free (value);
+  }
+}
+
+/**
+ * ctpl_value_to_gvalue:
+ * @value: A #CtplValue
+ * @gvalue: #GValue to fill
+ * 
+ * Converts a #CtplValue to a #GValue.
+ * 
+ * Array are represented with a boxed #GPtrArray containing allocated
+ * #GValue<!-- -->s.  This has been chosen over a #GArray of direct
+ * #GValue<!-- -->s because Vala does not accept it (Array&lt;Value&gt; is
+ * invalid), and the primary goal for the #GValue API is for language
+ * bindings.
+ */
+void
+ctpl_value_to_gvalue (const CtplValue *value,
+                      GValue          *gvalue)
+{
+  switch (value->type) {
+    case CTPL_VTYPE_ARRAY: {
+      GPtrArray  *array = g_ptr_array_new_with_free_func (free_value);
+      GSList     *node;
+      
+      for (node = value->value.v_array; node; node = node->next) {
+        GValue *item = g_malloc0 (sizeof *item);
+        
+        ctpl_value_to_gvalue (node->data, item);
+        g_ptr_array_add (array, item);
+      }
+      
+      g_value_init (gvalue, G_TYPE_PTR_ARRAY);
+      g_value_take_boxed (gvalue, array);
+      break;
+    }
+    case CTPL_VTYPE_FLOAT: {
+      g_value_init (gvalue, G_TYPE_DOUBLE);
+      g_value_set_double (gvalue, value->value.v_float);
+      break;
+    }
+    case CTPL_VTYPE_INT: {
+      g_value_init (gvalue, G_TYPE_LONG);
+      g_value_set_long (gvalue, value->value.v_int);
+      break;
+    }
+    case CTPL_VTYPE_STRING: {
+      g_value_init (gvalue, G_TYPE_STRING);
+      g_value_set_string (gvalue, value->value.v_string);
+      break;
+    }
+  }
+}
+
+/* sets from an array of GValue (ptr=FALSE, GValue*) or pointers to GValue
+ * (ptr=TRUE, GValue**) */
+static gboolean
+ctpl_value_set_from_gvalue_array_internal (CtplValue     *value,
+                                           const gboolean ptr,
+                                           const void    *values,
+                                           gsize          n_values,
+                                           GError       **error)
+{
+  gboolean  success = TRUE;
+  gsize     i;
+  
+  ctpl_value_free_value (value);
+  value->type = CTPL_VTYPE_ARRAY;
+  value->value.v_array = NULL;
+  
+  for (i = 0; success && i < n_values; i++) {
+    const GValue *src;
+    CtplValue    *item = ctpl_value_new ();
+    
+    if (ptr) {
+      src = ((const GValue **) values)[i];
+    } else {
+      src = &((const GValue *) values)[i];
+    }
+    
+    g_return_val_if_fail (src && G_IS_VALUE (src), FALSE);
+    
+    ctpl_value_init (item);
+    success = ctpl_value_set_from_gvalue (item, src, error);
+    if (! success) {
+      ctpl_value_free (item);
+    } else {
+      value->value.v_array = g_slist_prepend (value->value.v_array, item);
+    }
+  }
+  
+  value->value.v_array = g_slist_reverse (value->value.v_array);
+  
+  return success;
+}
+
+/**
+ * ctpl_value_set_from_gvalue_array: (rename-to ctpl_value_set_array)
+ * @value: A #CtplValue
+ * @values: (array length=n_values): An array of #GValue<!-- -->s
+ * @n_values: The values count
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Sets the value of a #CtplValue to the given array of #GValue<!-- -->s.
+ * The values are copied.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_value_set_from_gvalue_array (CtplValue      *value,
+                                  const GValue  *values,
+                                  gsize           n_values,
+                                  GError        **error)
+{
+  return ctpl_value_set_from_gvalue_array_internal (value, FALSE,
+                                                    values, n_values, error);
+}
+
+/**
+ * ctpl_value_set_from_gvalue_parray: (rename-to ctpl_value_set_from_parray)
+ * @value: A #CtplValue
+ * @values: (array length=n_values): An array of #GValue<!-- -->s
+ * @n_values: The values count
+ * @error: Return location for errors, or %NULL to ignore them.
+ * 
+ * Sets the value of a #CtplValue to the given array of #GValue<!-- -->s.
+ * The values are copied.
+ * 
+ * Returns: %TRUE on success, %FALSE otherwise.
+ */
+gboolean
+ctpl_value_set_from_gvalue_parray (CtplValue     *value,
+                                   const GValue **values,
+                                   gsize          n_values,
+                                   GError       **error)
+{
+  return ctpl_value_set_from_gvalue_array_internal (value, TRUE,
+                                                    values, n_values, error);
 }
 
 /*

@@ -526,6 +526,59 @@ hex_number  = 0xffe2; # 65506
   </chapter>
 
   <chapter>
+    <title><type>GValue</type> integration</title>
+    
+    <section>
+      <title>Introduction</title>
+      <para>
+        To improve integration with language bindings, several APIs expecting a
+        <link linkend="CtplValue"><type>CtplValue</type></link> have a
+        counterpart taking a <link linkend="GValue"><type>GValue</type></link>.
+        This extra API is less optimized than the primary one as the
+        <link linkend="GValue"><type>GValue</type></link>s are converted back and
+        forth (<link linkend="CtplValue"><type>CtplValue</type></link> remains
+        the internally used type).
+      </para>
+    </section>
+    
+    <section>
+      <title>Type correspondence</title>
+      <table>
+        <tr>
+          <th><link linkend="CtplValueType">CTPL type</link> ID</th>
+          <th><link linkend="GType">GLib type</link> ID</th>
+          <th>Vala-like type</th>
+          <th>Details</th>
+        </tr>
+        <tr>
+          <td>CTPL_VTYPE_INT</td>
+          <td>G_TYPE_LONG</td>
+          <td>long</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>CTPL_VTYPE_FLOAT</td>
+          <td>G_TYPE_DOUBLE</td>
+          <td>double</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>CTPL_VTYPE_STRING</td>
+          <td>G_TYPE_STRING</td>
+          <td>string</td>
+          <td>C string</td>
+        </tr>
+        <tr>
+          <td>CTPL_VTYPE_ARRAY</td>
+          <td>G_TYPE_PTR_ARRAY</td>
+          <td>GPtrArray&lt;GValue&gt;</td>
+          <td>Element type is <link linkend="GValue"><type>GValue</type></link></td>
+        </tr>
+      </table>
+    </section>
+  </chapter>
+
+  <chapter>
     <title>API reference</title>
     <xi:include href="xml/version.xml"/>
     <xi:include href="xml/value.xml"/>

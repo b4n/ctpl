@@ -169,6 +169,16 @@ void          ctpl_value_set_string           (CtplValue   *value,
 gboolean      ctpl_value_set_from_gvalue      (CtplValue     *value,
                                                const GValue  *val,
                                                GError       **error);
+void          ctpl_value_to_gvalue            (const CtplValue *value,
+                                               GValue          *gvalue);
+gboolean      ctpl_value_set_from_gvalue_array(CtplValue     *value,
+                                               const GValue  *values,
+                                               gsize          n_values,
+                                               GError      **error);
+gboolean      ctpl_value_set_from_gvalue_parray (CtplValue     *value,
+                                                 const GValue **values,
+                                                 gsize          n_values,
+                                                 GError      **error);
 void          ctpl_value_set_arrayv           (CtplValue     *value,
                                                CtplValueType  type,
                                                gsize          count,
