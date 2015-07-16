@@ -40,25 +40,6 @@ test_environ (void)
   ctpl_environ_unref (env);
 }
 
-static void
-test_output_stream (void)
-{
-  GOutputStream    *gos;
-  CtplOutputStream *os;
-  guchar            buf[1024];
-  const GType       T = ctpl_output_stream_get_type ();
-  gpointer          p;
-  
-  gos = g_memory_output_stream_new (buf, sizeof buf, NULL, NULL);
-  os = ctpl_output_stream_new (gos);
-  g_object_unref (gos);
-  
-  p = g_boxed_copy (T, os);
-  g_boxed_free (T, p);
-  
-  ctpl_output_stream_unref (os);
-}
-
 int
 main (void)
 {
@@ -66,7 +47,6 @@ main (void)
   
   test_token ();
   test_environ ();
-  test_output_stream ();
   
   return 0;
 }
