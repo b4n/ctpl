@@ -1,0 +1,46 @@
+/* Use GValue API */
+Environ.push skip=true
+Environ.push_float skip=true
+Environ.push_int skip=true
+Environ.push_string skip=true
+Environ.push_gvalue name="push" skip=false
+Environ.push_gvalue_array name="push_array" skip=false
+
+/* This binding is buggy, teh type of the arg should be `GLib.Value?[]`, not
+ * `GLib.Value[]`.  And I don't know how to change this, below doesn't work. */
+//~ Environ.push_gvalue_parray name="push_parray" skip=false
+//~ Environ.push_gvalue_parray.values type_name="GLib.Value?[]"
+Environ.push_gvalue_parray skip=true
+
+Environ.pop skip=true
+Environ.pop_gvalue name="pop"
+Environ.pop_gvalue.poped_value default=null
+
+Environ.lookup skip=true
+Environ.lookup_gvalue name="lookup"
+Environ.lookup_gvalue.gvalue default=null
+
+Environ.foreach skip=true
+Environ.foreach_gvalue name="foreach"
+
+/* use the GIO stream variants */
+
+Environ.add_from_stream skip=true
+Environ.add_from_gstream name="add_from_stream"
+Environ.add_from_gstream.name default=null
+
+lexer_lex_gstream name="lex" parent="Ctpl.Lexer"
+lexer_lex_gstream.name default=null
+lexer_lex_path name="lex_path" parent="Ctpl.Lexer"
+lexer_lex_string name="lex_string" parent="Ctpl.Lexer"
+
+parser_parse_to_gstream name="parse" parent="Ctpl.Parser"
+
+EnvironForeachFunc skip=true
+EnvironForeachGValueFunc name="EnvironForeachFunc"
+
+Value skip=true
+ValueType skip=true
+value_type_get_name skip=true
+
+*_error_quark skip=true

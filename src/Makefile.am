@@ -95,5 +95,12 @@ gir_DATA      = $(INTROSPECTION_GIRS)
 typelibdir    = $(libdir)/girepository-1.0
 typelib_DATA  = $(INTROSPECTION_GIRS:.gir=.typelib)
 
-CLEANFILES   += $(gir_DATA) $(typelib_DATA)
+vapidir       = $(datadir)/vapi
+vapi_DATA     = ctpl.vapi
+
+ctpl.vapi: $(INTROSPECTION_GIRS) Ctpl-1.0.metadata Ctpl-1.0.vala
+	$(AM_V_GEN)$(VAPIGEN) --library ctpl --pkg=gio-2.0 --metadatadir=$(srcdir) \
+		Ctpl-1.0.gir Ctpl-1.0.vala
+
+CLEANFILES   += $(gir_DATA) $(typelib_DATA) $(vapi_DATA)
 endif
