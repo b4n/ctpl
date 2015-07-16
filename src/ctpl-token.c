@@ -47,10 +47,6 @@ G_DEFINE_BOXED_TYPE (CtplToken,
                      ctpl_token,
                      ctpl_token_dup,
                      ctpl_token_free)
-G_DEFINE_BOXED_TYPE (CtplTokenExpr,
-                     ctpl_token_expr,
-                     ctpl_token_expr_dup,
-                     ctpl_token_expr_free)
 
 /* returns the length of @s. If @max is >= 0, return it, return the computed
  * length of @s otherwise. */

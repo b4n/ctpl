@@ -33,7 +33,6 @@ G_BEGIN_DECLS
 
 typedef struct _CtplOutputStream CtplOutputStream;
 
-GType             ctpl_output_stream_get_type       (void) G_GNUC_CONST;
 CtplOutputStream *ctpl_output_stream_new            (GOutputStream *stream);
 CtplOutputStream *ctpl_output_stream_ref            (CtplOutputStream *stream);
 void              ctpl_output_stream_unref          (CtplOutputStream *stream);

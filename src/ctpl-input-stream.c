@@ -77,11 +77,6 @@ struct _CtplInputStream
 };
 
 
-G_DEFINE_BOXED_TYPE (CtplInputStream,
-                     ctpl_input_stream,
-                     ctpl_input_stream_ref,
-                     ctpl_input_stream_unref)
-
 /**
  * ctpl_input_stream_new:
  * @stream: A #GInputStream

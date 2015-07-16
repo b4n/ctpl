@@ -50,11 +50,6 @@ struct _CtplOutputStream
   GOutputStream parent;
 };
 
-G_DEFINE_BOXED_TYPE (CtplOutputStream,
-                     ctpl_output_stream,
-                     ctpl_output_stream_ref,
-                     ctpl_output_stream_unref)
-
 /**
  * ctpl_output_stream_new:
  * @stream: A #GOutputStream
