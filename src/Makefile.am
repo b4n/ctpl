@@ -75,7 +75,18 @@ Ctpl_1_0_gir_INCLUDES         = GLib-2.0 Gio-2.0 GObject-2.0
 Ctpl_1_0_gir_CFLAGS           = $(INCLUDES) -DCTPL_COMPILATION
 Ctpl_1_0_gir_SCANNERFLAGS     = --c-include "ctpl/ctpl.h"
 Ctpl_1_0_gir_LIBS             = $(lib_LTLIBRARIES)
-Ctpl_1_0_gir_FILES            = $(libctpl_la_SOURCES) $(ctplinclude_HEADERS)
+Ctpl_1_0_gir_FILES            = ctpl-environ.c \
+                                ctpl-environ.h \
+                                ctpl-lexer.c \
+                                ctpl-lexer.h \
+                                ctpl-parser.c \
+                                ctpl-parser.h \
+                                ctpl-token.c \
+                                ctpl-token.h \
+                                ctpl-value.c \
+                                ctpl-value.h \
+                                ctpl-version.c \
+                                ctpl-version.h
 INTROSPECTION_GIRS           += Ctpl-1.0.gir
 
 girdir        = $(datadir)/gir-1.0
