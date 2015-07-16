@@ -46,9 +46,10 @@ CtplLexerExprError
 ctpl_lexer_expr_lex
 ctpl_lexer_expr_lex_full
 ctpl_lexer_expr_lex_string
-<SUBSECTION Standard>
+<SUBSECTION Private>
 ctpl_operator_to_string
 ctpl_operator_from_string
+<SUBSECTION Standard>
 ctpl_lexer_expr_error_quark
 </SECTION>
 
@@ -80,6 +81,8 @@ ctpl_token_expr_dump
 ctpl_token_get_token_type
 ctpl_token_append
 ctpl_token_prepend
+<SUBSECTION Standard>
+ctpl_token_get_type
 </SECTION>
 
 <SECTION>
@@ -134,12 +137,15 @@ ctpl_environ_add_from_gstream
 ctpl_environ_add_from_path
 ctpl_environ_add_from_string
 <SUBSECTION Standard>
+ctpl_environ_get_type
 ctpl_environ_error_quark
 </SECTION>
 
 <SECTION>
 <TITLE>CtplValue</TITLE>
 <FILE>value</FILE>
+CTPL_VALUE_ERROR
+CtplValueError
 CtplValueType
 CtplValue
 CTPL_VALUE_HOLDS
@@ -197,6 +203,7 @@ ctpl_value_type_get_name
 ctpl_value_get_held_type_name
 <SUBSECTION Standard>
 ctpl_value_error_quark
+ctpl_value_get_type
 </SECTION>
 
 <SECTION>
