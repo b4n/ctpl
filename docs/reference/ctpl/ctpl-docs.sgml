@@ -142,7 +142,7 @@
 #include &lt;ctpl/ctpl.h&gt;
 
 /**
- * procede_template:
+ * process_template:
  * @input:  The input stream
  * @env:    The environment against which parse the input.
  * @output: The output stream
@@ -153,7 +153,7 @@
  * Returns: %TRUE on success, %FALSE on error.
  */
 gboolean
-procede_template (CtplInputStream  *input,
+process_template (CtplInputStream  *input,
                   CtplEnviron      *env,
                   CtplOutputStream *output,
                   GError          **error)

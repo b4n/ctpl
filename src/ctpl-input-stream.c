@@ -1004,8 +1004,10 @@ ctpl_input_stream_skip_blank (CtplInputStream  *stream,
  * will simply escape the next character.
  * 
  * For instance, a string might look like this:
- * |[ "a valid string with \"special\" characters such as \\ (backslash) <!--
- * -->and \" (double quotes)" ]|
+ * <programlisting>
+ * "a valid string with \"special\" characters such as \\ (backslash)<!--
+ * -->and \" (double quotes)"
+ * </programlisting>
  * 
  * Returns: The read string, or %NULL on error
  * 
@@ -1300,10 +1302,11 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
  * 
  * Reads a number from a #CtplInputStream. A number can be a plain decimal
  * integer, a binary integer prefixed with <code>0b</code>, an octal integer
- * prefixed with <code>0o</code>, a hexadecimal integer prefixed with
- * <code>0x</code>, a decimal real with possible decimal exponent separated by a
- * <code>e</code> or a hexadecimal real with possible decimal power separated by
- * a <code>p</code>; each possibly preceded by a plus or minus sign.
+ * prefixed with <code>0o</code>, a hexadecimal integer prefixed
+ * with <code>0x</code>, a decimal real with possible decimal exponent
+ * separated by a <code>e</code> or a hexadecimal real with possible decimal
+ * power separated by a <code>p</code>; each possibly preceded by a plus or
+ * minus sign.
  * The decimal point of real numbers is always a period (<code>.</code>).
  * 
  * <example>
