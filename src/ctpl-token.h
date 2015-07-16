@@ -38,7 +38,7 @@ G_BEGIN_DECLS
  */
 typedef struct _CtplToken             CtplToken;
 /**
- * CtplTokenExpr:
+ * CtplTokenExpr: (skip)
  * 
  * Represents an expression token.
  */

@@ -356,7 +356,7 @@ ctpl_token_expr_free_full (CtplTokenExpr *token,
 }
 
 /**
- * ctpl_token_expr_free:
+ * ctpl_token_expr_free: (skip)
  * @token: A #CtplTokenExpr to free
  * 
  * Frees all memory used by a #CtplTokenExpr.
@@ -408,7 +408,7 @@ ctpl_token_dup (const CtplToken *token)
 }
 
 /**
- * ctpl_token_free:
+ * ctpl_token_free: (skip)
  * @token: A #CtplToken to free
  * 
  * Frees all memory used by a #CtplToken.

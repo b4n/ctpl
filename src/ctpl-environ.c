@@ -336,7 +336,7 @@ ctpl_environ_push_string (CtplEnviron  *env,
 }
 
 /**
- * ctpl_environ_push_gvalue:
+ * ctpl_environ_push_gvalue: (rename-to ctpl_environ_push)
  * @env: A #CtplEnviron
  * @symbol: A symbol name
  * @value: The symbol value
@@ -921,7 +921,7 @@ load_next (CtplEnviron     *env,
 }
 
 /**
- * ctpl_environ_add_from_stream:
+ * ctpl_environ_add_from_stream: (skip)
  * @env: A #CtplEnviron to fill
  * @stream: A #CtplInputStream from where read the environment description.
  * @error: Return location for an error, or %NULL to ignore them

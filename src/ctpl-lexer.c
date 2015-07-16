@@ -519,7 +519,7 @@ ctpl_lexer_lex_internal (CtplInputStream *stream,
 }
 
 /**
- * ctpl_lexer_lex:
+ * ctpl_lexer_lex: (skip)
  * @stream: A #CtplInputStream holding the data to analyse
  * @error: A #GError return location for error reporting, or %NULL to ignore
  *         errors.
@@ -554,7 +554,7 @@ ctpl_lexer_lex (CtplInputStream *stream,
 }
 
 /**
- * ctpl_lexer_lex_gstream:
+ * ctpl_lexer_lex_gstream: (rename-to ctpl_lexer_lex)
  * @gstream: A #GInputStream from which read the template
  * @name: (allow-none): The name of the stream, or %NULL for none.  This is
  *                      used to identify the stream in error messages.  See

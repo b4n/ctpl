@@ -221,7 +221,7 @@ ctpl_parser_parse_token (const CtplToken   *token,
 }
 
 /**
- * ctpl_parser_parse:
+ * ctpl_parser_parse: (skip)
  * @tree: A #CtplToken from which start parsing
  * @env: A #CtplEnviron representing the parsing environment
  * @output: A #CtplOutputStream in which write parsing output
@@ -248,7 +248,7 @@ ctpl_parser_parse (const CtplToken   *tree,
 }
 
 /**
- * ctpl_parser_parse_to_gstream:
+ * ctpl_parser_parse_to_gstream: (rename-to ctpl_parser_parse)
  * @tree: A #CtplToken from which start parsing
  * @env: A #CtplEnviron representing the parsing environment
  * @output: A #GOutputStream in which write parsing output

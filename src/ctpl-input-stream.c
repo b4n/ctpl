@@ -85,8 +85,8 @@ G_DEFINE_BOXED_TYPE (CtplInputStream,
 /**
  * ctpl_input_stream_new:
  * @stream: A #GInputStream
- * @name: The name of the stream, or %NULL for none. This is used to identify
- *        the stream in error messages
+ * @name: (allow-none): The name of the stream, or %NULL for none. This is used
+ *                      to identify the stream in error messages
  * 
  * Creates a new #CtplInputStream for a #GInputStream.
  * This function adds a reference to the #GInputStream.
@@ -119,7 +119,7 @@ ctpl_input_stream_new (GInputStream *stream,
  * @data: (scope notified) (array length=length): Data for which create the stream
  * @length: length of @data
  * @destroy: #GDestroyNotify to call on @data when finished, or %NULL
- * @name: The name of the stream to identify it in error messages
+ * @name: (allow-none): The name of the stream to identify it in error messages
  * 
  * Creates a new #CtplInputStream for in-memory data. This is a wrapper around
  * #GMemoryInputStream; see ctpl_input_stream_new().
