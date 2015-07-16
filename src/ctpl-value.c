@@ -517,7 +517,7 @@ ctpl_value_set_from_gvalue (CtplValue    *value,
 }
 
 static void
-free_value (GValue *value)
+free_value (void *value)
 {
   if (value) {
     g_value_unset (value);
