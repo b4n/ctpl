@@ -38,6 +38,7 @@ G_BEGIN_DECLS
  * Error domain of CtplEnviron.
  */
 #define CTPL_ENVIRON_ERROR  (ctpl_environ_error_quark ())
+#define CTPL_TYPE_ENVIRON   (ctpl_environ_get_type ())
 
 /**
  * CtplEnvironError:

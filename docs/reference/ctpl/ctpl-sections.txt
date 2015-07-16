@@ -83,6 +83,7 @@ ctpl_token_append
 ctpl_token_prepend
 <SUBSECTION Standard>
 ctpl_token_get_type
+CTPL_TYPE_TOKEN
 </SECTION>
 
 <SECTION>
@@ -139,6 +140,7 @@ ctpl_environ_add_from_string
 <SUBSECTION Standard>
 ctpl_environ_get_type
 ctpl_environ_error_quark
+CTPL_TYPE_ENVIRON
 </SECTION>
 
 <SECTION>
@@ -204,6 +206,7 @@ ctpl_value_get_held_type_name
 <SUBSECTION Standard>
 ctpl_value_error_quark
 ctpl_value_get_type
+CTPL_TYPE_VALUE
 </SECTION>
 
 <SECTION>

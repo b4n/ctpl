@@ -37,6 +37,7 @@ G_BEGIN_DECLS
  * Error domain of CtplValue.
  */
 #define CTPL_VALUE_ERROR  (ctpl_value_error_quark ())
+#define CTPL_TYPE_VALUE   (ctpl_value_get_type ())
 
 /**
  * CtplValueError:

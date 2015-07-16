@@ -31,6 +31,8 @@
 G_BEGIN_DECLS
 
 
+#define CTPL_TYPE_TOKEN (ctpl_token_get_type ())
+
 /**
  * CtplToken:
  * 
