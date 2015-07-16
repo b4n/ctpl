@@ -6,16 +6,6 @@ namespace Ctpl {
 		/* Fix buggy argument type (see .metadata) */
 		[CCode (cname = "ctpl_environ_push_gvalue_parray")]
 		public bool push_parray (string symbol, GLib.Value?[] value) throws GLib.Error;
-
-		/* These don't actually work, vapigen strips the function bodies... */
-		[CCode (cname = "_ctpl_vala_environ_push_garray")]
-		public bool push_garray (string symbol, GLib.Array<GLib.Value?> value) throws GLib.Error {
-			push_parray(symbol, value.data);
-		}
-		[CCode (cname = "_ctpl_vala_environ_push_generic_array")]
-		public bool push_generic_array (string symbol, GLib.GenericArray<GLib.Value?> value) throws GLib.Error {
-			push_parray(symbol, value.data);
-		}
 	}
 
 	namespace Lexer {}
