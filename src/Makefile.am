@@ -98,9 +98,12 @@ typelib_DATA  = $(INTROSPECTION_GIRS:.gir=.typelib)
 vapidir       = $(datadir)/vapi
 vapi_DATA     = ctpl.vapi
 
-ctpl.vapi: $(INTROSPECTION_GIRS) Ctpl-1.0.metadata Ctpl-1.0.vala
+VAPIGEN_EXTRAS  = Ctpl-1.0.metadata Ctpl-1.0.vala
+
+ctpl.vapi: $(INTROSPECTION_GIRS) $(VAPIGEN_EXTRAS)
 	$(AM_V_GEN)$(VAPIGEN) --library ctpl --pkg=gio-2.0 --metadatadir=$(srcdir) \
 		Ctpl-1.0.gir $(srcdir)/Ctpl-1.0.vala
 
+EXTRA_DIST   += $(VAPIGEN_EXTRAS)
 CLEANFILES   += $(gir_DATA) $(typelib_DATA) $(vapi_DATA)
 endif
