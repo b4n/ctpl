@@ -468,7 +468,6 @@ ctpl_value_set_from_gvalue (CtplValue    *value,
 #undef TYPE_CASE
 
     case G_TYPE_BOXED:
-      g_debug ("GValue type: %s", G_VALUE_TYPE_NAME (val));
       if (g_type_is_a (type, G_TYPE_VALUE)) {
         success = ctpl_value_set_from_gvalue (value, g_value_get_boxed (val),
                                               error);
