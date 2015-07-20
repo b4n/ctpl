@@ -58,6 +58,7 @@ typedef enum _CtplValueError
  * @CTPL_VTYPE_FLOAT: Floating point value (C's double)
  * @CTPL_VTYPE_STRING: 0-terminated string (C string)
  * @CTPL_VTYPE_ARRAY: Array of #CtplValue<!-- -->s
+ * @CTPL_VTYPE_FILTER: Filter (callback transforming a value)
  * 
  * Represents the types that a #CtplValue can hold.
  */
@@ -66,10 +67,43 @@ typedef enum _CtplValueType
   CTPL_VTYPE_INT,
   CTPL_VTYPE_FLOAT,
   CTPL_VTYPE_STRING,
-  CTPL_VTYPE_ARRAY
+  CTPL_VTYPE_ARRAY,
+  CTPL_VTYPE_FILTER
 } CtplValueType;
 
 typedef struct _CtplValue CtplValue;
+typedef struct _CtplValueFilter CtplValueFilter;
+
+/**
+ * CtplValueFilterFunc:
+ * @src: Source value to transform
+ * @dest: Destination value where to store the transformation result
+ * @args: (allow-none) (array length=n_args): An array of #CtplValue<!-- -->s
+ *                                            passed as argument to the filter
+ * @n_args: The number of arguments in @args
+ * @data: (closure): User data passed when creating the filter
+ * @error: Return location for errors
+ * 
+ * FIXME: @dest should probably be out caller-allocates but this breaks
+ *        vapigen.
+ * 
+ * Returns: %TRUE on success, %FLASE if an error was set.
+ */
+typedef gboolean (*CtplValueFilterFunc)  (const CtplValue  *src,
+                                          CtplValue        *dest,
+                                          const CtplValue **args,
+                                          gsize             n_args,
+                                          gpointer          data,
+                                          GError          **error);
+
+struct _CtplValueFilter
+{
+  /*<private>*/
+  gint                ref_count;
+  CtplValueFilterFunc func;
+  gpointer            data;
+  GDestroyNotify      destroy_data;
+};
 
 /* Public in order to be able to use statically allocated values. */
 /**
@@ -82,10 +116,11 @@ struct _CtplValue
   /*<private>*/
   gint type; /* held type */
   union {
-    glong     v_int;
-    gdouble   v_float;
-    gchar    *v_string;
-    GSList   *v_array;
+    glong             v_int;
+    gdouble           v_float;
+    gchar            *v_string;
+    GSList           *v_array;
+    CtplValueFilter  *v_filter;
   } value;
 };
 
@@ -141,6 +176,16 @@ struct _CtplValue
  */
 #define CTPL_VALUE_HOLDS_ARRAY(value) \
   (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_ARRAY))
+/**
+ * CTPL_VALUE_HOLDS_FILTER:
+ * @value: A #CtplValue
+ * 
+ * Check whether a #CtplValue holds a filter.
+ * 
+ * Returns: %TRUE if @value holds a filter, %FALSE otherwise.
+ */
+#define CTPL_VALUE_HOLDS_FILTER(value) \
+  (CTPL_VALUE_HOLDS (value, CTPL_VTYPE_FILTER))
 
 
 GType         ctpl_value_get_type             (void) G_GNUC_CONST;
@@ -161,6 +206,9 @@ CtplValue    *ctpl_value_new_arrayv           (CtplValueType type,
 CtplValue    *ctpl_value_new_array            (CtplValueType  type,
                                                gsize          count,
                                                ...) G_GNUC_NULL_TERMINATED;
+CtplValue    *ctpl_value_new_filter           (CtplValueFilterFunc  filter,
+                                               gpointer             user_data,
+                                               GDestroyNotify       destroy_data);
 void          ctpl_value_set_int              (CtplValue *value,
                                                glong      val);
 void          ctpl_value_set_float            (CtplValue *value,
@@ -208,6 +256,10 @@ void          ctpl_value_set_array_stringv    (CtplValue     *value,
 void          ctpl_value_set_array_string     (CtplValue     *value,
                                                gsize          count,
                                                ...) G_GNUC_NULL_TERMINATED;
+void          ctpl_value_set_filter           (CtplValue           *value,
+                                               CtplValueFilterFunc  filter,
+                                               gpointer             user_data,
+                                               GDestroyNotify       destroy_data);
 void          ctpl_value_array_append         (CtplValue       *value,
                                                const CtplValue *val);
 void          ctpl_value_array_prepend        (CtplValue       *value,

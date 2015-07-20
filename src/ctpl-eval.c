@@ -153,7 +153,8 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
     
     case CTPL_VTYPE_STRING:
       /* FIXME: should I use ctpl_value_to_string() or ctpl_value_convert()? */
-      if (CTPL_VALUE_HOLDS_ARRAY (rvalue)) {
+      if (CTPL_VALUE_HOLDS_ARRAY (rvalue) ||
+          CTPL_VALUE_HOLDS_FILTER (rvalue)) {
         g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
                      _("Operator '+' cannot be used with '%s' and '%s' types"),
                      ctpl_value_get_held_type_name (lvalue),
@@ -179,6 +180,14 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
         ctpl_value_set_string (value, tmp);
         g_free (tmp);
       }
+      break;
+    
+    case CTPL_VTYPE_FILTER:
+      g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                   _("Operator '+' cannot be used with '%s' and '%s' types"),
+                   ctpl_value_get_held_type_name (lvalue),
+                   ctpl_value_get_held_type_name (rvalue));
+      rv = FALSE;
       break;
   }
   
@@ -256,7 +265,14 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
   #define L_OR_R_IS(type) ((lvtype) == type || (rvtype) == type)
   
   /* first, if types are valid for a multiplication */
-  if (L_OR_R_IS (CTPL_VTYPE_ARRAY)) {
+  if (L_OR_R_IS (CTPL_VTYPE_FILTER)) {
+    g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                 _("Invalid operands for operator '*' (have '%s' and '%s'): "
+                   "cannot multiply filters."),
+                 ctpl_value_get_held_type_name (lvalue),
+                 ctpl_value_get_held_type_name (rvalue));
+    rv = FALSE;
+  } else if (L_OR_R_IS (CTPL_VTYPE_ARRAY)) {
     /* cannot multiply arrays */
     g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
                  _("Invalid operands for operator '*' (have '%s' and '%s'): "
@@ -344,6 +360,10 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
         }
         break;
       }
+      
+      case CTPL_VTYPE_FILTER:
+        g_assert_not_reached ();
+        break;
     }
   }
   
@@ -497,6 +517,16 @@ ctpl_eval_operator_cmp (CtplValue     *lvalue,
         g_free (tmp);
       }
       break;
+    
+    case CTPL_VTYPE_FILTER:
+      g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                   _("Invalid operands for operator '%s' "
+                     "(have '%s' and '%s')"),
+                   ctpl_operator_to_string (op),
+                   ctpl_value_get_held_type_name (lvalue),
+                   ctpl_value_get_held_type_name (rvalue));
+      rv = FALSE;
+      break;
   }
   
   return rv;
@@ -600,6 +630,28 @@ ctpl_eval_operator_modulo (CtplValue *lvalue,
   return rv;
 }
 
+/* Tries to apply a filter */
+static gboolean
+ctpl_eval_operator_filter (CtplValue *lvalue,
+                           CtplValue *rvalue,
+                           CtplValue *value,
+                           GError   **error)
+{
+  gboolean rv = TRUE;
+  
+  if (! CTPL_VALUE_HOLDS_FILTER (rvalue)) {
+    g_set_error (error, CTPL_EVAL_ERROR, CTPL_EVAL_ERROR_INVALID_OPERAND,
+                 _("Operator '|' requires a filter on its right, not '%s'"),
+                 ctpl_value_get_held_type_name (rvalue));
+    rv = FALSE;
+  } else {
+    rv = rvalue->value.v_filter->func (lvalue, value, NULL, 0,
+                                       rvalue->value.v_filter->data, error);
+  }
+  
+  return rv;
+}
+
 /* dispatches evaluation to specific functions. */
 static gboolean
 ctpl_eval_operator_internal (CtplOperator operator,
@@ -645,6 +697,10 @@ ctpl_eval_operator_internal (CtplOperator operator,
     case CTPL_OPERATOR_AND:
     case CTPL_OPERATOR_OR:
       rv = ctpl_eval_operator_and_or (lvalue, rvalue, operator, value, error);
+      break;
+    
+    case CTPL_OPERATOR_PIPE:
+      rv = ctpl_eval_operator_filter (lvalue, rvalue, value, error);
       break;
     
     case CTPL_OPERATOR_NONE:
@@ -832,6 +888,10 @@ ctpl_eval_bool_value (const CtplValue *value)
       eval = (string && *string != 0);
       break;
     }
+    
+    case CTPL_VTYPE_FILTER:
+      eval = value->value.v_filter->func != NULL;
+      break;
   }
   
   return eval;

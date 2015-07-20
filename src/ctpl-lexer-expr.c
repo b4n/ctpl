@@ -81,6 +81,30 @@
  *     </listitem>
  *   </varlistentry>
  *   <varlistentry>
+ *     <term>Filter operator</term>
+ *     <listitem>
+ *       <para>
+ *         filter (<code>|</code>)
+ *       </para>
+ *       <para>
+ *         The filter operator is a binary operator that can take any operand on
+ *         its left, but only a filter on its right.  A filter is an expression
+ *         expanding to function-like value that can process the left operand of
+ *         the filter operator, and expand to any value.
+ *         See ctpl_value_set_filter().
+ *       </para>
+ *       <para>
+ *         Filters cannot be defined inline, and can then only come form the
+ *         environment.  In practice, this means that the right operand (the
+ *         filter) will always ultimately be a reference to an environment
+ *         value, either directly or through an expression expansion.
+ *       </para>
+ *       <para>
+ *         The filter operator has a lower priority than other operators.
+ *       </para>
+ *     </listitem>
+ *   </varlistentry>
+ *   <varlistentry>
  *     <term>Unary operators</term>
  *     <listitem>
  *       <para>
@@ -132,9 +156,15 @@
  *     array[array[idx + 1]] * array[idx]
  *   </programlisting>
  * </example>
+ * <example>
+ *   <title>An expression with a filter</title>
+ *   <programlisting>
+ *     "hello world" | uppercase
+ *   </programlisting>
+ * </example>
  * Of course, the latter examples supposes that the environment contains the
- * variables @foo, @bar, @array and @idx, and that they contains appropriate
- * values for latter evaluation.
+ * variables @foo, @bar, @array, @idx and @uppercase, and that they contains
+ * appropriate values for latter evaluation.
  */
 
 
@@ -259,6 +289,7 @@ static const struct {
   { CTPL_OPERATOR_MUL,    20, "*",  1 },
   { CTPL_OPERATOR_NEQ,    30, "!=", 2 },
   { CTPL_OPERATOR_OR,     30, "||", 2 },
+  { CTPL_OPERATOR_PIPE,    0, "|",  1 },
   { CTPL_OPERATOR_PLUS,   10, "+",  1 },
   { CTPL_OPERATOR_SUPEQ,  30, ">=", 2 },
   { CTPL_OPERATOR_SUP,    30, ">",  1 },

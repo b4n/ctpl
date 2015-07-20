@@ -86,6 +86,8 @@
 
 static void   ctpl_value_set_array_internal   (CtplValue     *value,
                                                const GSList  *values);
+static void   ctpl_value_set_filter_internal  (CtplValue        *value,
+                                               CtplValueFilter  *filter);
 
 
 G_DEFINE_BOXED_TYPE (CtplValue,
@@ -176,6 +178,10 @@ ctpl_value_copy (const CtplValue *src_value,
       ctpl_value_set_array_internal (dst_value,
                                      ctpl_value_get_array (src_value));
       break;
+    
+    case CTPL_VTYPE_FILTER:
+      ctpl_value_set_filter_internal (dst_value, src_value->value.v_filter);
+      break;
   }
 }
 
@@ -228,6 +234,16 @@ ctpl_value_free_value (CtplValue *value)
         value->value.v_array = NULL;
       break;
     }
+    
+    case CTPL_VTYPE_FILTER:
+      if (value->value.v_filter && (--value->value.v_filter->ref_count) < 1) {
+        if (value->value.v_filter->destroy_data) {
+          value->value.v_filter->destroy_data (value->value.v_filter->data);
+        }
+        g_slice_free1 (sizeof *value->value.v_filter, value->value.v_filter);
+      }
+      value->value.v_filter = NULL;
+      break;
   }
 }
 
@@ -370,6 +386,31 @@ ctpl_value_new_array (CtplValueType type,
   va_start (ap, count);
   value = ctpl_value_new_arrayv (type, count, ap);
   va_end (ap);
+  
+  return value;
+}
+
+/**
+ * ctpl_value_new_filter:
+ * @filter: (scope notified) (closure user_data) (destroy destroy_data):
+ *          A #CtplValueFilterFunc
+ * @user_data: Data to pass to @filter
+ * @destroy_data: Callback to destroy @user_data
+ * 
+ * Creates a new #CtplValue and sets its value to the given filter.
+ * See ctpl_value_new() and ctpl_value_set_filter().
+ * 
+ * Returns: A newly allocated #CtplValue holding the filter.
+ */
+CtplValue *
+ctpl_value_new_filter (CtplValueFilterFunc  filter,
+                       gpointer             user_data,
+                       GDestroyNotify       destroy_data)
+{
+  CtplValue *value;
+  
+  value = ctpl_value_new ();
+  ctpl_value_set_filter (value, filter, user_data, destroy_data);
   
   return value;
 }
@@ -750,7 +791,12 @@ ctpl_value_set_arrayv (CtplValue     *value,
     }
     
     case CTPL_VTYPE_ARRAY: {
-      g_critical ("Cannot build arrays of arrays this way"); 
+      g_critical ("Cannot build arrays of arrays this way");
+      break;
+    }
+    
+    case CTPL_VTYPE_FILTER: {
+      g_critical ("Cannot build arrays of filters this way");
       break;
     }
   }
@@ -910,6 +956,54 @@ ctpl_value_set_array_string (CtplValue *value,
   va_start (ap, count);
   ctpl_value_set_array_stringv (value, count, ap);
   va_end (ap);
+}
+
+static void
+ctpl_value_set_filter_internal (CtplValue        *value,
+                                CtplValueFilter  *filter)
+{
+  filter->ref_count++;
+  ctpl_value_free_value (value);
+  value->type = CTPL_VTYPE_FILTER;
+  value->value.v_filter = filter;
+}
+
+/**
+ * ctpl_value_set_filter:
+ * @value: A #CtplValue
+ * @filter: (scope notified) (closure user_data) (destroy destroy_data):
+ *          A #CtplValueFilterFunc
+ * @user_data: Data to pass to @filter
+ * @destroy_data: Callback to destroy @user_data
+ * 
+ * Sets the value of a #CtplValue from the given filter.
+ * 
+ * Filters can be called using the `|` operator.  The @filter callback receive
+ * the left operand and is responsible to transform it in whichever manner it
+ * wants, to produce a new value.  Filters can fail, in which case parsing
+ * will fail accordingly.
+ * 
+ * A filter *must* always set an error *and* return %FALSE on error.
+ * 
+ * See ctpl_value_new_filter().
+ */
+void
+ctpl_value_set_filter (CtplValue           *value,
+                       CtplValueFilterFunc  filter,
+                       gpointer             user_data,
+                       GDestroyNotify       destroy_data)
+{
+  CtplValueFilter *f;
+  
+  g_return_if_fail (filter != NULL);
+  
+  f = g_slice_alloc (sizeof *f);
+  f->ref_count    = 0;
+  f->func         = filter;
+  f->data         = user_data;
+  f->destroy_data = destroy_data;
+  
+  ctpl_value_set_filter_internal (value, f);
 }
 
 /**
@@ -1129,6 +1223,9 @@ ctpl_value_type_get_name (CtplValueType type)
       /* TODO: return the array type? (e.g. "array of int",
        * "array of strings and floats", etc?) */
       return _("array");
+    
+    case CTPL_VTYPE_FILTER:
+      return _("filter");
   }
   
   return "???";
@@ -1396,6 +1493,10 @@ ctpl_value_to_string (const CtplValue *value)
     case CTPL_VTYPE_STRING:
       val = g_strdup (value->value.v_string);
       break;
+    
+    case CTPL_VTYPE_FILTER:
+      g_critical ("Cannot convert a filter to a string");
+      break;
   }
   
   return val;
@@ -1533,6 +1634,10 @@ ctpl_value_convert (CtplValue     *value,
         rv = (val != NULL);
         break;
       }
+      
+      case CTPL_VTYPE_FILTER:
+        rv = FALSE;
+        break;
     }
   }
   

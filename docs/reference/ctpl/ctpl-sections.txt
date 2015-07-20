@@ -150,11 +150,13 @@ CTPL_VALUE_ERROR
 CtplValueError
 CtplValueType
 CtplValue
+CtplValueFilterFunc
 CTPL_VALUE_HOLDS
 CTPL_VALUE_HOLDS_INT
 CTPL_VALUE_HOLDS_FLOAT
 CTPL_VALUE_HOLDS_STRING
 CTPL_VALUE_HOLDS_ARRAY
+CTPL_VALUE_HOLDS_FILTER
 ctpl_value_init
 ctpl_value_new
 ctpl_value_copy
@@ -166,6 +168,7 @@ ctpl_value_new_float
 ctpl_value_new_string
 ctpl_value_new_arrayv
 ctpl_value_new_array
+ctpl_value_new_filter
 ctpl_value_set_int
 ctpl_value_set_float
 ctpl_value_set_string
@@ -181,6 +184,7 @@ ctpl_value_set_array_string
 ctpl_value_set_from_gvalue
 ctpl_value_set_from_gvalue_array
 ctpl_value_set_from_gvalue_parray
+ctpl_value_set_filter
 ctpl_value_array_append
 ctpl_value_array_prepend
 ctpl_value_array_append_int
@@ -204,6 +208,8 @@ ctpl_value_to_gvalue
 ctpl_value_convert
 ctpl_value_type_get_name
 ctpl_value_get_held_type_name
+<SUBSECTION Private>
+CtplValueFilter
 <SUBSECTION Standard>
 ctpl_value_error_quark
 ctpl_value_get_type
