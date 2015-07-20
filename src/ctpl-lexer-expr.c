@@ -289,7 +289,7 @@ static const struct {
   { CTPL_OPERATOR_MUL,    20, "*",  1 },
   { CTPL_OPERATOR_NEQ,    30, "!=", 2 },
   { CTPL_OPERATOR_OR,     30, "||", 2 },
-  { CTPL_OPERATOR_PIPE,    0, "|",  1 },
+  { CTPL_OPERATOR_PIPE,   10, "|",  1 },
   { CTPL_OPERATOR_PLUS,   10, "+",  1 },
   { CTPL_OPERATOR_SUPEQ,  30, ">=", 2 },
   { CTPL_OPERATOR_SUP,    30, ">",  1 },
