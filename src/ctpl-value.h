@@ -165,6 +165,8 @@ void          ctpl_value_set_int              (CtplValue *value,
                                                glong      val);
 void          ctpl_value_set_float            (CtplValue *value,
                                                gdouble    val);
+void          ctpl_value_take_string          (CtplValue   *value,
+                                               gchar       *val);
 void          ctpl_value_set_string           (CtplValue   *value,
                                                const gchar *val);
 gboolean      ctpl_value_set_from_gvalue      (CtplValue     *value,

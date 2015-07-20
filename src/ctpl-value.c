@@ -407,6 +407,23 @@ ctpl_value_set_float (CtplValue *value,
 }
 
 /**
+ * ctpl_value_take_string:
+ * @value: A #CtplValue
+ * @val: A string
+ * 
+ * Sets the value of a #CtplValue to the given string.
+ * The string is not copied, and ownership is assumed.
+ */
+void
+ctpl_value_take_string (CtplValue  *value,
+                        gchar      *val)
+{
+  ctpl_value_free_value (value);
+  value->type = CTPL_VTYPE_STRING;
+  value->value.v_string = val;
+}
+
+/**
  * ctpl_value_set_string:
  * @value: A #CtplValue
  * @val: A string
@@ -418,12 +435,7 @@ void
 ctpl_value_set_string (CtplValue   *value,
                        const gchar *val)
 {
-  gchar *val_dup;
-  
-  val_dup = g_strdup (val);
-  ctpl_value_free_value (value);
-  value->type = CTPL_VTYPE_STRING;
-  value->value.v_string = val_dup;
+  ctpl_value_take_string (value, g_strdup (val));
 }
 
 /**
@@ -1517,9 +1529,8 @@ ctpl_value_convert (CtplValue     *value,
         gchar *val;
         
         val = ctpl_value_to_string (value);
-        ctpl_value_set_string (value, val);
+        ctpl_value_take_string (value, val);
         rv = (val != NULL);
-        g_free (val);
         break;
       }
     }

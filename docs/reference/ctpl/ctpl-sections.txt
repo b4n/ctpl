@@ -169,6 +169,7 @@ ctpl_value_new_array
 ctpl_value_set_int
 ctpl_value_set_float
 ctpl_value_set_string
+ctpl_value_take_string
 ctpl_value_set_arrayv
 ctpl_value_set_array
 ctpl_value_set_array_intv
