@@ -13,15 +13,20 @@
 
 /* parses a string with CTPL, returns the output, or %NULL on failure */
 gchar *
-ctpltest_parse_string (const gchar  *string,
-                       const gchar  *env_string,
-                       GError      **error)
+ctpltest_parse_string_full (const gchar *string,
+                            CtplEnviron *env_,
+                            const gchar *env_string,
+                            GError     **error)
 {
   CtplEnviron *env;
   CtplToken   *tree;
   gchar       *output = NULL;
   
-  env = ctpl_environ_new ();
+  if (env_) {
+    env = ctpl_environ_ref (env_);
+  } else {
+    env = ctpl_environ_new ();
+  }
   if (ctpl_environ_add_from_string (env, env_string, error)) {
     tree = ctpl_lexer_lex_string (string, error);
     if (tree) {
@@ -53,4 +58,12 @@ ctpltest_parse_string (const gchar  *string,
   ctpl_environ_unref (env);
   
   return output;
+}
+
+gchar *
+ctpltest_parse_string (const gchar  *string,
+                       const gchar  *env_string,
+                       GError      **error)
+{
+  return ctpltest_parse_string_full (string, NULL, env_string, error);
 }

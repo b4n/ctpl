@@ -8,6 +8,10 @@
 G_BEGIN_DECLS
 
 
+gchar          *ctpltest_parse_string_full    (const gchar *string,
+                                               CtplEnviron *env_,
+                                               const gchar *env_string,
+                                               GError     **error);
 gchar          *ctpltest_parse_string         (const gchar  *string,
                                                const gchar  *env_string,
                                                GError      **error);

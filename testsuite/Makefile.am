@@ -8,6 +8,7 @@ endif
 
 
 EXTRA_DIST  = success				\
+              filters				\
               fail				\
               environ
 

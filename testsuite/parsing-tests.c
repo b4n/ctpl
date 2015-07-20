@@ -77,6 +77,124 @@ show_diff (const gchar *a_,
   g_strfreev (b);
 }
 
+/* define some filters */
+
+static gboolean
+filter_urlencode (const CtplValue  *src,
+                  CtplValue        *dest,
+                  const CtplValue **args,
+                  gsize             n_args,
+                  gpointer          data,
+                  GError          **error)
+{
+  gchar *out;
+  
+  if (CTPL_VALUE_HOLDS_STRING (src)) {
+    out = g_uri_escape_string (ctpl_value_get_string (src), NULL, TRUE);
+  } else {
+    gchar *str = ctpl_value_to_string (src);
+    out = g_uri_escape_string (str, NULL, TRUE);
+    g_free (str);
+  }
+  ctpl_value_take_string (dest, out);
+  
+  return TRUE;
+}
+
+static gboolean
+filter_xmlentities (const CtplValue  *src,
+                    CtplValue        *dest,
+                    const CtplValue **args,
+                    gsize             n_args,
+                    gpointer          data,
+                    GError          **error)
+{
+  gchar *out;
+  
+  if (CTPL_VALUE_HOLDS_STRING (src)) {
+    out = g_markup_escape_text (ctpl_value_get_string (src), -1);
+  } else {
+    gchar *str = ctpl_value_to_string (src);
+    out = g_markup_escape_text (str, -1);
+    g_free (str);
+  }
+  ctpl_value_take_string (dest, out);
+  
+  return TRUE;
+}
+
+static gboolean
+filter_base64encode (const CtplValue  *src,
+                     CtplValue        *dest,
+                     const CtplValue **args,
+                     gsize             n_args,
+                     gpointer          data,
+                     GError          **error)
+{
+  gchar *out;
+  
+  if (CTPL_VALUE_HOLDS_STRING (src)) {
+    const gchar *str = ctpl_value_get_string (src);
+    out = g_base64_encode ((guchar *) str, strlen (str));
+  } else {
+    gchar *str = ctpl_value_to_string (src);
+    out = g_base64_encode ((guchar *) str, strlen (str));
+    g_free (str);
+  }
+  ctpl_value_take_string (dest, out);
+  
+  return TRUE;
+}
+
+static gboolean
+filter_base64decode (const CtplValue  *src,
+                     CtplValue        *dest,
+                     const CtplValue **args,
+                     gsize             n_args,
+                     gpointer          data,
+                     GError          **error)
+{
+  gchar *out;
+  
+  if (CTPL_VALUE_HOLDS_STRING (src)) {
+    const gchar *str = ctpl_value_get_string (src);
+    gsize len;
+    out = (gchar *) g_base64_decode (str, &len);
+  } else {
+    gchar *str = ctpl_value_to_string (src);
+    gsize len;
+    out = (gchar *) g_base64_decode_inplace (str, &len);
+    str[len] = 0;
+  }
+  ctpl_value_take_string (dest, out);
+  
+  return TRUE;
+}
+
+static CtplEnviron *
+create_default_env (void)
+{
+  CtplEnviron *env = ctpl_environ_new ();
+  
+#define INSTALL_FILTER(env, name)                                             \
+  G_STMT_START {                                                              \
+    CtplValue val_;                                                           \
+    ctpl_value_init (&val_);                                                  \
+    ctpl_value_set_filter (&val_, filter_##name, NULL, NULL);                 \
+    ctpl_environ_push (env, #name, &val_);                                    \
+    ctpl_value_free_value (&val_);                                            \
+  } G_STMT_END
+  
+  INSTALL_FILTER (env, xmlentities);
+  INSTALL_FILTER (env, urlencode);
+  INSTALL_FILTER (env, base64encode);
+  INSTALL_FILTER (env, base64decode);
+  
+#undef INSTALL_FILTER
+  
+  return env;
+}
+
 /* parses @string and check the result against @expected_output */
 static gboolean
 parse_check (const gchar *string,
@@ -84,10 +202,11 @@ parse_check (const gchar *string,
              const gchar *expected_output, /* may be NULL */
              GError     **error)
 {
-  gchar    *output;
-  gboolean  success = FALSE;
+  gchar        *output;
+  gboolean      success = FALSE;
+  CtplEnviron  *env     = create_default_env ();
   
-  output = ctpltest_parse_string (string, env_str, error);
+  output = ctpltest_parse_string_full (string, env, env_str, error);
   if (output) {
     if (expected_output && strcmp (output, expected_output) != 0) {
       g_set_error (error, 0, 0,
@@ -98,6 +217,7 @@ parse_check (const gchar *string,
     }
     g_free (output);
   }
+  ctpl_environ_unref (env);
   
   return success;
 }
@@ -230,6 +350,8 @@ main (int     argc,
   get_file_content (path, &env_str, FALSE);
   
   setptr (path, g_build_filename (srcdir, "success", NULL));
+  traverse_dir (path, success_tests_item, env_str);
+  setptr (path, g_build_filename (srcdir, "filters", NULL));
   traverse_dir (path, success_tests_item, env_str);
   setptr (path, g_build_filename (srcdir, "fail", NULL));
   traverse_dir (path, fail_tests_item, env_str);
