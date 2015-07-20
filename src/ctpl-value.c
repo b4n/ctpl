@@ -391,6 +391,25 @@ ctpl_value_new_array (CtplValueType type,
 }
 
 /**
+ * ctpl_value_new_empty_array: (rename-to ctpl_value_new_array)
+ * 
+ * Creates a new #CtplValue holding an empty array.
+ * 
+ * Returns: A newly allocated #CtplValue.
+ */
+CtplValue *
+ctpl_value_new_empty_array (void)
+{
+  CtplValue *value;
+  
+  value = ctpl_value_new ();
+  value->type = CTPL_VTYPE_ARRAY;
+  value->value.v_array = NULL;
+  
+  return value;
+}
+
+/**
  * ctpl_value_new_filter:
  * @filter: (scope notified) (closure user_data) (destroy destroy_data):
  *          A #CtplValueFilterFunc

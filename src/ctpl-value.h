@@ -206,6 +206,7 @@ CtplValue    *ctpl_value_new_arrayv           (CtplValueType type,
 CtplValue    *ctpl_value_new_array            (CtplValueType  type,
                                                gsize          count,
                                                ...) G_GNUC_NULL_TERMINATED;
+CtplValue    *ctpl_value_new_empty_array      (void);
 CtplValue    *ctpl_value_new_filter           (CtplValueFilterFunc  filter,
                                                gpointer             user_data,
                                                GDestroyNotify       destroy_data);
