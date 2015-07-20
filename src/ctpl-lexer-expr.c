@@ -223,11 +223,10 @@ read_string_literal (CtplInputStream *stream,
     CtplValue value;
     
     ctpl_value_init (&value);
-    ctpl_value_set_string (&value, string);
+    ctpl_value_take_string (&value, string);
     token = ctpl_token_expr_new_value (&value);
     ctpl_value_free_value (&value);
   }
-  g_free (string);
   
   return token;
 }

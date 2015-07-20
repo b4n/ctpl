@@ -176,8 +176,7 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
           tmp = g_strconcat (ctpl_value_get_string (lvalue),
                              ctpl_value_get_string (rvalue), NULL);
         }
-        ctpl_value_set_string (value, tmp);
-        g_free (tmp);
+        ctpl_value_take_string (value, tmp);
       }
       break;
   }
@@ -338,8 +337,7 @@ ctpl_eval_operator_mul (CtplValue *lvalue,
           if (! str) {
             rv = FALSE;
           } else {
-            ctpl_value_set_string (value, str);
-            g_free (str);
+            ctpl_value_take_string (value, str);
           }
         }
         break;
