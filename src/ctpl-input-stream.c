@@ -874,7 +874,7 @@ ctpl_input_stream_peek_symbol_full (CtplInputStream *stream,
  * 
  * Returns: The number of skipped bytes, or -1 on error.
  * 
- * Since: 
+ * Since: 0.2
  */
 gssize
 ctpl_input_stream_skip (CtplInputStream *stream,
@@ -1550,7 +1550,7 @@ ctpl_input_stream_read_int (CtplInputStream *stream,
  * 
  * Returns: The read character, or %CTPL_EOF at stream's end or on error
  * 
- * Since: 
+ * Since: 0.2
  */
 #undef ctpl_input_stream_get_c
 gchar
