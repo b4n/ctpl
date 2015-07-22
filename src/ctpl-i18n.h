@@ -36,6 +36,7 @@ G_BEGIN_DECLS
 #define _(String)   (ctpl_gettext (String))
 
 
+G_GNUC_INTERNAL
 const gchar  *ctpl_gettext  (const gchar *msg) G_GNUC_FORMAT(1);
 
 
