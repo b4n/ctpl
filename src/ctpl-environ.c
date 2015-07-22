@@ -301,8 +301,10 @@ ctpl_environ_push_string (CtplEnviron  *env,
   CtplValue val;
   
   ctpl_value_init (&val);
-  ctpl_value_set_string (&val, value);
+  /* to avoid double copy, make the value take it, but prevent freeing below */
+  ctpl_value_take_string (&val, (gchar *) value);
   ctpl_environ_push (env, symbol, &val);
+  val.value.v_string = NULL;
   ctpl_value_free_value (&val);
 }
 
