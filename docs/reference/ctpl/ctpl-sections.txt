@@ -185,41 +185,6 @@ ctpl_value_get_held_type_name
 </SECTION>
 
 <SECTION>
-<TITLE>CtplStack</TITLE>
-<FILE>stack</FILE>
-<SUBSECTION Private>
-CtplStack
-ctpl_stack_new
-ctpl_stack_free
-ctpl_stack_push
-ctpl_stack_push_ref
-ctpl_stack_pop
-ctpl_stack_peek
-ctpl_stack_is_empty
-</SECTION>
-
-<SECTION>
-<TITLE>Math utilities</TITLE>
-<FILE>mathutils</FILE>
-<SUBSECTION Private>
-CTPL_MATH_FLOAT_EQ
-ctpl_math_dtostr
-ctpl_math_float_to_string
-ctpl_math_int_to_string
-ctpl_math_string_to_float
-ctpl_math_string_to_int
-</SECTION>
-
-<SECTION>
-<TITLE>Translation utilities</TITLE>
-<FILE>i18n</FILE>
-<SUBSECTION Private>
-_
-N_
-ctpl_gettext
-</SECTION>
-
-<SECTION>
 <TITLE>CtplInputStream</TITLE>
 <FILE>input-stream</FILE>
 CTPL_EOF

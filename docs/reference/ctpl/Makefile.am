@@ -54,7 +54,12 @@ CFILE_GLOB=$(top_srcdir)/src/*.c
 
 # Header files to ignore when scanning.
 # e.g. IGNORE_HFILES=gtkdebug.h gtkintl.h
-IGNORE_HFILES=ctpl.h ctpl-lexer-private.h ctpl-token-private.h
+IGNORE_HFILES=ctpl.h \
+              ctpl-i18n.h \
+              ctpl-lexer-private.h \
+              ctpl-mathutils.h \
+              ctpl-stack.h \
+              ctpl-token-private.h
 IGNORE_CFILES=ctpl.c
 
 # Images to copy into HTML directory.
