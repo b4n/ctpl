@@ -547,9 +547,17 @@ hex_number  = 0xffe2; # 65506
     <title>API Index</title>
     <xi:include href="xml/api-index-full.xml"><xi:fallback /></xi:include>
   </index>
-  <index id="api-index-deprecated">
+  <index id="api-index-deprecated" role="deprecated">
     <title>Deprecated API Index</title>
     <xi:include href="xml/api-index-deprecated.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-0-2" role="0.2">
+    <title>Index of new symbols in 0.2</title>
+    <xi:include href="xml/api-index-0.2.xml"><xi:fallback /></xi:include>
+  </index>
+  <index id="api-index-0-3" role="0.3">
+    <title>Index of new symbols in 0.3</title>
+    <xi:include href="xml/api-index-0.3.xml"><xi:fallback /></xi:include>
   </index>
 
   <xi:include href="xml/annotation-glossary.xml"><xi:fallback /></xi:include>
