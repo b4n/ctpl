@@ -32,7 +32,7 @@ echo '*************************' >&2
 for f in $(ls "${srcdir}/"success/* | grep -v -e '-output$'); do
   success=false
   output="$f-output"
-  output_real="$(tempfile)"
+  output_real="$(mktemp)"
   
   echo "*** success test '$f'"
   $TESTPRG $ARGS "$f" > "$output_real" && success=true
