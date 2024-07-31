@@ -107,7 +107,6 @@ dump_g_memory_output_stream (GMemoryOutputStream *stream,
 {
   gchar  *buf;
   gsize   buf_size;
-  gsize   i;
   
   buf = g_memory_output_stream_get_data (stream);
 #if GLIB_CHECK_VERSION(2,18,0)

@@ -208,7 +208,6 @@ main (int     argc,
   const gchar *srcdir;
   gchar       *env_str;
   gchar       *path = NULL;
-  GError      *err = NULL;
   
   /* for autotools integration */
   if (! (srcdir = g_getenv ("srcdir"))) {
