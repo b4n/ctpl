@@ -157,7 +157,9 @@ main (int    argc,
   int               rv = 1;
   CtplInputStream  *stream;
   
+#if ! GLIB_CHECK_VERSION (2, 36, 0)
   g_type_init ();
+#endif
   
   # if 1
   if (argc >= 2) {

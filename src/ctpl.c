@@ -413,7 +413,9 @@ int main (int     argc,
   
   setup_i18n ();
   
+#if ! GLIB_CHECK_VERSION (2, 36, 0)
   g_type_init ();
+#endif
   
   if (! parse_options (&argc, &argv, &error)) {
     printerr (_("Option parsing failed: %s\n"), error->message);

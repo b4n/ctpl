@@ -161,7 +161,9 @@ test_2 (void)
 int
 main (void)
 {
+#if ! GLIB_CHECK_VERSION (2, 36, 0)
   g_type_init ();
+#endif
   
   return (test_1 () +
           test_2 ());

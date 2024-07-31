@@ -43,7 +43,9 @@ main (int     argc,
   int i   = 0;
   int ret = 0;
   
+#if ! GLIB_CHECK_VERSION (2, 36, 0)
   g_type_init ();
+#endif
   
   for (i = 1; i < argc; i++) {
     gchar    *endptr;

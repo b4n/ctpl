@@ -222,7 +222,9 @@ main (int     argc,
     return 1;
   }
   
+#if ! GLIB_CHECK_VERSION (2, 36, 0)
   g_type_init ();
+#endif
   
   #define setptr(ptr, val) (ptr = (g_free (ptr), val))
   
