@@ -26,6 +26,7 @@
 #include "ctpl-token-private.h" /* for ctpl_token*_dump() */
 
 
+#if 0
 static void
 _print_value (const CtplValue *value,
               size_t           nesting_level)
@@ -59,11 +60,13 @@ _print_value (const CtplValue *value,
     }
   }
 }
+
 static void
 print_value (const CtplValue *value)
 {
   _print_value (value, 0);
 }
+#endif
 
 static CtplEnviron *
 build_env (void)
