@@ -1,3 +1,14 @@
+# 0.3.5 (31/07/2024)
+
+  The version 0.3.5 is a bugfix and enhancement release for the 0.3 branch.
+  
+  ## Changes summary
+  
+  * Added ctpl_value_take_string() to reduce memory copies, and used it
+    internally where appropriate;
+  * Fixed build with GCC 14;
+
+
 # 0.3.4 (03/02/2015)
 
   The version 0.3.4 is a bugfix and enhancement release for the 0.3 branch.
