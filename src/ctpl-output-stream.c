@@ -64,7 +64,7 @@ struct _CtplOutputStream
 CtplOutputStream *
 ctpl_output_stream_new (GOutputStream *stream)
 {
-  return g_object_ref (stream);
+  return (CtplOutputStream *) g_object_ref (stream);
 }
 
 /**
