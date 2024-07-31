@@ -596,8 +596,6 @@ ctpl_input_stream_peek (CtplInputStream *stream,
                         gsize            count,
                         GError         **error)
 {
-  gssize read_size;
-  
   if (G_UNLIKELY (count > G_MAXSSIZE)) {
     g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                  "Too large count value passed to %s: %"G_GSIZE_FORMAT,
@@ -607,17 +605,18 @@ ctpl_input_stream_peek (CtplInputStream *stream,
   
   if ((stream->buf_size - stream->buf_pos) < count &&
       ! resize_cache (stream, stream->buf_pos + count, error)) {
-    read_size = -1;
+    return -1;
   } else {
     /* if the buffer is smaller that the request it is at EOF */
-    read_size = stream->buf_size - stream->buf_pos;
-    if ((gssize)count < read_size) {
-      read_size = (gssize)count;
+    gsize read_size = stream->buf_size - stream->buf_pos;
+
+    if (count < read_size) {
+      read_size = count;
     }
-    memcpy (buffer, &stream->buffer[stream->buf_pos], (gsize)read_size);
+    memcpy (buffer, &stream->buffer[stream->buf_pos], read_size);
+    
+    return (gssize) read_size;
   }
-  
-  return read_size;
 }
 
 /**

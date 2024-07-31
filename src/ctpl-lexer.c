@@ -439,7 +439,7 @@ ctpl_lexer_read_token_data (CtplInputStream *stream,
                                    c);
     } else if (gstring->len > 0) {
       /* only create non-empty tokens */
-      token = ctpl_token_new_data (gstring->str, gstring->len);
+      token = ctpl_token_new_data (gstring->str, (gssize) gstring->len);
     }
   }
   g_string_free (gstring, TRUE);
