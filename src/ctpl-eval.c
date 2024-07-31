@@ -141,8 +141,8 @@ ctpl_eval_operator_plus (CtplValue *lvalue,
                                    ctpl_value_get_int (rvalue));
         break;
       }
-      /* WARNING: conditional break to fall back to floating conversion if one
-       * operand is float */
+      /* fall back to floating conversion if one operand is float */
+      /* Fallthrough */
     case CTPL_VTYPE_FLOAT:
       rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT, "+", error);
       if (rv) {
@@ -453,8 +453,8 @@ ctpl_eval_operator_cmp (CtplValue     *lvalue,
         }
         break;
       }
-      /* WARNING: conditional break to fall back to floating conversion if one
-       * operand is float */
+      /* fall back to floating conversion if one operand is float */
+      /* Fallthrough */
     case CTPL_VTYPE_FLOAT:
       rv = ensure_operands_type (lvalue, rvalue, CTPL_VTYPE_FLOAT,
                                  ctpl_operator_to_string (op), error);

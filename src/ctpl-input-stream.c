@@ -1163,6 +1163,7 @@ ctpl_input_stream_read_number_internal (CtplInputStream *stream,
             in_number = FALSE;
             break;
           }
+          /* Fallthrough */
         case '2':
         case '3':
         case '4':
